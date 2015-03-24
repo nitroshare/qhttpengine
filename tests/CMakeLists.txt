@@ -1,3 +1,7 @@
+find_package(Qt5Test 5.1 REQUIRED)
+
+enable_testing()
+
 set(TESTS
     TestQHttpRequest
     TestQHttpResponse
