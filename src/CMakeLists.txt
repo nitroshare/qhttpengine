@@ -29,7 +29,8 @@ install(TARGETS qhttpengine
 )
 
 install(FILES ${INCLUDE}
-    DESTINATION include/qhttpengine)
+    DESTINATION include/qhttpengine
+)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.pc"
     DESTINATION lib/pkgconfig
 )
