@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.1.0)
 project(qhttpengine VERSION 0.1.0 LANGUAGES CXX)
 
 set(PROJECT_NAME "QHttpEngine")
@@ -13,5 +13,6 @@ set(CMAKE_AUTOMOC ON)
 
 enable_testing()
 
+add_subdirectory(doc)
 add_subdirectory(src)
 add_subdirectory(tests)
