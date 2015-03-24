@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.1.0)
-project(qhttpengine VERSION 0.1.0 LANGUAGES CXX)
+cmake_minimum_required(VERSION 2.8.9)
+project(qhttpengine LANGUAGES CXX)
 
 option(BUILD_DOC "Build Doxygen documentation" OFF)
 option(BUILD_TESTS "Build the test suite" OFF)
@@ -7,6 +7,11 @@ option(BUILD_TESTS "Build the test suite" OFF)
 set(PROJECT_NAME "QHttpEngine")
 set(PROJECT_DESCRIPTION "Simple and secure HTTP server for Qt applications")
 set(PROJECT_URL "https://github.com/nitroshare/qhttpengine")
+
+set(PROJECT_VERSION_MAJOR 0)
+set(PROJECT_VERSION_MINOR 1)
+set(PROJECT_VERSION_PATCH 0)
+set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 find_package(Qt5Network 5.1 REQUIRED)
 
