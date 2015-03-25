@@ -10,6 +10,8 @@ set(TESTS
 
 foreach(TEST ${TESTS})
     add_executable(${TEST} "${TEST}.cpp")
-    target_link_libraries(${TEST} Qt5::Test qhttpengine)
+    qt5_use_modules(${TEST} Test)
+    target_link_libraries(${TEST} qhttpengine)
+
     add_test(NAME ${TEST} COMMAND ${TEST})
 endforeach()

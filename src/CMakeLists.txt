@@ -15,7 +15,7 @@ set(SRC
 )
 
 add_library(qhttpengine SHARED ${SRC})
-target_link_libraries(qhttpengine Qt5::Network)
+qt5_use_modules(qhttpengine Network)
 
 set_target_properties(qhttpengine PROPERTIES
     DEFINE_SYMBOL QHTTPENGINE_LIBRARY
