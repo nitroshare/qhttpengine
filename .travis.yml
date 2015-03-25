@@ -10,7 +10,8 @@ before_install:
   - sudo apt-get update -qq
 
 install:
-  - sudo apt-get install -qq qtbase5-dev cmake
+  - sudo apt-get upgrade -qq
+  - sudo apt-get install -qq qtbase5-dev
 
 before_script:
   - mkdir build
