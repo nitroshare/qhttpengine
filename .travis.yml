@@ -5,12 +5,12 @@ compiler:
   - clang
 
 before_install:
+  - sudo apt-add-repository -y ppa:kalakris/cmake
   - sudo apt-add-repository -y ppa:ubuntu-sdk-team/ppa
-  - sudo apt-add-repository -y ppa:smspillaz/cmake-2.8.12
   - sudo apt-get update -qq
 
 install:
-  - sudo apt-get upgrade -qq
+  - sudo apt-get install -qq cmake
   - sudo apt-get install -qq qtbase5-dev
 
 before_script:
