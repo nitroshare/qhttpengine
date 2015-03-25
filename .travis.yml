@@ -5,10 +5,11 @@ compiler:
   - clang
 
 before_install:
+  - sudo apt-add-repository -y ppa:ubuntu-sdk-team/ppa
   - sudo apt-get update -qq
 
 install:
-  - sudo apt-get install -qq qtbase5-dev
+  - sudo apt-get install -qq qt5base-dev
 
 before_script:
   - mkdir build
