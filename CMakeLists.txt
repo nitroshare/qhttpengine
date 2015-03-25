@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.9)
-project(qhttpengine LANGUAGES CXX)
+project(qhttpengine)
 
 option(BUILD_DOC "Build Doxygen documentation" OFF)
 option(BUILD_TESTS "Build the test suite" OFF)
