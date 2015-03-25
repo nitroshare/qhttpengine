@@ -9,7 +9,7 @@ before_install:
   - sudo apt-get update -qq
 
 install:
-  - sudo apt-get install -qq qt5base-dev
+  - sudo apt-get install -qq qtbase5-dev
 
 before_script:
   - mkdir build
