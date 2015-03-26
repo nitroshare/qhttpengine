@@ -22,23 +22,36 @@
  * IN THE SOFTWARE.
  **/
 
-#ifndef QHTTPENGINE_QHTTPRESPONSE_H
-#define QHTTPENGINE_QHTTPRESPONSE_H
+#ifndef QHTTPENGINE_QHTTPSOCKETPRIVATE_H
+#define QHTTPENGINE_QHTTPSOCKETPRIVATE_H
 
 #include <QObject>
+#include <QTcpSocket>
+#include <QVariantMap>
 
-#include "config.h"
+#include "qhttpsocket.h"
 
-/**
- * @brief HTTP response sent to a client
- */
-class QHTTPENGINE_EXPORT QHttpResponse : public QObject
+class QHttpSocketPrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    //...
+    explicit QHttpSocketPrivate(QHttpSocket *socket);
+
+    QTcpSocket socket;
+    QByteArray buffer;
+
+    QByteArray method;
+    QByteArray path;
+    QVariantMap requestHeaders;
+
+    QByteArray statusCode;
+    QVariantMap responseHeaders;
+
+private:
+
+    QHttpSocket *const q;
 };
 
-#endif // QHTTPENGINE_QHTTPRESPONSE_H
+#endif // QHTTPENGINE_QHTTPSOCKETPRIVATE_H

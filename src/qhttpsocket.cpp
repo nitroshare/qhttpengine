@@ -22,4 +22,52 @@
  * IN THE SOFTWARE.
  **/
 
-#include "qhttpresponse.h"
+#include "qhttpsocket.h"
+#include "qhttpsocket_p.h"
+
+QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *socket)
+    : q(socket)
+{
+}
+
+QHttpSocket::QHttpSocket(qintptr socketDescriptor, QObject *parent)
+    : QIODevice(parent),
+      d(new QHttpSocketPrivate(this))
+{
+    d->socket.setSocketDescriptor(socketDescriptor);
+}
+
+QHttpSocket::~QHttpSocket()
+{
+    delete d;
+}
+
+QByteArray QHttpSocket::method() const
+{
+    return d->method;
+}
+
+QByteArray QHttpSocket::path() const
+{
+    return d->path;
+}
+
+QByteArray QHttpSocket::statusCode() const
+{
+    return d->statusCode;
+}
+
+void QHttpSocket::setStatusCode(const QByteArray &code)
+{
+    d->statusCode = code;
+}
+
+qint64 QHttpSocket::readData(char *data, qint64 maxlen)
+{
+    //...
+}
+
+qint64 QHttpSocket::writeData(const char *data, qint64 len)
+{
+    //...
+}
