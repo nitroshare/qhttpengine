@@ -1,7 +1,5 @@
 find_package(Qt5Test REQUIRED)
 
-enable_testing()
-
 set(TESTS
     TestQHttpRequest
     TestQHttpResponse
