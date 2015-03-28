@@ -49,7 +49,7 @@ class QHTTPENGINE_EXPORT QHttpSocket : public QIODevice
     Q_OBJECT
     Q_PROPERTY(Error error READ error NOTIFY errorChanged)
     Q_PROPERTY(QString requestMethod READ requestMethod)
-    Q_PROPERTY(QString requestPath READ requestPath)
+    Q_PROPERTY(QString requestUri READ requestUri)
     Q_PROPERTY(QStringList requestHeaders READ requestHeaders)
     Q_ENUMS(Error)
 
@@ -60,8 +60,8 @@ public:
      */
     enum Error {
         None = 0,
-        MalformedStatusLine,
-        MalformedHeaderLine,
+        MalformedRequestLine,
+        MalformedRequestHeader,
         InvalidHttpVersion,
         IncompleteHeader
     };
@@ -69,7 +69,7 @@ public:
     /**
      * @brief Create a new QHttpSocket instance from a socket descriptor
      */
-    explicit QHttpSocket(qintptr socketDescriptor, QObject *parent = 0);
+    QHttpSocket(qintptr socketDescriptor, QObject *parent = 0);
 
     /**
      * @brief Destroy the QHttpSocket instance
@@ -83,31 +83,50 @@ public:
 
     /**
      * @brief Retrieve the request method
+     *
+     * This method may only be called after the requestHeadersParsed() signal
+     * is emitted.
      */
     QString requestMethod() const;
 
     /**
-     * @brief Retrieve the request path
+     * @brief Retrieve the request URI
+     *
+     * This method may only be called after the requestHeadersParsed() signal
+     * is emitted.
      */
-    QString requestPath() const;
+    QString requestUri() const;
 
     /**
      * @brief Retrieve all request headers
+     *
+     * This method may only be called after the requestHeadersParsed() signal
+     * is emitted.
      */
     QStringList requestHeaders() const;
 
     /**
      * @brief Retrieve the value of a specific request header
+     *
+     * This method may only be called after the requestHeadersParsed() signal
+     * is emitted. Headers are case-insensitive. If the specified header was
+     * not set, then a null (empty) string is returned.
      */
     Q_INVOKABLE QString requestHeader(const QString &header) const;
 
     /**
      * @brief Set the response code
+     *
+     * This method may only be called before the response headers are written.
+     * If no response status code is explicitly set, it will assume a default
+     * value of "200 OK".
      */
     void setResponseStatusCode(const QString &statusCode);
 
     /**
      * @brief Set a response header to a specific value
+     *
+     * This method may only be called before the response headers are written.
      */
     Q_INVOKABLE void setResponseHeader(const QString &header, const QString &value);
 

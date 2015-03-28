@@ -41,16 +41,17 @@ public:
 
     QTcpSocket socket;
     QByteArray buffer;
-    bool readingHeader;
 
     QHttpSocket::Error error;
 
     QString requestMethod;
-    QString requestPath;
+    QString requestUri;
     QMap<QString, QString> requestHeaders;
+    bool requestHeadersRead;
 
     QString responseStatusCode;
     QMap<QString, QString> responseHeaders;
+    bool responseHeadersWritten;
 
 private Q_SLOTS:
 
@@ -58,7 +59,9 @@ private Q_SLOTS:
 
 private:
 
-    void parseHeaders(const QByteArray &headers);
+    void parseRequestHeaders(const QString &headers);
+    void parseRequestLine(const QString &line);
+    void parseRequestHeader(const QString &header);
 
     QHttpSocket *const q;
 };

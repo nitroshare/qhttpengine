@@ -22,30 +22,36 @@
  * IN THE SOFTWARE.
  **/
 
+#include <cstring>
+
 #include "qhttpsocket.h"
 #include "qhttpsocket_p.h"
 
 QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket)
     : q(httpSocket),
-      readingHeader(true)
+      error(QHttpSocket::None),
+      requestHeadersRead(false),
+      responseStatusCode("200 OK"),
+      responseHeadersWritten(false)
 {
     connect(&socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
+    connect(&socket, SIGNAL(bytesWritten(qint64)), q, SIGNAL(bytesWritten(qint64)));
 }
 
 void QHttpSocketPrivate::onReadyRead()
 {
     buffer.append(socket.readAll());
 
-    if(readingHeader) {
+    if(!requestHeadersRead) {
 
         // Check for two successive CRLF sequences in the input
         int index = buffer.indexOf("\r\n\r\n");
         if(index != -1) {
 
-            parseHeaders(buffer.left(index));
+            parseRequestHeaders(buffer.left(index));
 
             buffer.remove(0, index + 4);
-            readingHeader = false;
+            requestHeadersRead = true;
 
             Q_EMIT q->requestHeadersParsed();
         }
@@ -55,15 +61,52 @@ void QHttpSocketPrivate::onReadyRead()
     }
 }
 
-void QHttpSocketPrivate::parseHeaders(const QByteArray &headers)
+void QHttpSocketPrivate::parseRequestHeaders(const QString &headers)
 {
-    // Read and parse the status line
-    int index = headers.indexOf("\r\n");
-    if(index == -1) {
-        error = QHttpSocket::MalformedStatusLine;
-        q->setErrorString(tr("Malformed status line"));
-        Q_EMIT q->error();
+    // Each line ends with a CRLF
+    QStringList parts = headers.split("\r\n");
+
+    // Parse the request line and each of the headers that follow
+    parseRequestLine(parts.takeFirst());
+    foreach(QString header, parts) {
+        parseRequestHeader(header);
     }
+}
+
+void QHttpSocketPrivate::parseRequestLine(const QString &line)
+{
+    QStringList parts = line.split(" ");
+
+    // Ensure that the request line consists of exactly three parts
+    if(parts.count() != 3) {
+        Q_EMIT q->errorChanged(error = QHttpSocket::MalformedRequestLine);
+        return;
+    }
+
+    // Only HTTP versions 1.0 and 1.1 are currently supported
+    if(parts[2] != "HTTP/1.0" && parts[2] != "HTTP/1.1") {
+        Q_EMIT q->errorChanged(error = QHttpSocket::InvalidHttpVersion);
+        return;
+    }
+
+    requestMethod = parts[0];
+    requestUri = parts[1];
+}
+
+void QHttpSocketPrivate::parseRequestHeader(const QString &header)
+{
+    // Ensure that the header line contains at least one ":"
+    int index = header.indexOf(":");
+    if(index == -1) {
+        Q_EMIT q->errorChanged(error = QHttpSocket::MalformedRequestHeader);
+        return;
+    }
+
+    // Trim each part of the header and add it
+    requestHeaders.insert(
+        header.left(index).trimmed(),
+        header.mid(index + 1).trimmed()
+    );
 }
 
 QHttpSocket::QHttpSocket(qintptr socketDescriptor, QObject *parent)
@@ -85,31 +128,55 @@ QHttpSocket::Error QHttpSocket::error() const
 
 QString QHttpSocket::requestMethod() const
 {
+    if(!d->requestHeadersRead) {
+        qWarning("Request headers have not yet been read");
+    }
+
     return d->requestMethod;
 }
 
-QString QHttpSocket::requestPath() const
+QString QHttpSocket::requestUri() const
 {
-    return d->requestPath;
-}
+    if(!d->requestHeadersRead) {
+        qWarning("Request headers have not yet been read");
+    }
 
-QString QHttpSocket::requestHeader(const QString &header) const
-{
-    return d->requestHeaders.value(header);
+    return d->requestUri;
 }
 
 QStringList QHttpSocket::requestHeaders() const
 {
+    if(!d->requestHeadersRead) {
+        qWarning("Request headers have not yet been read");
+    }
+
     return d->requestHeaders.keys();
+}
+
+QString QHttpSocket::requestHeader(const QString &header) const
+{
+    if(!d->requestHeadersRead) {
+        qWarning("Request headers have not yet been read");
+    }
+
+    return d->requestHeaders.value(header.toLower());
 }
 
 void QHttpSocket::setResponseStatusCode(const QString &statusCode)
 {
+    if(d->responseHeadersWritten) {
+        qWarning("Response headers have already been written");
+    }
+
     d->responseStatusCode = statusCode;
 }
 
 void QHttpSocket::setResponseHeader(const QString &header, const QString &value)
 {
+    if(d->responseHeadersWritten) {
+        qWarning("Response headers have already been written");
+    }
+
     d->responseHeaders.insert(header, value);
 }
 
@@ -120,14 +187,30 @@ bool QHttpSocket::isSequential() const
 
 qint64 QHttpSocket::readData(char *data, qint64 maxlen)
 {
-    //...
+    // Data can only be read from the socket once the request headers are read
+    if(!d->requestHeadersRead) {
+        return -1;
+    }
 
-    return 0;
+    // Ensure that no more than the requested amount or the size of the buffer is read
+    qint64 size = qMin(static_cast<qint64>(d->buffer.size()), maxlen);
+    memcpy(data, d->buffer.constData(), size);
+
+    // Remove the amount that was read from the buffer
+    d->buffer.remove(0, size);
+
+    return size;
 }
 
 qint64 QHttpSocket::writeData(const char *data, qint64 len)
 {
-    //...
+    // If the response headers have not yet been written, they
+    // must immediately be written before the data can be
+    if(!d->responseHeadersWritten) {
 
-    return 0;
+        // TODO: write response headers
+        d->responseHeadersWritten = true;
+    }
+
+    return d->socket.write(data, len);
 }
