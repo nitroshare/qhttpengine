@@ -27,7 +27,7 @@
 
 #include <QObject>
 #include <QTcpSocket>
-#include <QVariantMap>
+#include <QMap>
 
 #include "qhttpsocket.h"
 
@@ -37,19 +37,28 @@ class QHttpSocketPrivate : public QObject
 
 public:
 
-    explicit QHttpSocketPrivate(QHttpSocket *socket);
+    explicit QHttpSocketPrivate(QHttpSocket *httpSocket);
 
     QTcpSocket socket;
     QByteArray buffer;
+    bool readingHeader;
 
-    QByteArray method;
-    QByteArray path;
-    QVariantMap requestHeaders;
+    QHttpSocket::Error error;
 
-    QByteArray statusCode;
-    QVariantMap responseHeaders;
+    QString requestMethod;
+    QString requestPath;
+    QMap<QString, QString> requestHeaders;
+
+    QString responseStatusCode;
+    QMap<QString, QString> responseHeaders;
+
+private Q_SLOTS:
+
+    void onReadyRead();
 
 private:
+
+    void parseHeaders(const QByteArray &headers);
 
     QHttpSocket *const q;
 };

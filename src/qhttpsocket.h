@@ -26,7 +26,7 @@
 #define QHTTPENGINE_QHTTPSOCKET_H
 
 #include <QIODevice>
-#include <QVariantMap>
+#include <QStringList>
 
 #include "config.h"
 
@@ -47,11 +47,24 @@ class QHttpSocketPrivate;
 class QHTTPENGINE_EXPORT QHttpSocket : public QIODevice
 {
     Q_OBJECT
-    Q_PROPERTY(QByteArray method READ method)
-    Q_PROPERTY(QByteArray path READ path)
-    Q_PROPERTY(QByteArray statusCode READ statusCode WRITE setStatusCode)
+    Q_PROPERTY(Error error READ error NOTIFY errorChanged)
+    Q_PROPERTY(QString requestMethod READ requestMethod)
+    Q_PROPERTY(QString requestPath READ requestPath)
+    Q_PROPERTY(QStringList requestHeaders READ requestHeaders)
+    Q_ENUMS(Error)
 
 public:
+
+    /**
+     * @brief Error encountered during client communication
+     */
+    enum Error {
+        None = 0,
+        MalformedStatusLine,
+        MalformedHeaderLine,
+        InvalidHttpVersion,
+        IncompleteHeader
+    };
 
     /**
      * @brief Create a new QHttpSocket instance from a socket descriptor
@@ -64,36 +77,50 @@ public:
     virtual ~QHttpSocket();
 
     /**
+     * @brief Retrieve the last error
+     */
+    Error error() const;
+
+    /**
      * @brief Retrieve the request method
      */
-    QByteArray method() const;
+    QString requestMethod() const;
 
     /**
      * @brief Retrieve the request path
      */
-    QByteArray path() const;
+    QString requestPath() const;
 
     /**
-     * @brief Retrieve the value of a request header
+     * @brief Retrieve all request headers
      */
-    QByteArray requestHeader(const QByteArray &header) const;
+    QStringList requestHeaders() const;
 
     /**
-     * @brief Retrieve the response code
+     * @brief Retrieve the value of a specific request header
      */
-    QByteArray statusCode() const;
+    Q_INVOKABLE QString requestHeader(const QString &header) const;
 
     /**
      * @brief Set the response code
      */
-    void setStatusCode(const QByteArray & code);
+    void setResponseStatusCode(const QString &statusCode);
 
     /**
-     * @brief Set a response header to the specified value
+     * @brief Set a response header to a specific value
      */
-    void setResponseHeader(const QByteArray &header, const QByteArray &value);
+    Q_INVOKABLE void setResponseHeader(const QString &header, const QString &value);
 
 Q_SIGNALS:
+
+    /**
+     * @brief Indicate that an error has occurred
+     *
+     * Any attempts to read from or write to the socket after this point will
+     * be ignored. A brief description of the error condition can be retrieved
+     * with the errorString() method.
+     */
+    void errorChanged(Error error);
 
     /**
      * @brief Indicate that request headers have been parsed
@@ -105,8 +132,9 @@ Q_SIGNALS:
 
 private:
 
-    qint64 readData(char *data, qint64 maxlen);
-    qint64 writeData(const char *data, qint64 len);
+    virtual bool isSequential() const;
+    virtual qint64 readData(char *data, qint64 maxlen);
+    virtual qint64 writeData(const char *data, qint64 len);
 
     QHttpSocketPrivate *const d;
     friend class QHttpSocketPrivate;

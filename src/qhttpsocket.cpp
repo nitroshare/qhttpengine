@@ -25,9 +25,45 @@
 #include "qhttpsocket.h"
 #include "qhttpsocket_p.h"
 
-QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *socket)
-    : q(socket)
+QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket)
+    : q(httpSocket),
+      readingHeader(true)
 {
+    connect(&socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
+}
+
+void QHttpSocketPrivate::onReadyRead()
+{
+    buffer.append(socket.readAll());
+
+    if(readingHeader) {
+
+        // Check for two successive CRLF sequences in the input
+        int index = buffer.indexOf("\r\n\r\n");
+        if(index != -1) {
+
+            parseHeaders(buffer.left(index));
+
+            buffer.remove(0, index + 4);
+            readingHeader = false;
+
+            Q_EMIT q->requestHeadersParsed();
+        }
+
+    } else {
+        Q_EMIT q->readyRead();
+    }
+}
+
+void QHttpSocketPrivate::parseHeaders(const QByteArray &headers)
+{
+    // Read and parse the status line
+    int index = headers.indexOf("\r\n");
+    if(index == -1) {
+        error = QHttpSocket::MalformedStatusLine;
+        q->setErrorString(tr("Malformed status line"));
+        Q_EMIT q->error();
+    }
 }
 
 QHttpSocket::QHttpSocket(qintptr socketDescriptor, QObject *parent)
@@ -42,32 +78,56 @@ QHttpSocket::~QHttpSocket()
     delete d;
 }
 
-QByteArray QHttpSocket::method() const
+QHttpSocket::Error QHttpSocket::error() const
 {
-    return d->method;
+    return d->error;
 }
 
-QByteArray QHttpSocket::path() const
+QString QHttpSocket::requestMethod() const
 {
-    return d->path;
+    return d->requestMethod;
 }
 
-QByteArray QHttpSocket::statusCode() const
+QString QHttpSocket::requestPath() const
 {
-    return d->statusCode;
+    return d->requestPath;
 }
 
-void QHttpSocket::setStatusCode(const QByteArray &code)
+QString QHttpSocket::requestHeader(const QString &header) const
 {
-    d->statusCode = code;
+    return d->requestHeaders.value(header);
+}
+
+QStringList QHttpSocket::requestHeaders() const
+{
+    return d->requestHeaders.keys();
+}
+
+void QHttpSocket::setResponseStatusCode(const QString &statusCode)
+{
+    d->responseStatusCode = statusCode;
+}
+
+void QHttpSocket::setResponseHeader(const QString &header, const QString &value)
+{
+    d->responseHeaders.insert(header, value);
+}
+
+bool QHttpSocket::isSequential() const
+{
+    return true;
 }
 
 qint64 QHttpSocket::readData(char *data, qint64 maxlen)
 {
     //...
+
+    return 0;
 }
 
 qint64 QHttpSocket::writeData(const char *data, qint64 len)
 {
     //...
+
+    return 0;
 }
