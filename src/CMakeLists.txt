@@ -15,6 +15,11 @@ set(SRC
 add_library(qhttpengine SHARED ${SRC})
 qt5_use_modules(qhttpengine Network)
 
+target_include_directories(qhttpengine PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_CURRENT_BINARY_DIR}"
+)
+
 set_target_properties(qhttpengine PROPERTIES
     DEFINE_SYMBOL QHTTPENGINE_LIBRARY
     VERSION ${PROJECT_VERSION}
