@@ -139,7 +139,7 @@ void QHttpSocketPrivate::parseRequestHeader(const QString &header)
 
     // Trim each part of the header and add it
     requestHeaders.insert(
-        header.left(index).trimmed(),
+        header.left(index).trimmed().toLower(),
         header.mid(index + 1).trimmed()
     );
 }
