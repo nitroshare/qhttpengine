@@ -38,6 +38,19 @@ QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket)
     connect(&socket, SIGNAL(bytesWritten(qint64)), q, SIGNAL(bytesWritten(qint64)));
 }
 
+void QHttpSocketPrivate::writeResponseHeaders()
+{
+    QString headers = QString("HTTP/1.0 %1\r\n").arg(responseStatusCode);
+
+    QMap<QString, QString>::const_iterator i = responseHeaders.constBegin();
+    while(i != responseHeaders.constEnd()) {
+        headers += QString("%1: %2").arg(i.key(), i.value());
+        ++i;
+    }
+
+    responseHeadersWritten = true;
+}
+
 void QHttpSocketPrivate::onReadyRead()
 {
     buffer.append(socket.readAll());
@@ -61,6 +74,28 @@ void QHttpSocketPrivate::onReadyRead()
     }
 }
 
+void QHttpSocketPrivate::abortWithError(QHttpSocket::Error socketError)
+{
+    error = socketError;
+
+    switch(error) {
+    case QHttpSocket::MalformedRequestLine:
+        q->setErrorString(tr("Malformed request line"));
+        break;
+    case QHttpSocket::MalformedRequestHeader:
+        q->setErrorString(tr("Malformed request header"));
+        break;
+    case QHttpSocket::InvalidHttpVersion:
+        q->setErrorString(tr("Invalid HTTP version"));
+        break;
+    case QHttpSocket::IncompleteHeader:
+        q->setErrorString(tr("Incomplete header received"));
+        break;
+    }
+
+    Q_EMIT q->errorChanged(error);
+}
+
 void QHttpSocketPrivate::parseRequestHeaders(const QString &headers)
 {
     // Each line ends with a CRLF
@@ -79,13 +114,13 @@ void QHttpSocketPrivate::parseRequestLine(const QString &line)
 
     // Ensure that the request line consists of exactly three parts
     if(parts.count() != 3) {
-        Q_EMIT q->errorChanged(error = QHttpSocket::MalformedRequestLine);
+        abortWithError(QHttpSocket::MalformedRequestLine);
         return;
     }
 
     // Only HTTP versions 1.0 and 1.1 are currently supported
     if(parts[2] != "HTTP/1.0" && parts[2] != "HTTP/1.1") {
-        Q_EMIT q->errorChanged(error = QHttpSocket::InvalidHttpVersion);
+        abortWithError(QHttpSocket::InvalidHttpVersion);
         return;
     }
 
@@ -98,7 +133,7 @@ void QHttpSocketPrivate::parseRequestHeader(const QString &header)
     // Ensure that the header line contains at least one ":"
     int index = header.indexOf(":");
     if(index == -1) {
-        Q_EMIT q->errorChanged(error = QHttpSocket::MalformedRequestHeader);
+        abortWithError(QHttpSocket::MalformedRequestHeader);
         return;
     }
 
@@ -207,9 +242,7 @@ qint64 QHttpSocket::writeData(const char *data, qint64 len)
     // If the response headers have not yet been written, they
     // must immediately be written before the data can be
     if(!d->responseHeadersWritten) {
-
-        // TODO: write response headers
-        d->responseHeadersWritten = true;
+        d->writeResponseHeaders();
     }
 
     return d->socket.write(data, len);

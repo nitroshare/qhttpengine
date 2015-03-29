@@ -39,6 +39,8 @@ public:
 
     explicit QHttpSocketPrivate(QHttpSocket *httpSocket);
 
+    void writeResponseHeaders();
+
     QTcpSocket socket;
     QByteArray buffer;
 
@@ -58,6 +60,8 @@ private Q_SLOTS:
     void onReadyRead();
 
 private:
+
+    void abortWithError(QHttpSocket::Error socketError);
 
     void parseRequestHeaders(const QString &headers);
     void parseRequestLine(const QString &line);
