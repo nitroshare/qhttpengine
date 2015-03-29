@@ -1,9 +1,7 @@
 find_package(Qt5Test REQUIRED)
 
 set(TESTS
-    TestQHttpRequest
-    TestQHttpResponse
-    TestQHttpServer
+    TestQHttpSocket
 )
 
 foreach(TEST ${TESTS})
