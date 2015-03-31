@@ -77,6 +77,11 @@ public:
     virtual ~QHttpSocket();
 
     /**
+     * @brief Close the socket
+     */
+    virtual void close() const;
+
+    /**
      * @brief Retrieve the last error
      */
     Error error() const;

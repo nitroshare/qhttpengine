@@ -149,11 +149,22 @@ QHttpSocket::QHttpSocket(qintptr socketDescriptor, QObject *parent)
       d(new QHttpSocketPrivate(this))
 {
     d->socket.setSocketDescriptor(socketDescriptor);
+    setOpenMode(QIODevice::ReadWrite);
 }
 
 QHttpSocket::~QHttpSocket()
 {
     delete d;
+}
+
+void QHttpSocket::close() const
+{
+    // If the response headers have not yet been written, then do so before closing
+    if(!d->responseHeadersWritten) {
+        d->writeResponseHeaders();
+    }
+
+    d->socket.close();
 }
 
 QHttpSocket::Error QHttpSocket::error() const
