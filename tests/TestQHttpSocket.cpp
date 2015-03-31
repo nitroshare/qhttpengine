@@ -58,6 +58,7 @@ public:
 private Q_SLOTS:
 
     // Initialization and cleanup
+    void initTestCase();
     void init();
     void cleanup();
 
@@ -81,7 +82,11 @@ TestQHttpSocket::TestQHttpSocket()
     : mClient(0),
       mSocket(0)
 {
-    mServer.listen(QHostAddress::LocalHost);
+}
+
+void TestQHttpSocket::initTestCase()
+{
+    QVERIFY(mServer.listen(QHostAddress::LocalHost));
     mPort = mServer.serverPort();
 }
 
@@ -114,28 +119,45 @@ void TestQHttpSocket::cleanup()
 
 void TestQHttpSocket::testRequestData()
 {
-    QSignalSpy spy(mSocket, SIGNAL(requestHeadersParsed()));
+    QSignalSpy requestHeadersParsedSpy(mSocket, SIGNAL(requestHeadersParsed()));
 
-    // Have the client send an empty request
+    // Have the client send a short request
     mClient->write(
         "GET /test HTTP/1.0\r\n"
         "Content-type: text/html\r\n"
-        "Content-length: 0\r\n"
-        "\r\n"
+        "Content-length: 4\r\n\r\n"
+        "test"
     );
 
-    QTRY_COMPARE(spy.count(), 1);
+    QTRY_COMPARE(requestHeadersParsedSpy.count(), 1);
     QCOMPARE(mSocket->error(), QHttpSocket::None);
     QCOMPARE(mSocket->requestMethod(), QString("GET"));
     QCOMPARE(mSocket->requestUri(), QString("/test"));
     QCOMPARE(mSocket->requestHeaders().count(), 2);
     QCOMPARE(mSocket->requestHeader("content-type"), QString("text/html"));
-    QCOMPARE(mSocket->requestHeader("content-length"), QString("0"));
+    QCOMPARE(mSocket->requestHeader("content-length"), QString("4"));
+    QCOMPARE(mSocket->readAll(), QByteArray("test"));
 }
 
 void TestQHttpSocket::testResponseData()
 {
-    //...
+    QSignalSpy requestHeadersParsedSpy(mSocket, SIGNAL(requestHeadersParsed()));
+    QSignalSpy disconnectedSpy(mClient, SIGNAL(disconnected()));
+
+    // Send a short request and wait for the socket to parse it
+    mClient->write("GET /test HTTP/1.0\r\n\r\n");
+    QTRY_COMPARE(requestHeadersParsedSpy.count(), 1);
+
+    // Customize the response and disconnect
+    mSocket->setResponseStatusCode("301 MOVED");
+    mSocket->setResponseHeader("Content-type", "text/html");
+    mSocket->setResponseHeader("Content-length", "4");
+    mSocket->write("test");
+    mSocket->close();
+
+    // Wait for the response from the socket
+    QTRY_COMPARE(disconnectedSpy.count(), 1);
+    QCOMPARE(mClient->readAll(), QByteArray("test"));
 }
 
 void TestQHttpSocket::testErrors()
