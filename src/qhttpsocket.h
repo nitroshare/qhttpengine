@@ -25,25 +25,35 @@
 #ifndef QHTTPENGINE_QHTTPSOCKET_H
 #define QHTTPENGINE_QHTTPSOCKET_H
 
-#include <QAbstractSocket>
 #include <QIODevice>
 #include <QStringList>
+#include <QTcpSocket>
 
 #include "config.h"
 
-class QHttpSocketPrivate;
+class QHTTPENGINE_EXPORT QHttpSocketPrivate;
 
 /**
  * @brief Socket for communicating with a client
  *
- * The QHttpSocket class provides an interface for communicating with an HTTP
- * client. Method, path, and headers from the request can be obtained through
- * the appropriate properties once the requestHeadersParsed() signal is
- * emitted. The request data can be read using QIODevice's read() method.
+ * QHttpSocket provides a class derived from QIODevice for communication with
+ * an HTTP client. A QTcpSocket instance is provided to the constructor and
+ * the class will then assume ownership of the socket.
  *
- * Response code and headers can be set through the appropriate properties.
- * The response data can be written directly using QIODevice's write() method.
- * All response headers must be set before writing any data.
+ * Once the requestHeadersParsed() signal is emitted, information about the
+ * request can be retrieved using the appropriate properties. This includes
+ * the request method, URI, and headers. As request data is received, the
+ * readyRead() signal is emitted and any available data can be read using
+ * QIODevice's read* methods.
+ *
+ * Response code and headers can be set as long as no data has been written
+ * to the socket. Response data can be written using QIODevice's write*
+ * methods. The socket may be closed using the close() method once writing is
+ * complete.
+ *
+ * If at any point during the exchange a protocol error is encountered, the
+ * errorChanged() signal is emitted. A human-readable description of the error
+ * can be obtained through the errorString() method.
  */
 class QHTTPENGINE_EXPORT QHttpSocket : public QIODevice
 {
@@ -52,6 +62,8 @@ class QHTTPENGINE_EXPORT QHttpSocket : public QIODevice
     Q_PROPERTY(QString requestMethod READ requestMethod)
     Q_PROPERTY(QString requestUri READ requestUri)
     Q_PROPERTY(QStringList requestHeaders READ requestHeaders)
+    Q_PROPERTY(bool requestHeadersRead READ requestHeadersRead)
+    Q_PROPERTY(bool responseHeadersWritten READ responseHeadersWritten)
     Q_ENUMS(Error)
 
 public:
@@ -69,12 +81,12 @@ public:
     };
 
     /**
-     * @brief Create a new QHttpSocket
+     * @brief Create a new QHttpSocket from a socket
      *
      * It is assumed that the socket is already in the connected state. The
      * QHttpSocket assumes ownership of the socket.
      */
-    QHttpSocket(QAbstractSocket *socket, QObject *parent = 0);
+    QHttpSocket(QTcpSocket *socket, QObject *parent = 0);
 
     /**
      * @brief Destroy the QHttpSocket instance
@@ -83,6 +95,9 @@ public:
 
     /**
      * @brief Close the socket
+     *
+     * This will cause the response headers to be written to the socket if
+     * they have not yet been written.
      */
     virtual void close();
 
@@ -116,6 +131,16 @@ public:
     QStringList requestHeaders() const;
 
     /**
+     * @brief Determine if request headers have been read yet
+     */
+    bool requestHeadersRead() const;
+
+    /**
+     * @brief Determine if response headers have been read yet
+     */
+    bool responseHeadersWritten() const;
+
+    /**
      * @brief Retrieve the value of a specific request header
      *
      * This method may only be called after the requestHeadersParsed() signal
@@ -131,7 +156,7 @@ public:
      * If no response status code is explicitly set, it will assume a default
      * value of "200 OK".
      */
-    void setResponseStatusCode(const QString &statusCode);
+    Q_INVOKABLE void setResponseStatusCode(const QString &statusCode);
 
     /**
      * @brief Set a response header to a specific value

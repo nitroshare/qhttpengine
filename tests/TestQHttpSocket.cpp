@@ -50,7 +50,7 @@ private:
 
 void TestQHttpSocket::initTestCase()
 {
-    QVERIFY(mServer.listen(QHostAddress::LocalHost));
+    QVERIFY(mServer.listen(QHostAddress("127.0.0.1")));
     mPort = mServer.serverPort();
 }
 
@@ -70,7 +70,6 @@ void TestQHttpSocket::testMethods()
 
     // Create spies for the signals emitted by the socket
     QSignalSpy requestHeadersParsedSpy(socket, SIGNAL(requestHeadersParsed()));
-    QSignalSpy readyReadSpy(socket, SIGNAL(readyRead()));
     QSignalSpy bytesWrittenSpy(socket, SIGNAL(bytesWritten(qint64)));
 
     // Verify the request headers
@@ -81,7 +80,7 @@ void TestQHttpSocket::testMethods()
     QCOMPARE(socket->requestHeader("Content-Type"), QString("text/plain"));
 
     // Verify the request data
-    QTRY_COMPARE(readyReadSpy.count(), 1);
+    QTRY_VERIFY(socket->requestHeadersRead());
     QCOMPARE(socket->readAll(), QByteArray("test"));
 
     // Write response data and close the socket
@@ -93,6 +92,7 @@ void TestQHttpSocket::testMethods()
     // Wait for the indication that the correct number of bytes were written
     QTRY_COMPARE(bytesWrittenSpy.count(), 1);
     QCOMPARE(bytesWrittenSpy.at(0).at(0).toInt(), 4);
+    QVERIFY(socket->responseHeadersWritten());
 
     // Wait for the reply to indicate the request finished
     QTRY_VERIFY(reply->isFinished());

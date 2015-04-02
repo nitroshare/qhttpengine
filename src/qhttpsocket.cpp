@@ -29,7 +29,7 @@
 #include "qhttpsocket.h"
 #include "qhttpsocket_p.h"
 
-QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket, QAbstractSocket *baseSocket)
+QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket, QTcpSocket *baseSocket)
     : q(httpSocket),
       socket(baseSocket),
       error(QHttpSocket::None),
@@ -213,7 +213,7 @@ void QHttpSocketPrivate::parseRequestHeader(const QString &header)
     );
 }
 
-QHttpSocket::QHttpSocket(QAbstractSocket *socket, QObject *parent)
+QHttpSocket::QHttpSocket(QTcpSocket *socket, QObject *parent)
     : QIODevice(parent),
       d(new QHttpSocketPrivate(this, socket))
 {
@@ -243,55 +243,47 @@ QHttpSocket::Error QHttpSocket::error() const
 
 QString QHttpSocket::requestMethod() const
 {
-    if(!d->requestHeadersRead) {
-        qWarning("Request headers have not yet been read");
-    }
-
+    Q_ASSERT(requestHeadersRead());
     return d->requestMethod;
 }
 
 QString QHttpSocket::requestUri() const
 {
-    if(!d->requestHeadersRead) {
-        qWarning("Request headers have not yet been read");
-    }
-
+    Q_ASSERT(requestHeadersRead());
     return d->requestUri;
 }
 
 QStringList QHttpSocket::requestHeaders() const
 {
-    if(!d->requestHeadersRead) {
-        qWarning("Request headers have not yet been read");
-    }
-
+    Q_ASSERT(requestHeadersRead());
     return d->requestHeaders.keys();
+}
+
+bool QHttpSocket::requestHeadersRead() const
+{
+    return d->requestHeadersRead;
+}
+
+bool QHttpSocket::responseHeadersWritten() const
+{
+    return d->responseHeadersWritten;
 }
 
 QString QHttpSocket::requestHeader(const QString &header) const
 {
-    if(!d->requestHeadersRead) {
-        qWarning("Request headers have not yet been read");
-    }
-
+    Q_ASSERT(requestHeadersRead());
     return d->requestHeaders.value(header.toLower());
 }
 
 void QHttpSocket::setResponseStatusCode(const QString &statusCode)
 {
-    if(d->responseHeadersWritten) {
-        qWarning("Response headers have already been written");
-    }
-
+    Q_ASSERT(!responseHeadersWritten());
     d->responseStatusCode = statusCode;
 }
 
 void QHttpSocket::setResponseHeader(const QString &header, const QString &value)
 {
-    if(d->responseHeadersWritten) {
-        qWarning("Response headers have already been written");
-    }
-
+    Q_ASSERT(!responseHeadersWritten());
     d->responseHeaders.insert(header, value);
 }
 
