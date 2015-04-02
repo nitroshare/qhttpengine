@@ -3,13 +3,13 @@ configure_file(qhttpengine.pc.in "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.pc" @O
 
 set(INCLUDE
     "${CMAKE_CURRENT_BINARY_DIR}/config.h"
-    qhttpserver.h
     qhttpsocket.h
+    qjsonserver.h
 )
 
 set(SRC
-    qhttpserver.cpp
     qhttpsocket.cpp
+    qjsonserver.cpp
 )
 
 add_library(qhttpengine SHARED ${SRC})

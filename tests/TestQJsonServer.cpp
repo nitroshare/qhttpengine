@@ -22,23 +22,18 @@
  * IN THE SOFTWARE.
  **/
 
-#ifndef QHTTPENGINE_QHTTPSERVER_H
-#define QHTTPENGINE_QHTTPSERVER_H
+#include <QTest>
 
-#include <QObject>
+#include "qjsonserver.h"
 
-#include "config.h"
-
-/**
- * @brief HTTP server
- */
-class QHTTPENGINE_EXPORT QHttpServer : public QObject
+class TestQJsonServer : public QObject
 {
     Q_OBJECT
 
-public:
+private Q_SLOTS:
 
     //...
 };
 
-#endif // QHTTPENGINE_QHTTPSERVER_H
+QTEST_MAIN(TestQJsonServer)
+#include "TestQJsonServer.moc"

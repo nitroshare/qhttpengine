@@ -22,4 +22,23 @@
  * IN THE SOFTWARE.
  **/
 
-#include "qhttpserver.h"
+#ifndef QHTTPENGINE_QJSONSERVER_H
+#define QHTTPENGINE_QJSONSERVER_H
+
+#include <QObject>
+
+#include "config.h"
+
+/**
+ * @brief JSON server
+ */
+class QHTTPENGINE_EXPORT QJsonServer : public QObject
+{
+    Q_OBJECT
+
+public:
+
+    //...
+};
+
+#endif // QHTTPENGINE_QJSONSERVER_H

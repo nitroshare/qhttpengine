@@ -2,6 +2,7 @@ find_package(Qt5Test REQUIRED)
 
 set(TESTS
     TestQHttpSocket
+    TestQJsonServer
 )
 
 foreach(TEST ${TESTS})
