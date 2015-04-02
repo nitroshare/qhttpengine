@@ -174,8 +174,7 @@ void QHttpSocketPrivate::parseRequestHeaders(const QString &headers)
         parseRequestHeader(header);
     }
 
-    requestHeadersRead = true;
-    Q_EMIT q->requestHeadersParsed();
+    Q_EMIT q->requestHeadersReadChanged(requestHeadersRead = true);
 }
 
 void QHttpSocketPrivate::parseRequestLine(const QString &line)
@@ -264,11 +263,6 @@ bool QHttpSocket::requestHeadersRead() const
     return d->requestHeadersRead;
 }
 
-bool QHttpSocket::responseHeadersWritten() const
-{
-    return d->responseHeadersWritten;
-}
-
 QString QHttpSocket::requestHeader(const QString &header) const
 {
     Q_ASSERT(requestHeadersRead());
@@ -277,13 +271,13 @@ QString QHttpSocket::requestHeader(const QString &header) const
 
 void QHttpSocket::setResponseStatusCode(const QString &statusCode)
 {
-    Q_ASSERT(!responseHeadersWritten());
+    Q_ASSERT(!d->responseHeadersWritten);
     d->responseStatusCode = statusCode;
 }
 
 void QHttpSocket::setResponseHeader(const QString &header, const QString &value)
 {
-    Q_ASSERT(!responseHeadersWritten());
+    Q_ASSERT(!d->responseHeadersWritten);
     d->responseHeaders.insert(header, value);
 }
 
@@ -295,7 +289,7 @@ bool QHttpSocket::isSequential() const
 qint64 QHttpSocket::readData(char *data, qint64 maxlen)
 {
     // Data can only be read from the socket once the request headers are read
-    if(!d->requestHeadersRead) {
+    if(!requestHeadersRead()) {
         return -1;
     }
 

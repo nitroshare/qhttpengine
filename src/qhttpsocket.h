@@ -40,10 +40,10 @@ class QHTTPENGINE_EXPORT QHttpSocketPrivate;
  * an HTTP client. A QTcpSocket instance is provided to the constructor and
  * the class will then assume ownership of the socket.
  *
- * Once the requestHeadersParsed() signal is emitted, information about the
- * request can be retrieved using the appropriate properties. This includes
- * the request method, URI, and headers. As request data is received, the
- * readyRead() signal is emitted and any available data can be read using
+ * Once the requestHeadersReadChanged() signal is emitted, information about
+ * the request can be retrieved using the appropriate properties. This
+ * includes the request method, URI, and headers. As request data is received,
+ * the readyRead() signal is emitted and any available data can be read using
  * QIODevice's read* methods.
  *
  * Response code and headers can be set as long as no data has been written
@@ -62,8 +62,7 @@ class QHTTPENGINE_EXPORT QHttpSocket : public QIODevice
     Q_PROPERTY(QString requestMethod READ requestMethod)
     Q_PROPERTY(QString requestUri READ requestUri)
     Q_PROPERTY(QStringList requestHeaders READ requestHeaders)
-    Q_PROPERTY(bool requestHeadersRead READ requestHeadersRead)
-    Q_PROPERTY(bool responseHeadersWritten READ responseHeadersWritten)
+    Q_PROPERTY(bool requestHeadersRead READ requestHeadersRead NOTIFY requestHeadersReadChanged)
     Q_ENUMS(Error)
 
 public:
@@ -136,11 +135,6 @@ public:
     bool requestHeadersRead() const;
 
     /**
-     * @brief Determine if response headers have been read yet
-     */
-    bool responseHeadersWritten() const;
-
-    /**
      * @brief Retrieve the value of a specific request header
      *
      * This method may only be called after the requestHeadersParsed() signal
@@ -177,12 +171,12 @@ Q_SIGNALS:
     void errorChanged(Error error);
 
     /**
-     * @brief Indicate that request headers have been parsed
+     * @brief Indicate that request headers have been read
      *
      * Once this signal is emitted, it is safe to begin reading request data.
      * The readyRead() signal will be emitted as request data is received.
      */
-    void requestHeadersParsed();
+    void requestHeadersReadChanged(bool requestHeadersRead);
 
 private:
 
