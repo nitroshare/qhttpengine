@@ -29,24 +29,6 @@
 
 #include "qhttpsocket.h"
 
-// Allow qintptr to be used in a signal
-Q_DECLARE_METATYPE(qintptr)
-
-class TcpServer : public QTcpServer
-{
-    Q_OBJECT
-
-Q_SIGNALS:
-
-    void newSocketDescriptor(qintptr socketDescriptor);
-
-private:
-
-    virtual void incomingConnection(qintptr socketDescriptor) {
-        Q_EMIT newSocketDescriptor(socketDescriptor);
-    }
-};
-
 class TestQHttpSocket : public QObject
 {
     Q_OBJECT
@@ -71,7 +53,7 @@ private Q_SLOTS:
 
 private:
 
-    TcpServer mServer;
+    QTcpServer mServer;
     quint16 mPort;
 
     QTcpSocket *mClient;
@@ -92,7 +74,7 @@ void TestQHttpSocket::initTestCase()
 
 void TestQHttpSocket::init()
 {
-    QSignalSpy spy(&mServer, SIGNAL(newSocketDescriptor(qintptr)));
+    QSignalSpy spy(&mServer, SIGNAL(newConnection()));
 
     mClient = new QTcpSocket;
     mClient->connectToHost(QHostAddress(QHostAddress::LocalHost), mPort);
@@ -101,7 +83,7 @@ void TestQHttpSocket::init()
     QTRY_COMPARE(spy.count(), 1);
     QTRY_VERIFY(mClient->isOpen());
 
-    mSocket = new QHttpSocket(spy.at(0).at(0).value<qintptr>());
+    mSocket = new QHttpSocket(mServer.nextPendingConnection());
 }
 
 void TestQHttpSocket::cleanup()

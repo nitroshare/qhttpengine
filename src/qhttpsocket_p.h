@@ -25,8 +25,8 @@
 #ifndef QHTTPENGINE_QHTTPSOCKETPRIVATE_H
 #define QHTTPENGINE_QHTTPSOCKETPRIVATE_H
 
+#include <QAbstractSocket>
 #include <QObject>
-#include <QTcpSocket>
 #include <QMap>
 
 #include "qhttpsocket.h"
@@ -37,11 +37,11 @@ class QHttpSocketPrivate : public QObject
 
 public:
 
-    explicit QHttpSocketPrivate(QHttpSocket *httpSocket);
+    QHttpSocketPrivate(QHttpSocket *httpSocket, QAbstractSocket *baseSocket);
 
     void writeResponseHeaders();
 
-    QTcpSocket socket;
+    QAbstractSocket *socket;
     QByteArray buffer;
 
     QHttpSocket::Error error;
@@ -53,11 +53,14 @@ public:
 
     QString responseStatusCode;
     QMap<QString, QString> responseHeaders;
+    qint64 responseHeaderLength;
     bool responseHeadersWritten;
 
 private Q_SLOTS:
 
     void onReadyRead();
+    void onBytesWritten(qint64 bytes);
+    void onError(QAbstractSocket::SocketError socketError);
 
 private:
 

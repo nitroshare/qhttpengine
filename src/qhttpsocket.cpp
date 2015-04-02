@@ -27,58 +27,115 @@
 #include "qhttpsocket.h"
 #include "qhttpsocket_p.h"
 
-QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket)
+QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket, QAbstractSocket *baseSocket)
     : q(httpSocket),
+      socket(baseSocket),
       error(QHttpSocket::None),
       requestHeadersRead(false),
       responseStatusCode("200 OK"),
+      responseHeaderLength(0),
       responseHeadersWritten(false)
 {
-    connect(&socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
-    connect(&socket, SIGNAL(bytesWritten(qint64)), q, SIGNAL(bytesWritten(qint64)));
+    // Re-parent the socket to this class
+    socket->setParent(this);
+
+    // Both of these signals must be handled directly since the
+    // socket acts as a transport both for headers and for data
+    connect(socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
+    connect(socket, SIGNAL(bytesWritten(qint64)), this, SLOT(onBytesWritten(qint64)));
+
+    // Also, the error signal needs to be handled
+    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onError(QAbstractSocket::SocketError)));
 }
 
 void QHttpSocketPrivate::writeResponseHeaders()
 {
-    QString headers = QString("HTTP/1.0 %1\r\n").arg(responseStatusCode);
+    // Use a QByteArray for building the header so that we
+    // can later determine exactly how many bytes were written
+    QByteArray header;
 
+    // Append the status line
+    header.append("HTTP/1.0 ");
+    header.append(responseStatusCode.toUtf8());
+    header.append("\r\n");
+
+    // Append each of the headers followed by a CRLF
     QMap<QString, QString>::const_iterator i = responseHeaders.constBegin();
-    while(i != responseHeaders.constEnd()) {
-        headers += QString("%1: %2").arg(i.key(), i.value());
-        ++i;
+    for(; i != responseHeaders.constEnd(); ++i) {
+        header.append(i.key().toUtf8());
+        header.append(": ");
+        header.append(i.value().toUtf8());
+        header.append("\r\n");
     }
 
+    // Append an extra CRLF
+    header.append("\r\n");
+
+    // Write the header
+    socket->write(header);
+    responseHeaderLength = header.length();
     responseHeadersWritten = true;
 }
 
 void QHttpSocketPrivate::onReadyRead()
 {
-    buffer.append(socket.readAll());
+    // Add the new data to the internal buffer
+    buffer.append(socket->readAll());
 
+    // If the request headers have not yet been parsed, check for two CRLFs
     if(!requestHeadersRead) {
 
-        // Check for two successive CRLF sequences in the input
         int index = buffer.indexOf("\r\n\r\n");
         if(index != -1) {
 
+            // Parse the headers and remove them from the data
             parseRequestHeaders(buffer.left(index));
-
             buffer.remove(0, index + 4);
-            requestHeadersRead = true;
 
-            Q_EMIT q->requestHeadersParsed();
+        } else {
+            return;
         }
+    }
 
-    } else {
+    // If there is data in the buffer, emit the readyRead signal
+    if(buffer.length()) {
         Q_EMIT q->readyRead();
     }
 }
 
+void QHttpSocketPrivate::onBytesWritten(qint64 bytes)
+{
+    // Since this signal may be emitted even if no data was actually written,
+    // the number of bytes needs to be subtracted from the header length
+    if(responseHeaderLength - bytes >= 0) {
+        responseHeaderLength -= bytes;
+    } else {
+        Q_EMIT q->bytesWritten(bytes - responseHeaderLength);
+        responseHeaderLength = 0;
+    }
+}
+
+void QHttpSocketPrivate::onError(QAbstractSocket::SocketError socketError)
+{
+    // If the "error" was simply the client disconnecting, then check
+    // to see if the headers were received - otherwise it's a protocol error
+    if(socketError == QAbstractSocket::RemoteHostClosedError) {
+
+        if(!requestHeadersRead) {
+            abortWithError(QHttpSocket::IncompleteHeader);
+        }
+
+    } else {
+        abortWithError(QHttpSocket::SocketError);
+    }
+
+    // Indicate that the device is no longer open
+    q->setOpenMode(QIODevice::NotOpen);
+}
+
 void QHttpSocketPrivate::abortWithError(QHttpSocket::Error socketError)
 {
-    error = socketError;
-
-    switch(error) {
+    switch(socketError) {
     case QHttpSocket::MalformedRequestLine:
         q->setErrorString(tr("Malformed request line"));
         break;
@@ -91,28 +148,35 @@ void QHttpSocketPrivate::abortWithError(QHttpSocket::Error socketError)
     case QHttpSocket::IncompleteHeader:
         q->setErrorString(tr("Incomplete header received"));
         break;
+    case QHttpSocket::SocketError:
+        q->setErrorString(socket->errorString());
+        break;
     }
 
-    Q_EMIT q->errorChanged(error);
+    Q_EMIT q->errorChanged(error = socketError);
 }
 
 void QHttpSocketPrivate::parseRequestHeaders(const QString &headers)
 {
-    // Each line ends with a CRLF
+    // Split the header into individual lines
     QStringList parts = headers.split("\r\n");
 
-    // Parse the request line and each of the headers that follow
+    // Parse the first line (the request line)
     parseRequestLine(parts.takeFirst());
+
+    // Parse each of the remaining lines (the headers)
     foreach(QString header, parts) {
         parseRequestHeader(header);
     }
+
+    requestHeadersRead = true;
+    Q_EMIT q->requestHeadersParsed();
 }
 
 void QHttpSocketPrivate::parseRequestLine(const QString &line)
 {
+    // The request line consists of three parts separated by space
     QStringList parts = line.split(" ");
-
-    // Ensure that the request line consists of exactly three parts
     if(parts.count() != 3) {
         abortWithError(QHttpSocket::MalformedRequestLine);
         return;
@@ -130,25 +194,24 @@ void QHttpSocketPrivate::parseRequestLine(const QString &line)
 
 void QHttpSocketPrivate::parseRequestHeader(const QString &header)
 {
-    // Ensure that the header line contains at least one ":"
+    // Each header consists of the key, ":", and the value
     int index = header.indexOf(":");
     if(index == -1) {
         abortWithError(QHttpSocket::MalformedRequestHeader);
         return;
     }
 
-    // Trim each part of the header and add it
+    // Trim each part and add it to the map
     requestHeaders.insert(
         header.left(index).trimmed().toLower(),
         header.mid(index + 1).trimmed()
     );
 }
 
-QHttpSocket::QHttpSocket(qintptr socketDescriptor, QObject *parent)
+QHttpSocket::QHttpSocket(QAbstractSocket *socket, QObject *parent)
     : QIODevice(parent),
-      d(new QHttpSocketPrivate(this))
+      d(new QHttpSocketPrivate(this, socket))
 {
-    d->socket.setSocketDescriptor(socketDescriptor);
     setOpenMode(QIODevice::ReadWrite);
 }
 
@@ -164,7 +227,7 @@ void QHttpSocket::close() const
         d->writeResponseHeaders();
     }
 
-    d->socket.close();
+    d->socket->close();
 }
 
 QHttpSocket::Error QHttpSocket::error() const
@@ -256,5 +319,5 @@ qint64 QHttpSocket::writeData(const char *data, qint64 len)
         d->writeResponseHeaders();
     }
 
-    return d->socket.write(data, len);
+    return d->socket->write(data, len);
 }

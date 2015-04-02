@@ -25,6 +25,7 @@
 #ifndef QHTTPENGINE_QHTTPSOCKET_H
 #define QHTTPENGINE_QHTTPSOCKET_H
 
+#include <QAbstractSocket>
 #include <QIODevice>
 #include <QStringList>
 
@@ -63,13 +64,17 @@ public:
         MalformedRequestLine,
         MalformedRequestHeader,
         InvalidHttpVersion,
-        IncompleteHeader
+        IncompleteHeader,
+        SocketError
     };
 
     /**
-     * @brief Create a new QHttpSocket instance from a socket descriptor
+     * @brief Create a new QHttpSocket
+     *
+     * It is assumed that the socket is already in the connected state. The
+     * QHttpSocket assumes ownership of the socket.
      */
-    QHttpSocket(qintptr socketDescriptor, QObject *parent = 0);
+    QHttpSocket(QAbstractSocket *socket, QObject *parent = 0);
 
     /**
      * @brief Destroy the QHttpSocket instance
