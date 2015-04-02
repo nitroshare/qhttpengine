@@ -24,6 +24,8 @@
 
 #include <cstring>
 
+#include <QTimer>
+
 #include "qhttpsocket.h"
 #include "qhttpsocket_p.h"
 
@@ -46,6 +48,9 @@ QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket, QAbstractSocket 
 
     // Also, the error signal needs to be handled
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onError(QAbstractSocket::SocketError)));
+
+    // Next time the event loop is entered, attempt to read data from the socket
+    QTimer::singleShot(0, this, SLOT(onReadyRead()));
 }
 
 void QHttpSocketPrivate::writeResponseHeaders()
@@ -220,7 +225,7 @@ QHttpSocket::~QHttpSocket()
     delete d;
 }
 
-void QHttpSocket::close() const
+void QHttpSocket::close()
 {
     // If the response headers have not yet been written, then do so before closing
     if(!d->responseHeadersWritten) {
@@ -228,6 +233,7 @@ void QHttpSocket::close() const
     }
 
     d->socket->close();
+    setOpenMode(QIODevice::NotOpen);
 }
 
 QHttpSocket::Error QHttpSocket::error() const

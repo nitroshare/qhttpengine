@@ -22,9 +22,12 @@
  * IN THE SOFTWARE.
  **/
 
+#include <QBuffer>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QSignalSpy>
 #include <QTcpServer>
-#include <QTcpSocket>
 #include <QTest>
 
 #include "qhttpsocket.h"
@@ -33,38 +36,17 @@ class TestQHttpSocket : public QObject
 {
     Q_OBJECT
 
-public:
-
-    TestQHttpSocket();
-
 private Q_SLOTS:
 
-    // Initialization and cleanup
     void initTestCase();
-    void init();
-    void cleanup();
-
-    // Tests for each of the methods
-    void testRequestData();
-    void testResponseData();
-
-    // Tests for predefined conditions
-    void testErrors();
+    void testMethods();
 
 private:
 
+    QNetworkAccessManager mManager;
     QTcpServer mServer;
     quint16 mPort;
-
-    QTcpSocket *mClient;
-    QHttpSocket *mSocket;
 };
-
-TestQHttpSocket::TestQHttpSocket()
-    : mClient(0),
-      mSocket(0)
-{
-}
 
 void TestQHttpSocket::initTestCase()
 {
@@ -72,79 +54,57 @@ void TestQHttpSocket::initTestCase()
     mPort = mServer.serverPort();
 }
 
-void TestQHttpSocket::init()
+void TestQHttpSocket::testMethods()
 {
-    QSignalSpy spy(&mServer, SIGNAL(newConnection()));
+    // Issue a simple request to the server
+    QNetworkRequest request(QUrl(QString("http://127.0.0.1:%2/test").arg(mPort)));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "text/plain");
+    QNetworkReply *reply = mManager.post(request, "test");
 
-    mClient = new QTcpSocket;
-    mClient->connectToHost(QHostAddress(QHostAddress::LocalHost), mPort);
+    // Ensure that a request was received by the server
+    QSignalSpy newSignalSpy(&mServer, SIGNAL(newConnection()));
+    QTRY_COMPARE(newSignalSpy.count(), 1);
 
-    // Wait for the client and socket to establish a connection
-    QTRY_COMPARE(spy.count(), 1);
-    QTRY_VERIFY(mClient->isOpen());
+    // Create the HTTP socket
+    QHttpSocket *socket = new QHttpSocket(mServer.nextPendingConnection());
 
-    mSocket = new QHttpSocket(mServer.nextPendingConnection());
-}
+    // Create spies for the signals emitted by the socket
+    QSignalSpy requestHeadersParsedSpy(socket, SIGNAL(requestHeadersParsed()));
+    QSignalSpy readyReadSpy(socket, SIGNAL(readyRead()));
+    QSignalSpy bytesWrittenSpy(socket, SIGNAL(bytesWritten(qint64)));
 
-void TestQHttpSocket::cleanup()
-{
-    if(mClient) {
-        mClient->deleteLater();
-        mClient = 0;
-    }
-
-    if(mSocket) {
-        mSocket->deleteLater();
-        mSocket = 0;
-    }
-}
-
-void TestQHttpSocket::testRequestData()
-{
-    QSignalSpy requestHeadersParsedSpy(mSocket, SIGNAL(requestHeadersParsed()));
-
-    // Have the client send a short request
-    mClient->write(
-        "GET /test HTTP/1.0\r\n"
-        "Content-type: text/html\r\n"
-        "Content-length: 4\r\n\r\n"
-        "test"
-    );
-
+    // Verify the request headers
     QTRY_COMPARE(requestHeadersParsedSpy.count(), 1);
-    QCOMPARE(mSocket->error(), QHttpSocket::None);
-    QCOMPARE(mSocket->requestMethod(), QString("GET"));
-    QCOMPARE(mSocket->requestUri(), QString("/test"));
-    QCOMPARE(mSocket->requestHeaders().count(), 2);
-    QCOMPARE(mSocket->requestHeader("content-type"), QString("text/html"));
-    QCOMPARE(mSocket->requestHeader("content-length"), QString("4"));
-    QCOMPARE(mSocket->readAll(), QByteArray("test"));
-}
+    QCOMPARE(socket->error(), QHttpSocket::None);
+    QCOMPARE(socket->requestMethod(), QString("POST"));
+    QCOMPARE(socket->requestUri(), QString("/test"));
+    QCOMPARE(socket->requestHeader("Content-Type"), QString("text/plain"));
 
-void TestQHttpSocket::testResponseData()
-{
-    QSignalSpy requestHeadersParsedSpy(mSocket, SIGNAL(requestHeadersParsed()));
-    QSignalSpy disconnectedSpy(mClient, SIGNAL(disconnected()));
+    // Verify the request data
+    QTRY_COMPARE(readyReadSpy.count(), 1);
+    QCOMPARE(socket->readAll(), QByteArray("test"));
 
-    // Send a short request and wait for the socket to parse it
-    mClient->write("GET /test HTTP/1.0\r\n\r\n");
-    QTRY_COMPARE(requestHeadersParsedSpy.count(), 1);
+    // Write response data and close the socket
+    socket->setResponseStatusCode("200 OK");
+    socket->setResponseHeader("Content-Type", "text/plain");
+    socket->write("test");
+    socket->close();
 
-    // Customize the response and disconnect
-    mSocket->setResponseStatusCode("301 MOVED");
-    mSocket->setResponseHeader("Content-type", "text/html");
-    mSocket->setResponseHeader("Content-length", "4");
-    mSocket->write("test");
-    mSocket->close();
+    // Wait for the indication that the correct number of bytes were written
+    QTRY_COMPARE(bytesWrittenSpy.count(), 1);
+    QCOMPARE(bytesWrittenSpy.at(0).at(0).toInt(), 4);
 
-    // Wait for the response from the socket
-    QTRY_COMPARE(disconnectedSpy.count(), 1);
-    QCOMPARE(mClient->readAll(), QByteArray("test"));
-}
+    // Wait for the reply to indicate the request finished
+    QTRY_VERIFY(reply->isFinished());
 
-void TestQHttpSocket::testErrors()
-{
-    //...
+    // Examine the data from the reply
+    QCOMPARE(reply->attribute(QNetworkRequest::HttpStatusCodeAttribute), QVariant(200));
+    QCOMPARE(reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute), QVariant("OK"));
+    QCOMPARE(reply->header(QNetworkRequest::ContentTypeHeader), QVariant("text/plain"));
+    QCOMPARE(reply->readAll(), QByteArray("test"));
+
+    socket->deleteLater();
+    reply->deleteLater();
 }
 
 QTEST_MAIN(TestQHttpSocket)

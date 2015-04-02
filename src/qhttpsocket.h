@@ -84,7 +84,7 @@ public:
     /**
      * @brief Close the socket
      */
-    virtual void close() const;
+    virtual void close();
 
     /**
      * @brief Retrieve the last error
