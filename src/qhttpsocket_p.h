@@ -47,7 +47,7 @@ public:
     QHttpSocket::HttpError httpError;
 
     QString requestMethod;
-    QString requestUri;
+    QString requestPath;
     QMap<QString, QString> requestHeaders;
     bool requestHeadersRead;
 

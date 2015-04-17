@@ -174,7 +174,7 @@ void QHttpSocketPrivate::parseRequestLine(const QString &line)
     }
 
     requestMethod = parts[0];
-    requestUri = parts[1];
+    requestPath = parts[1];
 }
 
 void QHttpSocketPrivate::parseRequestHeader(const QString &header)
@@ -208,6 +208,11 @@ QHttpSocket::~QHttpSocket()
     delete d;
 }
 
+qint64 QHttpSocket::bytesAvailable() const
+{
+    return d->buffer.size() + QIODevice::bytesAvailable();
+}
+
 void QHttpSocket::close()
 {
     // Don't do anything if the device was already closed
@@ -224,6 +229,11 @@ void QHttpSocket::close()
     QIODevice::close();
 }
 
+bool QHttpSocket::isSequential() const
+{
+    return true;
+}
+
 QHttpSocket::HttpError QHttpSocket::httpError() const
 {
     return d->httpError;
@@ -234,9 +244,9 @@ QString QHttpSocket::requestMethod() const
     return d->requestMethod;
 }
 
-QString QHttpSocket::requestUri() const
+QString QHttpSocket::requestPath() const
 {
-    return d->requestUri;
+    return d->requestPath;
 }
 
 QStringList QHttpSocket::requestHeaders() const
@@ -262,11 +272,6 @@ void QHttpSocket::setResponseStatusCode(const QString &statusCode)
 void QHttpSocket::setResponseHeader(const QString &header, const QString &value)
 {
     d->responseHeaders.insert(header, value);
-}
-
-bool QHttpSocket::isSequential() const
-{
-    return true;
 }
 
 qint64 QHttpSocket::readData(char *data, qint64 maxlen)

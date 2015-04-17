@@ -59,7 +59,7 @@ class QHTTPENGINE_EXPORT QHttpSocket : public QIODevice
     Q_OBJECT
     Q_PROPERTY(HttpError httpError READ httpError NOTIFY httpErrorChanged)
     Q_PROPERTY(QString requestMethod READ requestMethod)
-    Q_PROPERTY(QString requestUri READ requestUri)
+    Q_PROPERTY(QString requestPath READ requestPath)
     Q_PROPERTY(QStringList requestHeaders READ requestHeaders)
     Q_PROPERTY(bool requestHeadersRead READ requestHeadersRead NOTIFY requestHeadersReadChanged)
     Q_ENUMS(HttpError)
@@ -90,12 +90,22 @@ public:
     virtual ~QHttpSocket();
 
     /**
+     * @brief Retrieve the number of bytes available for reading
+     */
+    virtual qint64 bytesAvailable() const;
+
+    /**
      * @brief Close the socket
      *
      * This will cause the response headers to be written to the socket if
      * they have not yet been written.
      */
     virtual void close();
+
+    /**
+     * @brief Determine if the device is sequential
+     */
+    virtual bool isSequential() const;
 
     /**
      * @brief Retrieve the last error
@@ -111,12 +121,12 @@ public:
     QString requestMethod() const;
 
     /**
-     * @brief Retrieve the request URI
+     * @brief Retrieve the request path
      *
      * This method may only be called after the requestHeadersParsed() signal
      * is emitted.
      */
-    QString requestUri() const;
+    QString requestPath() const;
 
     /**
      * @brief Retrieve all request headers
@@ -177,7 +187,6 @@ Q_SIGNALS:
 
 private:
 
-    virtual bool isSequential() const;
     virtual qint64 readData(char *data, qint64 maxlen);
     virtual qint64 writeData(const char *data, qint64 len);
 
