@@ -32,7 +32,7 @@
 QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket, QTcpSocket *baseSocket)
     : q(httpSocket),
       socket(baseSocket),
-      error(QHttpSocket::None),
+      httpError(QHttpSocket::NoError),
       requestHeadersRead(false),
       responseStatusCode("200 OK"),
       responseHeaderLength(0),
@@ -45,9 +45,6 @@ QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket, QTcpSocket *base
     // socket acts as a transport both for headers and for data
     connect(socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
     connect(socket, SIGNAL(bytesWritten(qint64)), this, SLOT(onBytesWritten(qint64)));
-
-    // Also, the error signal needs to be handled
-    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onError(QAbstractSocket::SocketError)));
 
     // Next time the event loop is entered, attempt to read data from the socket
     QTimer::singleShot(0, this, SLOT(onReadyRead()));
@@ -78,6 +75,7 @@ void QHttpSocketPrivate::writeResponseHeaders()
 
     // Write the header
     socket->write(header);
+
     responseHeaderLength = header.length();
     responseHeadersWritten = true;
 }
@@ -97,12 +95,36 @@ void QHttpSocketPrivate::onReadyRead()
             parseRequestHeaders(buffer.left(index));
             buffer.remove(0, index + 4);
 
+            // Check to see if an error occurred during parsing
+            if(httpError != QHttpSocket::NoError) {
+
+                // Set a descriptive error message
+                switch(httpError) {
+                case QHttpSocket::MalformedRequestLine:
+                    q->setErrorString(tr("Malformed request line"));
+                    break;
+                case QHttpSocket::MalformedRequestHeader:
+                    q->setErrorString(tr("Malformed request header"));
+                    break;
+                case QHttpSocket::InvalidHttpVersion:
+                    q->setErrorString(tr("Invalid HTTP version"));
+                    break;
+                }
+
+                Q_EMIT q->httpErrorChanged(httpError);
+
+            } else {
+
+                // Indicate that the request headers were parsed
+                Q_EMIT q->requestHeadersReadChanged(requestHeadersRead = true);
+            }
+
         } else {
             return;
         }
     }
 
-    // If there is data in the buffer, emit the readyRead signal
+    // If there is data remaining in the buffer, emit the readyRead signal
     if(buffer.length()) {
         Q_EMIT q->readyRead();
     }
@@ -110,7 +132,7 @@ void QHttpSocketPrivate::onReadyRead()
 
 void QHttpSocketPrivate::onBytesWritten(qint64 bytes)
 {
-    // Since this signal may be emitted even if no data was actually written,
+    // Since this signal may be emitted even if no actual data was written,
     // the number of bytes needs to be subtracted from the header length
     if(responseHeaderLength - bytes >= 0) {
         responseHeaderLength -= bytes;
@@ -118,47 +140,6 @@ void QHttpSocketPrivate::onBytesWritten(qint64 bytes)
         Q_EMIT q->bytesWritten(bytes - responseHeaderLength);
         responseHeaderLength = 0;
     }
-}
-
-void QHttpSocketPrivate::onError(QAbstractSocket::SocketError socketError)
-{
-    // If the "error" was simply the client disconnecting, then check
-    // to see if the headers were received - otherwise it's a protocol error
-    if(socketError == QAbstractSocket::RemoteHostClosedError) {
-
-        if(!requestHeadersRead) {
-            abortWithError(QHttpSocket::IncompleteHeader);
-        }
-
-    } else {
-        abortWithError(QHttpSocket::SocketError);
-    }
-
-    // Indicate that the device is no longer open
-    q->setOpenMode(QIODevice::NotOpen);
-}
-
-void QHttpSocketPrivate::abortWithError(QHttpSocket::Error socketError)
-{
-    switch(socketError) {
-    case QHttpSocket::MalformedRequestLine:
-        q->setErrorString(tr("Malformed request line"));
-        break;
-    case QHttpSocket::MalformedRequestHeader:
-        q->setErrorString(tr("Malformed request header"));
-        break;
-    case QHttpSocket::InvalidHttpVersion:
-        q->setErrorString(tr("Invalid HTTP version"));
-        break;
-    case QHttpSocket::IncompleteHeader:
-        q->setErrorString(tr("Incomplete header received"));
-        break;
-    case QHttpSocket::SocketError:
-        q->setErrorString(socket->errorString());
-        break;
-    }
-
-    Q_EMIT q->errorChanged(error = socketError);
 }
 
 void QHttpSocketPrivate::parseRequestHeaders(const QString &headers)
@@ -170,26 +151,26 @@ void QHttpSocketPrivate::parseRequestHeaders(const QString &headers)
     parseRequestLine(parts.takeFirst());
 
     // Parse each of the remaining lines (the headers)
-    foreach(QString header, parts) {
+    foreach(const QString &header, parts) {
         parseRequestHeader(header);
     }
-
-    Q_EMIT q->requestHeadersReadChanged(requestHeadersRead = true);
 }
 
 void QHttpSocketPrivate::parseRequestLine(const QString &line)
 {
     // The request line consists of three parts separated by space
     QStringList parts = line.split(" ");
+
+    // If 3 parts are not supplied, then stop parsing the line
+    // to avoid invalid array indices later on
     if(parts.count() != 3) {
-        abortWithError(QHttpSocket::MalformedRequestLine);
+        httpError = QHttpSocket::MalformedRequestLine;
         return;
     }
 
     // Only HTTP versions 1.0 and 1.1 are currently supported
     if(parts[2] != "HTTP/1.0" && parts[2] != "HTTP/1.1") {
-        abortWithError(QHttpSocket::InvalidHttpVersion);
-        return;
+        httpError = QHttpSocket::InvalidHttpVersion;
     }
 
     requestMethod = parts[0];
@@ -200,8 +181,10 @@ void QHttpSocketPrivate::parseRequestHeader(const QString &header)
 {
     // Each header consists of the key, ":", and the value
     int index = header.indexOf(":");
+
+    // If the colon was not found, then stop parsing the header
     if(index == -1) {
-        abortWithError(QHttpSocket::MalformedRequestHeader);
+        httpError = QHttpSocket::MalformedRequestHeader;
         return;
     }
 
@@ -216,6 +199,7 @@ QHttpSocket::QHttpSocket(QTcpSocket *socket, QObject *parent)
     : QIODevice(parent),
       d(new QHttpSocketPrivate(this, socket))
 {
+    // The device is immediately open for reading
     setOpenMode(QIODevice::ReadWrite);
 }
 
@@ -226,35 +210,36 @@ QHttpSocket::~QHttpSocket()
 
 void QHttpSocket::close()
 {
+    // Don't do anything if the device was already closed
+    if(!isOpen()) {
+        return;
+    }
+
     // If the response headers have not yet been written, then do so before closing
     if(!d->responseHeadersWritten) {
         d->writeResponseHeaders();
     }
 
-    d->socket->close();
-    setOpenMode(QIODevice::NotOpen);
+    QIODevice::close();
 }
 
-QHttpSocket::Error QHttpSocket::error() const
+QHttpSocket::HttpError QHttpSocket::httpError() const
 {
-    return d->error;
+    return d->httpError;
 }
 
 QString QHttpSocket::requestMethod() const
 {
-    Q_ASSERT(requestHeadersRead());
     return d->requestMethod;
 }
 
 QString QHttpSocket::requestUri() const
 {
-    Q_ASSERT(requestHeadersRead());
     return d->requestUri;
 }
 
 QStringList QHttpSocket::requestHeaders() const
 {
-    Q_ASSERT(requestHeadersRead());
     return d->requestHeaders.keys();
 }
 
@@ -265,19 +250,16 @@ bool QHttpSocket::requestHeadersRead() const
 
 QString QHttpSocket::requestHeader(const QString &header) const
 {
-    Q_ASSERT(requestHeadersRead());
     return d->requestHeaders.value(header.toLower());
 }
 
 void QHttpSocket::setResponseStatusCode(const QString &statusCode)
 {
-    Q_ASSERT(!d->responseHeadersWritten);
     d->responseStatusCode = statusCode;
 }
 
 void QHttpSocket::setResponseHeader(const QString &header, const QString &value)
 {
-    Q_ASSERT(!d->responseHeadersWritten);
     d->responseHeaders.insert(header, value);
 }
 

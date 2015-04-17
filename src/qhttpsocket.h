@@ -37,8 +37,7 @@ class QHTTPENGINE_EXPORT QHttpSocketPrivate;
  * @brief Socket for communicating with a client
  *
  * QHttpSocket provides a class derived from QIODevice for communication with
- * an HTTP client. A QTcpSocket instance is provided to the constructor and
- * the class will then assume ownership of the socket.
+ * an HTTP client. A QTcpSocket instance is provided to the constructor.
  *
  * Once the requestHeadersReadChanged() signal is emitted, information about
  * the request can be retrieved using the appropriate properties. This
@@ -58,25 +57,23 @@ class QHTTPENGINE_EXPORT QHttpSocketPrivate;
 class QHTTPENGINE_EXPORT QHttpSocket : public QIODevice
 {
     Q_OBJECT
-    Q_PROPERTY(Error error READ error NOTIFY errorChanged)
+    Q_PROPERTY(HttpError httpError READ httpError NOTIFY httpErrorChanged)
     Q_PROPERTY(QString requestMethod READ requestMethod)
     Q_PROPERTY(QString requestUri READ requestUri)
     Q_PROPERTY(QStringList requestHeaders READ requestHeaders)
     Q_PROPERTY(bool requestHeadersRead READ requestHeadersRead NOTIFY requestHeadersReadChanged)
-    Q_ENUMS(Error)
+    Q_ENUMS(HttpError)
 
 public:
 
     /**
-     * @brief Error encountered during client communication
+     * @brief HTTP error encountered during client communication
      */
-    enum Error {
-        None = 0,
+    enum HttpError {
+        NoError = 0,
         MalformedRequestLine,
         MalformedRequestHeader,
-        InvalidHttpVersion,
-        IncompleteHeader,
-        SocketError
+        InvalidHttpVersion
     };
 
     /**
@@ -103,7 +100,7 @@ public:
     /**
      * @brief Retrieve the last error
      */
-    Error error() const;
+    HttpError httpError() const;
 
     /**
      * @brief Retrieve the request method
@@ -162,13 +159,13 @@ public:
 Q_SIGNALS:
 
     /**
-     * @brief Indicate that an error has occurred
+     * @brief Indicate that an HTTP error has occurred
      *
      * Any attempts to read from or write to the socket after this point will
      * be ignored. A brief description of the error condition can be retrieved
      * with the errorString() method.
      */
-    void errorChanged(Error error);
+    void httpErrorChanged(HttpError httpError);
 
     /**
      * @brief Indicate that request headers have been read

@@ -41,10 +41,10 @@ public:
 
     void writeResponseHeaders();
 
-    QTcpSocket *socket;
+    QTcpSocket *const socket;
     QByteArray buffer;
 
-    QHttpSocket::Error error;
+    QHttpSocket::HttpError httpError;
 
     QString requestMethod;
     QString requestUri;
@@ -60,11 +60,8 @@ private Q_SLOTS:
 
     void onReadyRead();
     void onBytesWritten(qint64 bytes);
-    void onError(QAbstractSocket::SocketError socketError);
 
 private:
-
-    void abortWithError(QHttpSocket::Error socketError);
 
     void parseRequestHeaders(const QString &headers);
     void parseRequestLine(const QString &line);
