@@ -220,6 +220,7 @@ void QHttpSocket::close()
         d->writeResponseHeaders();
     }
 
+    d->socket->close();
     QIODevice::close();
 }
 
