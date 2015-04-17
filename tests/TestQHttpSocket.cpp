@@ -22,7 +22,6 @@
  * IN THE SOFTWARE.
  **/
 
-#include <QBuffer>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -74,7 +73,7 @@ void TestQHttpSocket::testMethods()
 
     // Verify the request headers
     QTRY_VERIFY(socket->requestHeadersRead());
-    QCOMPARE(socket->error(), QHttpSocket::None);
+    QCOMPARE(socket->httpError(), QHttpSocket::NoError);
     QCOMPARE(socket->requestMethod(), QString("POST"));
     QCOMPARE(socket->requestUri(), QString("/test"));
     QCOMPARE(socket->requestHeader("Content-Type"), QString("text/plain"));
