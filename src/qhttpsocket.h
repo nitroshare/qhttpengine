@@ -95,17 +95,17 @@ public:
     virtual qint64 bytesAvailable() const;
 
     /**
-     * @brief Close the socket
+     * @brief Determine if the device is sequential
+     */
+    virtual bool isSequential() const;
+
+    /**
+     * @brief Write response headers to the socket
      *
      * This will cause the response headers to be written to the socket if
      * they have not yet been written.
      */
-    virtual void close();
-
-    /**
-     * @brief Determine if the device is sequential
-     */
-    virtual bool isSequential() const;
+    void flush();
 
     /**
      * @brief Retrieve the last error

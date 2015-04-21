@@ -38,9 +38,6 @@ QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket, QTcpSocket *base
       responseHeaderLength(0),
       responseHeadersWritten(false)
 {
-    // Re-parent the socket to this class
-    socket->setParent(this);
-
     // Both of these signals must be handled directly since the
     // socket acts as a transport both for headers and for data
     connect(socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
@@ -213,25 +210,16 @@ qint64 QHttpSocket::bytesAvailable() const
     return d->buffer.size() + QIODevice::bytesAvailable();
 }
 
-void QHttpSocket::close()
-{
-    // Don't do anything if the device was already closed
-    if(!isOpen()) {
-        return;
-    }
-
-    // If the response headers have not yet been written, then do so before closing
-    if(!d->responseHeadersWritten) {
-        d->writeResponseHeaders();
-    }
-
-    d->socket->close();
-    QIODevice::close();
-}
-
 bool QHttpSocket::isSequential() const
 {
     return true;
+}
+
+void QHttpSocket::flush()
+{
+    if(!d->responseHeadersWritten) {
+        d->writeResponseHeaders();
+    }
 }
 
 QHttpSocket::HttpError QHttpSocket::httpError() const
@@ -278,7 +266,7 @@ qint64 QHttpSocket::readData(char *data, qint64 maxlen)
 {
     // Data can only be read from the socket once the request headers are read
     if(!requestHeadersRead()) {
-        return -1;
+        return 0;
     }
 
     // Ensure that no more than the requested amount or the size of the buffer is read
