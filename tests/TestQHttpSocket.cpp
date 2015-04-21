@@ -22,6 +22,7 @@
  * IN THE SOFTWARE.
  **/
 
+#include <QListIterator>
 #include <QSignalSpy>
 #include <QTcpServer>
 #include <QTcpSocket>
@@ -43,8 +44,11 @@ private Q_SLOTS:
     void testRequestData();
     void testResponseProperties();
     void testResponseData();
+    void testSignals();
 
 private:
+
+    bool responseHeadersRead();
 
     QTcpServer mServer;
 
@@ -99,11 +103,10 @@ void TestQHttpSocket::testRequestData()
     QTRY_VERIFY(mServerSocket->requestHeadersRead());
     QCOMPARE(mServerSocket->bytesAvailable(), 0);
 
-    QByteArray data(65536, '*');
-    mClientSocket->write(data);
+    mClientSocket->write("test");
 
-    QTRY_COMPARE(mServerSocket->bytesAvailable(), data.length());
-    QCOMPARE(mServerSocket->readAll(), data);
+    QTRY_COMPARE(mServerSocket->bytesAvailable(), 4);
+    QCOMPARE(mServerSocket->readAll(), QByteArray("test"));
 }
 
 void TestQHttpSocket::testResponseProperties()
@@ -115,7 +118,7 @@ void TestQHttpSocket::testResponseProperties()
     mServerSocket->setResponseHeader("X-Test", "test");
     mServerSocket->flush();
 
-    QTRY_VERIFY(mClientSocket->peek(65536).indexOf("\r\n\r\n") != -1);
+    QTRY_VERIFY(responseHeadersRead());
     QCOMPARE(mClientSocket->readAll(), QByteArray("HTTP/1.0 403 FORBIDDEN\r\nX-Test: test\r\n\r\n"));
 }
 
@@ -125,14 +128,48 @@ void TestQHttpSocket::testResponseData()
     QTRY_VERIFY(mServerSocket->requestHeadersRead());
 
     mServerSocket->flush();
-    QTRY_VERIFY(mClientSocket->peek(65536).indexOf("\r\n\r\n") != -1);
-    mClientSocket->read(mClientSocket->peek(65536).indexOf("\r\n\r\n") + 4);
+    QTRY_VERIFY(responseHeadersRead());
+    mClientSocket->readAll();
 
-    QByteArray data(65536, '*');
-    mServerSocket->write(data);
+    mServerSocket->write("test");
 
-    QTRY_COMPARE(mClientSocket->bytesAvailable(), data.length());
-    QCOMPARE(mClientSocket->readAll(), data);
+    QTRY_COMPARE(mClientSocket->bytesAvailable(), 4);
+    QCOMPARE(mClientSocket->readAll(), QByteArray("test"));
+}
+
+void TestQHttpSocket::testSignals()
+{
+    QSignalSpy reqHdrReadSpy(mServerSocket, SIGNAL(requestHeadersReadChanged(bool)));
+    QSignalSpy readyReadSpy(mServerSocket, SIGNAL(readyRead()));
+    QSignalSpy bytesWrittenSpy(mServerSocket, SIGNAL(bytesWritten(qint64)));
+
+    // Ensure that the requestHeadersRead signal was emitted
+    mClientSocket->write("GET /path HTTP/1.1\r\n\r\n");
+    QTRY_COMPARE(reqHdrReadSpy.count(), 1);
+
+    // Ensure that a single readyRead signal was emitted
+    QCOMPARE(readyReadSpy.count(), 0);
+    mClientSocket->write("*");
+    QTRY_COMPARE(readyReadSpy.count(), 1);
+
+    // Send the response headers and ignore them
+    mServerSocket->flush();
+    QTRY_VERIFY(responseHeadersRead());
+    mClientSocket->readAll();
+
+    // Ensure that a single bytesWritten signal is emitted for each write
+    QCOMPARE(bytesWrittenSpy.count(), 0);
+
+    for(int i = 0; i < 2; ++i) {
+        mServerSocket->write("*");
+        QTRY_COMPARE(bytesWrittenSpy.count(), 1);
+        QCOMPARE(bytesWrittenSpy.takeFirst().at(0).toLongLong(), 1);
+    }
+}
+
+bool TestQHttpSocket::responseHeadersRead()
+{
+    return mClientSocket->peek(65536).indexOf("\r\n\r\n") != -1;
 }
 
 QTEST_MAIN(TestQHttpSocket)
