@@ -22,23 +22,12 @@
  * IN THE SOFTWARE.
  **/
 
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
 #include <QSignalSpy>
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QTest>
 
 #include "qhttpsocket.h"
-
-// Define the data that will be used for the tests
-const QString Path = "/test";
-const QByteArray HeaderName = "Content-Type";
-const QByteArray HeaderValue = "text/plain";
-const QByteArray Data = "test";
-const int StatusCode = 200;
-const QString StatusReason = "OK";
 
 class TestQHttpSocket : public QObject
 {
@@ -57,92 +46,93 @@ private Q_SLOTS:
 
 private:
 
-    QNetworkAccessManager mManager;
     QTcpServer mServer;
-    quint16 mPort;
 
-    QNetworkReply *mReply;
-    QHttpSocket *mSocket;
+    QTcpSocket *mClientSocket;
+    QHttpSocket *mServerSocket;
 };
 
 void TestQHttpSocket::initTestCase()
 {
-    // Select a random port to listen on
     QVERIFY(mServer.listen());
-    mPort = mServer.serverPort();
-
-    mReply = 0;
-    mSocket = 0;
 }
 
 void TestQHttpSocket::init()
 {
-    QUrl url(QString("http://127.0.0.1:%2%3").arg(mPort).arg(Path));
+    mClientSocket = new QTcpSocket;
+    mClientSocket->connectToHost(QHostAddress::LocalHost, mServer.serverPort());
+    mServerSocket = 0;
 
-    // Create the request and set a raw header
-    QNetworkRequest request(url);
-    request.setRawHeader(HeaderName, HeaderValue);
+    QTRY_COMPARE(mClientSocket->state(), QAbstractSocket::ConnectedState);
 
-    // Send the request, including the POST data
-    mReply = mManager.post(request, Data);
-
-    // Ensure that a request was received by the server
-    QSignalSpy newConnectionSignalSpy(&mServer, SIGNAL(newConnection()));
-    QTRY_COMPARE(newConnectionSignalSpy.count(), 1);
-
-    // Create the HTTP socket
     QTcpSocket *socket = mServer.nextPendingConnection();
-    mSocket = new QHttpSocket(socket);
-    socket->setParent(mSocket);
-
-    // Ensure that the request headers are received
-    QTRY_VERIFY(mSocket->requestHeadersRead());
+    mServerSocket = new QHttpSocket(socket);
+    socket->setParent(mServerSocket);
 }
 
 void TestQHttpSocket::cleanup()
 {
-    if(mReply) {
-        mReply->deleteLater();
-        mSocket = 0;
-    }
+    delete mClientSocket;
 
-    if(mSocket) {
-        mSocket->deleteLater();
-        mSocket = 0;
+    if(mServerSocket) {
+        delete mServerSocket;
     }
 }
 
 void TestQHttpSocket::testRequestProperties()
 {
-    QCOMPARE(mSocket->httpError(), QHttpSocket::NoError);
-    QCOMPARE(mSocket->requestMethod(), QString("POST"));
-    QCOMPARE(mSocket->requestPath(), Path);
-    QCOMPARE(mSocket->requestHeader(HeaderName), QString(HeaderValue));
+    mClientSocket->write("PUT /path HTTP/1.1\r\n");
+    mClientSocket->write("X-Test: test\r\n\r\n");
+
+    QTRY_VERIFY(mServerSocket->requestHeadersRead());
+
+    QCOMPARE(mServerSocket->httpError(), QHttpSocket::NoError);
+    QCOMPARE(mServerSocket->requestMethod(), QString("PUT"));
+    QCOMPARE(mServerSocket->requestPath(), QString("/path"));
+    QCOMPARE(mServerSocket->requestHeader("X-Test"), QString("test"));
 }
 
 void TestQHttpSocket::testRequestData()
 {
-    QTRY_COMPARE(mSocket->bytesAvailable(), Data.length());
-    QCOMPARE(mSocket->readAll(), Data);
+    mClientSocket->write("POST /path HTTP/1.1\r\n\r\n");
+
+    QTRY_VERIFY(mServerSocket->requestHeadersRead());
+    QCOMPARE(mServerSocket->bytesAvailable(), 0);
+
+    QByteArray data(65536, '*');
+    mClientSocket->write(data);
+
+    QTRY_COMPARE(mServerSocket->bytesAvailable(), data.length());
+    QCOMPARE(mServerSocket->readAll(), data);
 }
 
 void TestQHttpSocket::testResponseProperties()
 {
-    mSocket->setResponseStatusCode(QString("%1 %2").arg(StatusCode).arg(StatusReason));
-    mSocket->setResponseHeader(HeaderName, HeaderValue);
-    mSocket->close();
+    mClientSocket->write("GET /path HTTP/1.1\r\n\r\n");
+    QTRY_VERIFY(mServerSocket->requestHeadersRead());
 
-    QTRY_VERIFY(mReply->isFinished());
-    QCOMPARE(mReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt(), StatusCode);
-    QCOMPARE(mReply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString(), StatusReason);
+    mServerSocket->setResponseStatusCode("403 FORBIDDEN");
+    mServerSocket->setResponseHeader("X-Test", "test");
+    mServerSocket->flush();
+
+    QTRY_VERIFY(mClientSocket->peek(65536).indexOf("\r\n\r\n") != -1);
+    QCOMPARE(mClientSocket->readAll(), QByteArray("HTTP/1.0 403 FORBIDDEN\r\nX-Test: test\r\n\r\n"));
 }
 
 void TestQHttpSocket::testResponseData()
 {
-    mSocket->write(Data);
+    mClientSocket->write("GET /path HTTP/1.1\r\n\r\n");
+    QTRY_VERIFY(mServerSocket->requestHeadersRead());
 
-    QTRY_COMPARE(mReply->bytesAvailable(), Data.length());
-    QCOMPARE(mReply->readAll(), Data);
+    mServerSocket->flush();
+    QTRY_VERIFY(mClientSocket->peek(65536).indexOf("\r\n\r\n") != -1);
+    mClientSocket->read(mClientSocket->peek(65536).indexOf("\r\n\r\n") + 4);
+
+    QByteArray data(65536, '*');
+    mServerSocket->write(data);
+
+    QTRY_COMPARE(mClientSocket->bytesAvailable(), data.length());
+    QCOMPARE(mClientSocket->readAll(), data);
 }
 
 QTEST_MAIN(TestQHttpSocket)
