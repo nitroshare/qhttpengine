@@ -93,9 +93,10 @@ void TestQHttpSocket::testRequestProperties()
     QTRY_VERIFY(mServerSocket->requestHeadersRead());
 
     QCOMPARE(mServerSocket->httpError(), QHttpSocket::NoError);
-    QCOMPARE(mServerSocket->requestMethod(), QString("PUT"));
-    QCOMPARE(mServerSocket->requestPath(), QString("/path"));
-    QCOMPARE(mServerSocket->requestHeader("X-Test"), QString("test"));
+    QCOMPARE(mServerSocket->requestMethod(), QByteArray("PUT"));
+    QCOMPARE(mServerSocket->requestPath(), QByteArray("/path"));
+    QCOMPARE(mServerSocket->requestHeader("X-Test"), QByteArray("test"));
+    QVERIFY(mServerSocket->requestHeaders().contains("X-Test"));
 }
 
 void TestQHttpSocket::testRequestData()
