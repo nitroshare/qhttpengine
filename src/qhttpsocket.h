@@ -34,21 +34,21 @@
 class QHTTPENGINE_EXPORT QHttpSocketPrivate;
 
 /**
- * @brief Socket for communicating with a client
+ * @brief Socket for communicating with an HTTP client
  *
  * QHttpSocket provides a class derived from QIODevice for communication with
- * an HTTP client. A QTcpSocket instance is provided to the constructor.
+ * an HTTP client though a QTcpSocket instance provided to the constructor.
  *
  * Once the requestHeadersReadChanged() signal is emitted, information about
  * the request can be retrieved using the appropriate properties. This
- * includes the request method, URI, and headers. As request data is received,
- * the readyRead() signal is emitted and any available data can be read using
- * QIODevice's read* methods.
+ * includes the request method, path, and headers. As request data is
+ * received, the readyRead() signal is emitted and any available data can be
+ * read using QIODevice's read*() methods.
  *
  * Response code and headers can be set as long as no data has been written
- * to the socket. Response data can be written using QIODevice's write*
- * methods. The headers are written immediately by calling the flush() method
- * or attempting to write data to the socket.
+ * to the socket. Response data can be written using QIODevice's write*()
+ * methods. The headers are written manually by calling the flush() method or
+ * automatically by attempting to write data to the socket.
  *
  * If at any point during the exchange a protocol error is encountered, the
  * httpErrorChanged() signal is emitted. A human-readable description of the
@@ -77,10 +77,9 @@ public:
     };
 
     /**
-     * @brief Create a new QHttpSocket from a socket
+     * @brief Create a new QHttpSocket from a QTcpSocket
      *
-     * It is assumed that the socket is already in the connected state. The
-     * QHttpSocket assumes ownership of the socket.
+     * It is assumed that the socket is already in the connected state.
      */
     QHttpSocket(QTcpSocket *socket, QObject *parent = 0);
 
@@ -96,19 +95,18 @@ public:
 
     /**
      * @brief Determine if the device is sequential
+     *
+     * This method will always return true.
      */
     virtual bool isSequential() const;
 
     /**
      * @brief Write response headers to the socket
-     *
-     * This will cause the response headers to be written to the socket if
-     * they have not yet been written.
      */
     void flush();
 
     /**
-     * @brief Retrieve the last error
+     * @brief Retrieve the most recent HTTP error
      */
     HttpError httpError() const;
 
@@ -171,9 +169,9 @@ Q_SIGNALS:
     /**
      * @brief Indicate that an HTTP error has occurred
      *
-     * Any attempts to read from or write to the socket after this point will
-     * be ignored. A brief description of the error condition can be retrieved
-     * with the errorString() method.
+     * Any attempts to read from or write to the socket after this point may
+     * fail. A brief description of the error condition can be retrieved with
+     * the errorString() method.
      */
     void httpErrorChanged(HttpError httpError);
 
