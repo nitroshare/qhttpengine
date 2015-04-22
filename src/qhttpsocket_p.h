@@ -46,13 +46,13 @@ public:
 
     QHttpSocket::HttpError httpError;
 
-    QString requestMethod;
-    QString requestPath;
-    QMap<QString, QString> requestHeaders;
+    QByteArray requestMethod;
+    QByteArray requestPath;
+    QMap<QByteArray, QByteArray> requestHeaders;
     bool requestHeadersRead;
 
-    QString responseStatusCode;
-    QMap<QString, QString> responseHeaders;
+    QByteArray responseStatusCode;
+    QMap<QByteArray, QByteArray> responseHeaders;
     qint64 responseHeaderLength;
     bool responseHeadersWritten;
 
@@ -63,9 +63,11 @@ private Q_SLOTS:
 
 private:
 
-    void parseRequestHeaders(const QString &headers);
-    void parseRequestLine(const QString &line);
-    void parseRequestHeader(const QString &header);
+    QList<QByteArray> split(const QByteArray &data, const QByteArray &delim);
+
+    void parseRequestHeaders(const QByteArray &headers);
+    void parseRequestLine(const QByteArray &line);
+    void parseRequestHeader(const QByteArray &header);
 
     QHttpSocket *const q;
 };

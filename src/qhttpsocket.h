@@ -26,7 +26,7 @@
 #define QHTTPENGINE_QHTTPSOCKET_H
 
 #include <QIODevice>
-#include <QStringList>
+#include <QList>
 #include <QTcpSocket>
 
 #include "config.h"
@@ -47,20 +47,20 @@ class QHTTPENGINE_EXPORT QHttpSocketPrivate;
  *
  * Response code and headers can be set as long as no data has been written
  * to the socket. Response data can be written using QIODevice's write*
- * methods. The socket may be closed using the close() method once writing is
- * complete.
+ * methods. The headers are written immediately by calling the flush() method
+ * or attempting to write data to the socket.
  *
  * If at any point during the exchange a protocol error is encountered, the
- * errorChanged() signal is emitted. A human-readable description of the error
- * can be obtained through the errorString() method.
+ * httpErrorChanged() signal is emitted. A human-readable description of the
+ * error can be obtained through the errorString() method.
  */
 class QHTTPENGINE_EXPORT QHttpSocket : public QIODevice
 {
     Q_OBJECT
     Q_PROPERTY(HttpError httpError READ httpError NOTIFY httpErrorChanged)
-    Q_PROPERTY(QString requestMethod READ requestMethod)
-    Q_PROPERTY(QString requestPath READ requestPath)
-    Q_PROPERTY(QStringList requestHeaders READ requestHeaders)
+    Q_PROPERTY(QByteArray requestMethod READ requestMethod)
+    Q_PROPERTY(QByteArray requestPath READ requestPath)
+    Q_PROPERTY(QList<QByteArray> requestHeaders READ requestHeaders)
     Q_PROPERTY(bool requestHeadersRead READ requestHeadersRead NOTIFY requestHeadersReadChanged)
     Q_ENUMS(HttpError)
 
@@ -118,7 +118,7 @@ public:
      * This method may only be called after the requestHeadersParsed() signal
      * is emitted.
      */
-    QString requestMethod() const;
+    QByteArray requestMethod() const;
 
     /**
      * @brief Retrieve the request path
@@ -126,7 +126,7 @@ public:
      * This method may only be called after the requestHeadersParsed() signal
      * is emitted.
      */
-    QString requestPath() const;
+    QByteArray requestPath() const;
 
     /**
      * @brief Retrieve all request headers
@@ -134,7 +134,7 @@ public:
      * This method may only be called after the requestHeadersParsed() signal
      * is emitted.
      */
-    QStringList requestHeaders() const;
+    QList<QByteArray> requestHeaders() const;
 
     /**
      * @brief Determine if request headers have been read yet
@@ -148,7 +148,7 @@ public:
      * is emitted. Headers are case-insensitive. If the specified header was
      * not set, then a null (empty) string is returned.
      */
-    Q_INVOKABLE QString requestHeader(const QString &header) const;
+    Q_INVOKABLE QByteArray requestHeader(const QByteArray &header) const;
 
     /**
      * @brief Set the response code
@@ -157,14 +157,14 @@ public:
      * If no response status code is explicitly set, it will assume a default
      * value of "200 OK".
      */
-    Q_INVOKABLE void setResponseStatusCode(const QString &statusCode);
+    Q_INVOKABLE void setResponseStatusCode(const QByteArray &statusCode);
 
     /**
      * @brief Set a response header to a specific value
      *
      * This method may only be called before the response headers are written.
      */
-    Q_INVOKABLE void setResponseHeader(const QString &header, const QString &value);
+    Q_INVOKABLE void setResponseHeader(const QByteArray &header, const QByteArray &value);
 
 Q_SIGNALS:
 
