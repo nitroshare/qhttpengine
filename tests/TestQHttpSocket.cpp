@@ -45,6 +45,7 @@ private Q_SLOTS:
     void testResponseProperties();
     void testResponseData();
     void testSignals();
+    void testError();
 
 private:
 
@@ -58,6 +59,7 @@ private:
 
 void TestQHttpSocket::initTestCase()
 {
+    qRegisterMetaType<QHttpSocket::HttpError>("HttpError");
     QVERIFY(mServer.listen());
 }
 
@@ -165,6 +167,17 @@ void TestQHttpSocket::testSignals()
         QTRY_COMPARE(bytesWrittenSpy.count(), 1);
         QCOMPARE(bytesWrittenSpy.takeFirst().at(0).toLongLong(), 1);
     }
+}
+
+void TestQHttpSocket::testError()
+{
+    QSignalSpy errorSpy(mServerSocket, SIGNAL(httpErrorChanged(HttpError)));
+
+    // Send a malformed request line
+    mClientSocket->write("error\r\n\r\n");
+
+    QTRY_COMPARE(errorSpy.count(), 1);
+    QCOMPARE(mServerSocket->httpError(), QHttpSocket::MalformedRequestLine);
 }
 
 bool TestQHttpSocket::responseHeadersRead()
