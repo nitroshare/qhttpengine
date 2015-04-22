@@ -194,4 +194,6 @@ private:
     friend class QHttpSocketPrivate;
 };
 
+Q_DECLARE_METATYPE(QHttpSocket::HttpError)
+
 #endif // QHTTPENGINE_QHTTPSOCKET_H
