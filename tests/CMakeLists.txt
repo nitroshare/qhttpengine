@@ -10,5 +10,8 @@ foreach(TEST ${TESTS})
     qt5_use_modules(${TEST} Test)
     target_link_libraries(${TEST} qhttpengine)
 
-    add_test(NAME ${TEST} COMMAND ${TEST})
+    add_test(NAME ${TEST}
+        COMMAND ${TEST}
+        WORKING_DIRECTORY $<TARGET_FILE_DIR:qhttpengine>
+    )
 endforeach()
