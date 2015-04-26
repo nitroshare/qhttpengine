@@ -12,6 +12,5 @@ foreach(TEST ${TESTS})
 
     add_test(NAME ${TEST}
         COMMAND ${TEST}
-        WORKING_DIRECTORY $<TARGET_FILE_DIR:qhttpengine>
     )
 endforeach()
