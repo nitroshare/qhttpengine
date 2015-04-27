@@ -106,6 +106,8 @@ void QHttpSocketPrivate::onReadyRead()
                 case QHttpSocket::InvalidHttpVersion:
                     q->setErrorString(tr("Invalid HTTP version"));
                     break;
+                default:
+                    break;
                 }
 
                 Q_EMIT q->httpErrorChanged(httpError);
