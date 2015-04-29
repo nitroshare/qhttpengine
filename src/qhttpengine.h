@@ -27,10 +27,12 @@
 
 #include <QList>
 
+#include "config.h"
+
 /**
  * @brief Utility functions
  */
-class QHttpEngine
+class QHTTPENGINE_EXPORT QHttpEngine
 {
 public:
 
