@@ -30,18 +30,18 @@
 /**
  * @brief Utility functions
  */
-namespace QHttpEngine
+class QHttpEngine
 {
+public:
 
-/**
- * @brief Split a QByteArray by the provided delimiter
- *
- * If the delimiter is not present in the QByteArray, a list will be returned
- * containing the original QByteArray as its only element. The delimiter must
- * not be empty.
- */
-QList<QByteArray> split(const QByteArray &data, const QByteArray &delim);
-
-}
+    /**
+     * @brief Split a QByteArray by the provided delimiter
+     *
+     * If the delimiter is not present in the QByteArray, a list will be returned
+     * containing the original QByteArray as its only element. The delimiter must
+     * not be empty.
+     */
+    static QList<QByteArray> split(const QByteArray &data, const QByteArray &delim);
+};
 
 #endif // QHTTPENGINE_QHTTPENGINE_H
