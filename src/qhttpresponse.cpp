@@ -26,7 +26,8 @@
 #include "qhttpresponse_p.h"
 
 QHttpResponsePrivate::QHttpResponsePrivate(QHttpResponse *response, QIODevice *baseDevice)
-    : q(response),
+    : QObject(response),
+      q(response),
       device(baseDevice),
       headersWritten(false)
 {
@@ -50,11 +51,6 @@ QHttpResponse::QHttpResponse(QIODevice *device, QObject *parent)
       d(new QHttpResponsePrivate(this, device))
 {
     setOpenMode(QIODevice::WriteOnly);
-}
-
-QHttpResponse::~QHttpResponse()
-{
-    delete d;
 }
 
 bool QHttpResponse::isSequential() const

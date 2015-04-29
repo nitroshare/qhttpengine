@@ -30,7 +30,8 @@
 #include "qhttprequest_p.h"
 
 QHttpRequestPrivate::QHttpRequestPrivate(QHttpRequest *request, QIODevice *baseDevice)
-    : q(request),
+    : QObject(request),
+      q(request),
       device(baseDevice),
       error(QHttpRequest::NoError),
       headersParsed(false)
@@ -172,11 +173,6 @@ QHttpRequest::QHttpRequest(QIODevice *device, QObject *parent)
       d(new QHttpRequestPrivate(this, device))
 {
     setOpenMode(QIODevice::ReadOnly);
-}
-
-QHttpRequest::~QHttpRequest()
-{
-    delete d;
 }
 
 qint64 QHttpRequest::bytesAvailable() const

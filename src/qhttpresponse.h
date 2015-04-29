@@ -48,11 +48,6 @@ public:
     QHttpResponse(QIODevice *device, QObject *parent = 0);
 
     /**
-     * @brief Destroy the QHttpResponse
-     */
-    virtual ~QHttpResponse();
-
-    /**
      * @brief Determine if the device is sequential
      *
      * This method will always return true.

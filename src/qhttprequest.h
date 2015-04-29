@@ -64,11 +64,6 @@ public:
     QHttpRequest(QIODevice *device, QObject *parent = 0);
 
     /**
-     * @brief Destroy the QHttpRequest
-     */
-    virtual ~QHttpRequest();
-
-    /**
      * @brief Retrieve the number of bytes available for reading
      */
     virtual qint64 bytesAvailable() const;
