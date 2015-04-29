@@ -41,8 +41,14 @@ public:
 
     QIODevice *device;
 
+    QByteArray statusCode;
     QMap<QByteArray, QByteArray> headers;
-    bool headersSent;
+    qint64 headerLength;
+    bool headersWritten;
+
+private Q_SLOTS:
+
+    void onBytesWritten(qint64 bytes);
 
 private:
 

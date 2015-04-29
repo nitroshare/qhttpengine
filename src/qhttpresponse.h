@@ -40,10 +40,50 @@ class QHTTPENGINE_EXPORT QHttpResponse : public QIODevice
 
 public:
 
+    /**
+     * @brief Create a new QHttpResponse from a QIODevice
+     *
+     * It is assumed that the device is already opened for writing
+     */
     QHttpResponse(QIODevice *device, QObject *parent = 0);
+
+    /**
+     * @brief Destroy the QHttpResponse
+     */
     virtual ~QHttpResponse();
 
+    /**
+     * @brief Determine if the device is sequential
+     *
+     * This method will always return true.
+     */
+    virtual bool isSequential() const;
+
+    /**
+     * @brief Write response headers to the device
+     */
+    Q_INVOKABLE void writeHeaders();
+
+    /**
+     * @brief Set the response code
+     *
+     * This method may only be called before the response headers are written.
+     * If no response status code is explicitly set, it will assume a default
+     * value of "200 OK".
+     */
+    Q_INVOKABLE void setStatusCode(const QByteArray &statusCode);
+
+    /**
+     * @brief Set a response header to a specific value
+     *
+     * This method may only be called before the response headers are written.
+     */
+    Q_INVOKABLE void setHeader(const QByteArray &name, const QByteArray &value);
+
 private:
+
+    virtual qint64 readData(char *data, qint64 maxlen);
+    virtual qint64 writeData(const char *data, qint64 len);
 
     QHttpResponsePrivate *const d;
     friend class QHttpResponsePrivate;
