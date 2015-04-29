@@ -5,14 +5,12 @@ set(INCLUDE
     "${CMAKE_CURRENT_BINARY_DIR}/config.h"
     qhttprequest.h
     qhttpresponse.h
-    qhttpsocket.h
     qjsonserver.h
 )
 
 set(SRC
     qhttprequest.cpp
     qhttpresponse.cpp
-    qhttpsocket.cpp
     qjsonserver.cpp
 )
 

@@ -3,7 +3,6 @@ find_package(Qt5Test REQUIRED)
 set(TESTS
     TestQHttpRequest
     TestQHttpResponse
-    TestQHttpSocket
     TestQJsonServer
 )
 
