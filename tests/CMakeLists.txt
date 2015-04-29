@@ -1,6 +1,7 @@
 find_package(Qt5Test REQUIRED)
 
 set(TESTS
+    TestQHttpRequest
     TestQHttpSocket
     TestQJsonServer
 )

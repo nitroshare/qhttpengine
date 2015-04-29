@@ -25,7 +25,7 @@
 #ifndef QHTTPENGINE_QHTTPREQUESTPRIVATE_H
 #define QHTTPENGINE_QHTTPREQUESTPRIVATE_H
 
-#include <QAbstractSocket>
+#include <QIODevice>
 #include <QMap>
 #include <QObject>
 
@@ -37,9 +37,9 @@ class QHttpRequestPrivate : public QObject
 
 public:
 
-    QHttpRequestPrivate(QHttpRequest *request, QAbstractSocket *baseSocket);
+    QHttpRequestPrivate(QHttpRequest *request, QIODevice *baseDevice);
 
-    QAbstractSocket *const socket;
+    QIODevice *const device;
 
     QHttpRequest::Error error;
     QByteArray method;

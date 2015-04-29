@@ -3,11 +3,13 @@ configure_file(qhttpengine.pc.in "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.pc" @O
 
 set(INCLUDE
     "${CMAKE_CURRENT_BINARY_DIR}/config.h"
+    qhttprequest.h
     qhttpsocket.h
     qjsonserver.h
 )
 
 set(SRC
+    qhttprequest.cpp
     qhttpsocket.cpp
     qjsonserver.cpp
 )

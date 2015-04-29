@@ -29,22 +29,22 @@
 #include "qhttprequest.h"
 #include "qhttprequest_p.h"
 
-QHttpRequestPrivate::QHttpRequestPrivate(QHttpRequest *request, QAbstractSocket *baseSocket)
+QHttpRequestPrivate::QHttpRequestPrivate(QHttpRequest *request, QIODevice *baseDevice)
     : q(request),
-      socket(baseSocket),
+      device(baseDevice),
       error(QHttpRequest::NoError),
       headersParsed(false)
 {
-    connect(socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
+    connect(device, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 
-    // Attempt to read data from the socket the next time the event loop is entered
+    // Attempt to read data from the device the next time the event loop is entered
     QTimer::singleShot(0, this, SLOT(onReadyRead()));
 }
 
 void QHttpRequestPrivate::onReadyRead()
 {
     // Add the new data to the internal buffer
-    buffer.append(socket->readAll());
+    buffer.append(device->readAll());
 
     // If the request headers have not yet been parsed, check for two CRLFs
     if(!headersParsed) {
@@ -167,9 +167,9 @@ void QHttpRequestPrivate::parseHeader(const QByteArray &line)
     );
 }
 
-QHttpRequest::QHttpRequest(QAbstractSocket *socket, QObject *parent)
+QHttpRequest::QHttpRequest(QIODevice *device, QObject *parent)
     : QIODevice(parent),
-      d(new QHttpRequestPrivate(this, socket))
+      d(new QHttpRequestPrivate(this, device))
 {
     setOpenMode(QIODevice::ReadOnly);
 }
@@ -228,7 +228,7 @@ QByteArray QHttpRequest::header(const QByteArray &name) const
 
 qint64 QHttpRequest::readData(char *data, qint64 maxlen)
 {
-    // Data can only be read from the socket once the request headers are parsed
+    // Data can only be read from the device once the request headers are parsed
     if(!headersParsed()) {
         return 0;
     }

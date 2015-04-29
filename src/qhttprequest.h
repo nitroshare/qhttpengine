@@ -25,7 +25,6 @@
 #ifndef QHTTPENGINE_QHTTPREQUEST_H
 #define QHTTPENGINE_QHTTPREQUEST_H
 
-#include <QAbstractSocket>
 #include <QIODevice>
 #include <QList>
 
@@ -34,7 +33,7 @@
 class QHTTPENGINE_EXPORT QHttpRequestPrivate;
 
 /**
- * @brief The QHttpRequest class
+ * @brief HTTP request parser
  */
 class QHTTPENGINE_EXPORT QHttpRequest : public QIODevice
 {
@@ -58,12 +57,11 @@ public:
     };
 
     /**
-     * @brief Create a new QHttpRequest from a QAbstractSocket
+     * @brief Create a new QHttpRequest from a QIODevice
      *
-     * It is assumed that the socket is already in the connected state and is
-     * open for reading.
+     * It is assumed that the device is already opened for reading.
      */
-    QHttpRequest(QAbstractSocket *socket, QObject *parent = 0);
+    QHttpRequest(QIODevice *device, QObject *parent = 0);
 
     /**
      * @brief Destroy the QHttpRequest
