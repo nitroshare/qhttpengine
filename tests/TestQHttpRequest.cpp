@@ -127,7 +127,7 @@ void TestQHttpRequest::testProperties()
 void TestQHttpRequest::testRead()
 {
     QTcpServer server;
-    QVERIFY(server.listen());
+    QVERIFY(server.listen(QHostAddress::LocalHost));
 
     QTcpSocket clientSocket;
     clientSocket.connectToHost(server.serverAddress(), server.serverPort());
