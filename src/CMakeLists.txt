@@ -23,6 +23,7 @@ target_include_directories(qhttpengine PUBLIC
 )
 
 set_target_properties(qhttpengine PROPERTIES
+    DEFINE_SYMBOL QT_NO_SIGNALS_SLOTS_KEYWORDS
     DEFINE_SYMBOL QHTTPENGINE_LIBRARY
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
