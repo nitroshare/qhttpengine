@@ -40,23 +40,20 @@ public:
     QHttpRequestPrivate(QHttpRequest *request, QIODevice *baseDevice);
 
     QIODevice *const device;
+    QByteArray buffer;
 
     QHttpRequest::Error error;
+
     QByteArray method;
     QByteArray path;
-
     QMap<QByteArray, QByteArray> headers;
     bool headersParsed;
-
-    QByteArray buffer;
 
 private Q_SLOTS:
 
     void onReadyRead();
 
 private:
-
-    QList<QByteArray> split(const QByteArray &data, const QByteArray &delim);
 
     void parseHeaders(const QByteArray &data);
     void parseStatusLine(const QByteArray &line);

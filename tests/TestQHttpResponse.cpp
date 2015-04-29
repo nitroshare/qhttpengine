@@ -28,6 +28,7 @@
 #include <QSignalSpy>
 #include <QTest>
 
+#include "qhttpengine.h"
 #include "qhttpresponse.h"
 
 class TestQHttpResponse : public QObject
@@ -38,10 +39,6 @@ private Q_SLOTS:
 
     void testProperties();
     void testWrite();
-
-private:
-
-    QList<QByteArray> split(const QByteArray &data, const QByteArray &delim);
 };
 
 void TestQHttpResponse::testProperties()
@@ -58,7 +55,7 @@ void TestQHttpResponse::testProperties()
     QCOMPARE(data.right(4), QByteArray("\r\n\r\n"));
     data.chop(4);
 
-    QList<QByteArray> lines = split(data, "\r\n");
+    QList<QByteArray> lines = QHttpEngine::split(data, "\r\n");
     QCOMPARE(lines.takeFirst(), QByteArray("HTTP/1.0 404 NOT FOUND"));
     QVERIFY(lines.contains("X-Test: test"));
 }
@@ -79,30 +76,6 @@ void TestQHttpResponse::testWrite()
 
     QTRY_COMPARE(bytesWrittenSpy.count(), 1);
     QCOMPARE(bytesWrittenSpy.at(0).at(0).toLongLong(), 1);
-}
-
-// TODO: move this into a separate class / namespace since it is essentially
-// copied-and-pasted unmodified from the QHttpResponse class
-
-QList<QByteArray> TestQHttpResponse::split(const QByteArray &data, const QByteArray &delim)
-{
-    QList<QByteArray> parts;
-    int index = 0;
-
-    forever {
-        int nextIndex = data.indexOf(delim, index);
-
-        // If the delimiter wasn't found, the final part is the remainder of the string
-        if(nextIndex == -1) {
-            parts.append(data.mid(index));
-            break;
-        }
-
-        parts.append(data.mid(index, nextIndex - index));
-        index = nextIndex + delim.length();
-    }
-
-    return parts;
 }
 
 QTEST_MAIN(TestQHttpResponse)

@@ -26,6 +26,7 @@
 
 #include <QTimer>
 
+#include "qhttpengine.h"
 #include "qhttprequest.h"
 #include "qhttprequest_p.h"
 
@@ -94,31 +95,10 @@ void QHttpRequestPrivate::onReadyRead()
     }
 }
 
-QList<QByteArray> QHttpRequestPrivate::split(const QByteArray &data, const QByteArray &delim)
-{
-    QList<QByteArray> parts;
-    int index = 0;
-
-    forever {
-        int nextIndex = data.indexOf(delim, index);
-
-        // If the delimiter wasn't found, the final part is the remainder of the string
-        if(nextIndex == -1) {
-            parts.append(data.mid(index));
-            break;
-        }
-
-        parts.append(data.mid(index, nextIndex - index));
-        index = nextIndex + delim.length();
-    }
-
-    return parts;
-}
-
 void QHttpRequestPrivate::parseHeaders(const QByteArray &data)
 {
     // Split the header into individual lines
-    QList<QByteArray> lines = split(data, "\r\n");
+    QList<QByteArray> lines = QHttpEngine::split(data, "\r\n");
 
     // Parse the status line
     parseStatusLine(lines.takeFirst());
