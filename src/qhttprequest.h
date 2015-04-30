@@ -34,6 +34,20 @@ class QHTTPENGINE_EXPORT QHttpRequestPrivate;
 
 /**
  * @brief HTTP request parser
+ *
+ * QHttpRequest provides a class derived from QIODevice that can be used to
+ * read data received from an HTTP client through a QIODevice provided in the
+ * constructor.
+ *
+ * Once the headersParsedChanged() signal is emitted, information about the
+ * request can be retrieved using the appropriate properties. This includes
+ * the method, path, and headers. As data is received, the readyRead() signal
+ * is emitted and any available data can be read using QIODevice's read()
+ * method.
+ *
+ * If an error is encountered while parsing the headers, the errorChanged()
+ * signal is emitted. A human-readable description of the error can be
+ * obtained through the errorString() method.
  */
 class QHTTPENGINE_EXPORT QHttpRequest : public QIODevice
 {

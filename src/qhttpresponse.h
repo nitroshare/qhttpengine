@@ -33,6 +33,15 @@ class QHTTPENGINE_EXPORT QHttpResponsePrivate;
 
 /**
  * @brief HTTP response generator
+ *
+ * QHttpResponse provides a class derived from QIODevice that can be used to
+ * write data to an HTTP client through a QIODevice provided in the
+ * constructor.
+ *
+ * The status code and headers may be set as long as no data has been written
+ * to the device and the writeHeaders() method has not been called. The
+ * headers are written either when the writeHeaders() method is called or when
+ * data is first written to the device.
  */
 class QHTTPENGINE_EXPORT QHttpResponse : public QIODevice
 {
