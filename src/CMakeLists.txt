@@ -7,6 +7,7 @@ set(INCLUDE
     qhttprequest.h
     qhttpresponse.h
     qhttpserver.h
+    qiodevicecopier.h
 )
 
 set(SRC
@@ -14,6 +15,7 @@ set(SRC
     qhttprequest.cpp
     qhttpresponse.cpp
     qhttpserver.cpp
+    qiodevicecopier.cpp
 )
 
 add_library(qhttpengine SHARED ${SRC})
