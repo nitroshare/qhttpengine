@@ -22,7 +22,7 @@
  * IN THE SOFTWARE.
  */
 
-#include <QtCore>
+#include <QByteArray>
 
 #include "qhttpengine.h"
 
