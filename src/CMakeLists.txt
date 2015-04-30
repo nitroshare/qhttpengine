@@ -6,14 +6,14 @@ set(INCLUDE
     qhttpengine.h
     qhttprequest.h
     qhttpresponse.h
-    qjsonserver.h
+    qhttpserver.h
 )
 
 set(SRC
     qhttpengine.cpp
     qhttprequest.cpp
     qhttpresponse.cpp
-    qjsonserver.cpp
+    qhttpserver.cpp
 )
 
 add_library(qhttpengine SHARED ${SRC})

@@ -22,4 +22,24 @@
  * IN THE SOFTWARE.
  **/
 
-#include "qjsonserver.h"
+#ifndef QHTTPENGINE_QHTTPSERVERPRIVATE_H
+#define QHTTPENGINE_QHTTPSERVERPRIVATE_H
+
+#include <QObject>
+
+#include "qhttpserver.h"
+
+class QHttpServerPrivate : public QObject
+{
+    Q_OBJECT
+
+public:
+
+    QHttpServerPrivate(QHttpServer *httpServer);
+
+private:
+
+    QHttpServer *const q;
+};
+
+#endif // QHTTPENGINE_QHTTPSERVERPRIVATE_H

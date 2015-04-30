@@ -22,18 +22,19 @@
  * IN THE SOFTWARE.
  **/
 
-#include <QTest>
+#include "qhttpserver.h"
+#include "qhttpserver_p.h"
 
-#include "qjsonserver.h"
-
-class TestQJsonServer : public QObject
+QHttpServerPrivate::QHttpServerPrivate(QHttpServer *httpServer)
+    : QObject(httpServer),
+      q(httpServer)
 {
-    Q_OBJECT
-
-private Q_SLOTS:
-
     //...
-};
+}
 
-QTEST_MAIN(TestQJsonServer)
-#include "TestQJsonServer.moc"
+QHttpServer::QHttpServer(QObject *parent)
+    : QObject(parent),
+      d(new QHttpServerPrivate(this))
+{
+    //...
+}

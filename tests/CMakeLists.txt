@@ -4,7 +4,7 @@ set(TESTS
     TestQHttpEngine
     TestQHttpRequest
     TestQHttpResponse
-    TestQJsonServer
+    TestQHttpServer
 )
 
 foreach(TEST ${TESTS})
