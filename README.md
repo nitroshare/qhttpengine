@@ -34,5 +34,7 @@ Use the instructions below to build the library:
 
 3. Build the library:
 
-   - **Unix-based (including MinGW-w64):** `make`
-   - **Windows (MSVC++):** `nmake`
+   - **Unix-based (including MinGW-w64):**
+            `make`
+   - **Windows (MSVC++):**
+            `nmake`
