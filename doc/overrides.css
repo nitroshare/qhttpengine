@@ -1,0 +1,45 @@
+/**
+ * Overrides for Doxygen CSS
+ * Copyright 2015 - Nathan Osman
+ */
+
+/* Ensure that a sane font is selected by default since
+   the current stylesheet uses Roboto if available */
+body, table, div, p, dl {
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+/* Remove the underline from the titlearea and increase the margin */
+#titlearea {
+    border-bottom: 0;
+    margin-bottom: 16px;
+}
+
+/* The .footer class is also used in the img at the bottom for some reason */
+.footer img {
+    width: auto;
+}
+
+/* Add the border back to the tab list */
+.tabs {
+    border-top: 1px solid #5373b4;
+}
+
+/* The next two rules fix up the search box */
+.tabs .tablist li:last-child {
+    float: right;
+    position: relative;
+}
+
+.tablist {
+    width: 100%;
+}
+
+/* Ensure that certain parts of the page are never wider than about 900px */
+@media (min-width: 992px) {
+    #top, .header, .contents, .footer {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        width: 800px;
+    }
+}
