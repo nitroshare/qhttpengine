@@ -5,6 +5,7 @@ set(TESTS
     TestQHttpRequest
     TestQHttpResponse
     TestQHttpServer
+    TestQIODeviceCopier
 )
 
 foreach(TEST ${TESTS})

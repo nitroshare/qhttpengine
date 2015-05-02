@@ -38,10 +38,46 @@ class QHTTPENGINE_EXPORT QIODeviceCopierPrivate;
 class QHTTPENGINE_EXPORT QIODeviceCopier : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(qint64 bufferSize READ bufferSize WRITE setBufferSize)
 
 public:
 
+    /**
+     * @brief Create a new device copier from the specified source and destination devices
+     */
     QIODeviceCopier(QIODevice *src, QIODevice *dest, QObject *parent = 0);
+
+    /**
+     * @brief Retrieve the current buffer size
+     */
+    qint64 bufferSize() const;
+
+    /**
+     * @brief Set the size of the buffer
+     */
+    void setBufferSize(qint64 size);
+
+Q_SIGNALS:
+
+    /**
+     * @brief Indicate that an error has occurred
+     */
+    void error(const QString &message);
+
+    /**
+     * @brief Indicate that the copy operation has finished
+     */
+    void finished();
+
+public Q_SLOTS:
+
+    /**
+     * @brief Begin the copy operation
+     *
+     * The source device will be opened for reading and the destination device
+     * opened for writing if applicable.
+     */
+    void start();
 
 private:
 

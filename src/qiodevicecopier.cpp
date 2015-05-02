@@ -22,21 +22,90 @@
  * IN THE SOFTWARE.
  */
 
+#include <QTimer>
+
 #include "qiodevicecopier.h"
 #include "qiodevicecopier_p.h"
+
+// Default value for the bufferSize property
+const qint64 DefaultBufferSize = 65536;
 
 QIODeviceCopierPrivate::QIODeviceCopierPrivate(QIODeviceCopier *copier, QIODevice *srcDevice, QIODevice *destDevice)
     : QObject(copier),
       q(copier),
       src(srcDevice),
-      dest(destDevice)
+      dest(destDevice),
+      bufferSize(DefaultBufferSize)
 {
-    //...
+    // readyRead() and readChannelFinished() are only emitted for sequential
+    // devices - for other types of devices, it is necessary to check atEnd()
+    // in order to determine whether the end of the device has been reached
+
+    connect(src, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
+    connect(src, SIGNAL(readChannelFinished()), this, SLOT(onReadChannelFinished()));
+}
+
+void QIODeviceCopierPrivate::onReadyRead()
+{
+    dest->write(src->readAll());
+}
+
+void QIODeviceCopierPrivate::onReadChannelFinished()
+{
+    // Read any data that remains and signal the end of the operation
+    onReadyRead();
+    Q_EMIT q->finished();
+}
+
+void QIODeviceCopierPrivate::nextBlock()
+{
+    // Read an amount of data up to the size of the buffer
+    dest->write(src->read(DefaultBufferSize));
+
+    // Check if the end of the device has been reached - if so,
+    // emit the finished signal and if not, continue to read
+    // data at the next iteration of the event loop
+    if(src->atEnd()) {
+        Q_EMIT q->finished();
+    } else {
+        QTimer::singleShot(0, this, SLOT(nextBlock()));
+    }
 }
 
 QIODeviceCopier::QIODeviceCopier(QIODevice *src, QIODevice *dest, QObject *parent)
     : QObject(parent),
       d(new QIODeviceCopierPrivate(this, src, dest))
 {
-    //...
+}
+
+qint64 QIODeviceCopier::bufferSize() const
+{
+    return d->bufferSize;
+}
+
+void QIODeviceCopier::setBufferSize(qint64 size)
+{
+    d->bufferSize = size;
+}
+
+void QIODeviceCopier::start()
+{
+    if(!d->src->isReadable()) {
+        if(!d->src->open(QIODevice::ReadOnly)) {
+            Q_EMIT error(tr("Unable to open source device for reading"));
+            Q_EMIT finished();
+            return;
+        }
+    }
+
+    if(!d->dest->isWritable()) {
+        if(!d->dest->open(QIODevice::WriteOnly)) {
+            Q_EMIT error(tr("Unable to open destination device for writing"));
+            Q_EMIT finished();
+            return;
+        }
+    }
+
+    // The first read from the device needs to be triggered
+    QTimer::singleShot(0, d, d->src->isSequential() ? SLOT(onReadyRead()) : SLOT(nextBlock()));
 }

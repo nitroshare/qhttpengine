@@ -22,37 +22,42 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QIODEVICECOPIERPRIVATE_H
-#define QHTTPENGINE_QIODEVICECOPIERPRIVATE_H
-
-#include <QIODevice>
+#include <QBuffer>
 #include <QObject>
+#include <QSignalSpy>
+#include <QTest>
 
 #include "qiodevicecopier.h"
 
-class QIODeviceCopierPrivate : public QObject
+class TestQIODeviceCopier : public QObject
 {
     Q_OBJECT
 
-public:
-
-    QIODeviceCopierPrivate(QIODeviceCopier *copier, QIODevice *srcDevice, QIODevice *destDevice);
-
-    QIODevice *const src;
-    QIODevice *const dest;
-
-    qint64 bufferSize;
-
 private Q_SLOTS:
 
-    void onReadyRead();
-    void onReadChannelFinished();
-
-    void nextBlock();
-
-private:
-
-    QIODeviceCopier *const q;
+    void testQBuffer();
 };
 
-#endif // QHTTPENGINE_QIODEVICECOPIERPRIVATE_H
+void TestQIODeviceCopier::testQBuffer()
+{
+    QByteArray srcData = "12345678";
+    QByteArray destData;
+
+    QBuffer src(&srcData);
+    QBuffer dest(&destData);
+
+    QIODeviceCopier copier(&src, &dest);
+    copier.setBufferSize(2);
+
+    QSignalSpy errorSpy(&copier, SIGNAL(error(QString)));
+    QSignalSpy finishedSpy(&copier, SIGNAL(finished()));
+
+    copier.start();
+
+    QTRY_COMPARE(finishedSpy.count(), 1);
+    QCOMPARE(errorSpy.count(), 0);
+    QCOMPARE(destData, srcData);
+}
+
+QTEST_MAIN(TestQIODeviceCopier)
+#include "TestQIODeviceCopier.moc"
