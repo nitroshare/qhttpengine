@@ -37,12 +37,6 @@ QIODeviceCopierPrivate::QIODeviceCopierPrivate(QIODeviceCopier *copier, QIODevic
       dest(destDevice),
       bufferSize(DefaultBufferSize)
 {
-    // readyRead() and readChannelFinished() are only emitted for sequential
-    // devices - for other types of devices, it is necessary to check atEnd()
-    // in order to determine whether the end of the device has been reached
-
-    connect(src, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
-    connect(src, SIGNAL(readChannelFinished()), this, SLOT(onReadChannelFinished()));
 }
 
 void QIODeviceCopierPrivate::onReadyRead()
@@ -70,6 +64,11 @@ void QIODeviceCopierPrivate::nextBlock()
     } else {
         QTimer::singleShot(0, this, SLOT(nextBlock()));
     }
+}
+
+void QIODeviceCopierPrivate::onAboutToClose()
+{
+    Q_EMIT q->finished();
 }
 
 QIODeviceCopier::QIODeviceCopier(QIODevice *src, QIODevice *dest, QObject *parent)
@@ -105,6 +104,16 @@ void QIODeviceCopier::start()
             return;
         }
     }
+
+    // These signals cannot be connected in the constructor since they may
+    // begin firing before the start() method is called
+
+    // readyRead() and readChannelFinished() are only emitted for sequential
+    // devices - for other types of devices, it is necessary to check atEnd()
+    // in order to determine whether the end of the device has been reached
+    connect(d->src, SIGNAL(readyRead()), d, SLOT(onReadyRead()));
+    connect(d->src, SIGNAL(readChannelFinished()), d, SLOT(onReadChannelFinished()));
+    connect(d->src, SIGNAL(aboutToClose()), d, SLOT(onAboutToClose()));
 
     // The first read from the device needs to be triggered
     QTimer::singleShot(0, d, d->src->isSequential() ? SLOT(onReadyRead()) : SLOT(nextBlock()));

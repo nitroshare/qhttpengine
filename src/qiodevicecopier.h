@@ -34,6 +34,10 @@ class QHTTPENGINE_EXPORT QIODeviceCopierPrivate;
 
 /**
  * @brief Device copier
+ *
+ * QIODeviceCopier provides a set of methods for reading data from a QIODevice
+ * and writing it to another. The class operates asynchronously and therefore
+ * can be used from the main thread.
  */
 class QHTTPENGINE_EXPORT QIODeviceCopier : public QObject
 {
@@ -60,12 +64,18 @@ public:
 Q_SIGNALS:
 
     /**
-     * @brief Indicate that an error has occurred
+     * @brief Indicate that an error occurred
      */
     void error(const QString &message);
 
     /**
-     * @brief Indicate that the copy operation has finished
+     * @brief Indicate that the copy operation finished
+     *
+     * For sequential devices, this will occur when readChannelFinished() is
+     * emitted. For other files, this signal relies on QIODevice::atEnd() and
+     * QIODevice::aboutToClose().
+     *
+     * This signal will also be emitted immediately after the error() signal.
      */
     void finished();
 
@@ -75,7 +85,10 @@ public Q_SLOTS:
      * @brief Begin the copy operation
      *
      * The source device will be opened for reading and the destination device
-     * opened for writing if applicable.
+     * opened for writing if applicable. If opening either file fails for some
+     * reason, the error() signal will be emitted.
+     *
+     * This method should never be invoked more than once.
      */
     void start();
 

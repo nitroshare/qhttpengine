@@ -49,6 +49,7 @@ private Q_SLOTS:
     void onReadChannelFinished();
 
     void nextBlock();
+    void onAboutToClose();
 
 private:
 
