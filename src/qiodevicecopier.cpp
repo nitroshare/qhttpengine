@@ -66,11 +66,6 @@ void QIODeviceCopierPrivate::nextBlock()
     }
 }
 
-void QIODeviceCopierPrivate::onAboutToClose()
-{
-    Q_EMIT q->finished();
-}
-
 QIODeviceCopier::QIODeviceCopier(QIODevice *src, QIODevice *dest, QObject *parent)
     : QObject(parent),
       d(new QIODeviceCopierPrivate(this, src, dest))
@@ -113,7 +108,6 @@ void QIODeviceCopier::start()
     // in order to determine whether the end of the device has been reached
     connect(d->src, SIGNAL(readyRead()), d, SLOT(onReadyRead()));
     connect(d->src, SIGNAL(readChannelFinished()), d, SLOT(onReadChannelFinished()));
-    connect(d->src, SIGNAL(aboutToClose()), d, SLOT(onAboutToClose()));
 
     // The first read from the device needs to be triggered
     QTimer::singleShot(0, d, d->src->isSequential() ? SLOT(onReadyRead()) : SLOT(nextBlock()));

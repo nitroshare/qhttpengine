@@ -25,9 +25,13 @@
 #include <QBuffer>
 #include <QObject>
 #include <QSignalSpy>
+#include <QTcpServer>
+#include <QTcpSocket>
 #include <QTest>
 
 #include "qiodevicecopier.h"
+
+const QByteArray SampleData = "1234567890";
 
 class TestQIODeviceCopier : public QObject
 {
@@ -36,14 +40,15 @@ class TestQIODeviceCopier : public QObject
 private Q_SLOTS:
 
     void testQBuffer();
+    void testQTcpSocket();
 };
 
 void TestQIODeviceCopier::testQBuffer()
 {
-    QByteArray srcData = "12345678";
-    QByteArray destData;
+    QBuffer src;
+    src.setData(SampleData);
 
-    QBuffer src(&srcData);
+    QByteArray destData;
     QBuffer dest(&destData);
 
     QIODeviceCopier copier(&src, &dest);
@@ -56,7 +61,37 @@ void TestQIODeviceCopier::testQBuffer()
 
     QTRY_COMPARE(finishedSpy.count(), 1);
     QCOMPARE(errorSpy.count(), 0);
-    QCOMPARE(destData, srcData);
+    QCOMPARE(destData, SampleData);
+}
+
+void TestQIODeviceCopier::testQTcpSocket()
+{
+    QTcpServer server;
+    QVERIFY(server.listen(QHostAddress::LocalHost));
+
+    QTcpSocket clientSocket;
+    clientSocket.connectToHost(server.serverAddress(), server.serverPort());
+
+    QTRY_COMPARE(clientSocket.state(), QAbstractSocket::ConnectedState);
+    QTcpSocket *serverSocket = server.nextPendingConnection();
+
+    QByteArray destData;
+    QBuffer dest(&destData);
+
+    QIODeviceCopier copier(serverSocket, &dest);
+    copier.setBufferSize(2);
+
+    QSignalSpy errorSpy(&copier, SIGNAL(error(QString)));
+    QSignalSpy finishedSpy(&copier, SIGNAL(finished()));
+
+    copier.start();
+
+    clientSocket.write(SampleData);
+    clientSocket.disconnectFromHost();
+
+    QTRY_COMPARE(finishedSpy.count(), 1);
+    QCOMPARE(errorSpy.count(), 0);
+    QCOMPARE(destData, SampleData);
 }
 
 QTEST_MAIN(TestQIODeviceCopier)
