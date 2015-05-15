@@ -32,6 +32,7 @@
 #include <QTcpSocket>
 
 #include "qhttprequest.h"
+#include "qsocketpair.h"
 
 typedef QPair<QByteArray, QByteArray> Header;
 typedef QList<Header> HeaderList;
@@ -126,26 +127,20 @@ void TestQHttpRequest::testProperties()
 
 void TestQHttpRequest::testRead()
 {
-    QTcpServer server;
-    QVERIFY(server.listen(QHostAddress::LocalHost));
+    QSocketPair pair;
+    QTRY_VERIFY(pair.isConnected());
 
-    QTcpSocket clientSocket;
-    clientSocket.connectToHost(server.serverAddress(), server.serverPort());
-
-    QTRY_COMPARE(clientSocket.state(), QAbstractSocket::ConnectedState);
-
-    QTcpSocket *serverSocket = server.nextPendingConnection();
-    QHttpRequest request(serverSocket);
+    QHttpRequest request(pair.server());
 
     QSignalSpy hPChangedSpy(&request, SIGNAL(headersParsedChanged(bool)));
     QSignalSpy readyReadSpy(&request, SIGNAL(readyRead()));
 
-    clientSocket.write("POST /test HTTP/1.0\r\n\r\n");
+    pair.client()->write("POST /test HTTP/1.0\r\n\r\n");
 
     QTRY_COMPARE(hPChangedSpy.count(), 1);
     QTRY_COMPARE(readyReadSpy.count(), 0);
 
-    clientSocket.write("*");
+    pair.client()->write("*");
 
     QTRY_COMPARE(readyReadSpy.count(), 1);
 

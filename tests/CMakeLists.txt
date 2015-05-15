@@ -8,8 +8,12 @@ set(TESTS
     TestQIODeviceCopier
 )
 
+set(COMMON
+    qsocketpair.cpp
+)
+
 foreach(TEST ${TESTS})
-    add_executable(${TEST} "${TEST}.cpp")
+    add_executable(${TEST} "${TEST}.cpp" ${COMMON})
     qt5_use_modules(${TEST} Test)
     target_link_libraries(${TEST} qhttpengine)
     set_target_properties(${TEST} PROPERTIES
