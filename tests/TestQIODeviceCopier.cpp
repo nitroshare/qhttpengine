@@ -30,6 +30,7 @@
 #include <QTest>
 
 #include "qiodevicecopier.h"
+#include "qsocketpair.h"
 
 const QByteArray SampleData = "1234567890";
 
@@ -66,19 +67,13 @@ void TestQIODeviceCopier::testQBuffer()
 
 void TestQIODeviceCopier::testQTcpSocket()
 {
-    QTcpServer server;
-    QVERIFY(server.listen(QHostAddress::LocalHost));
-
-    QTcpSocket clientSocket;
-    clientSocket.connectToHost(server.serverAddress(), server.serverPort());
-
-    QTRY_COMPARE(clientSocket.state(), QAbstractSocket::ConnectedState);
-    QTcpSocket *serverSocket = server.nextPendingConnection();
+    QSocketPair pair;
+    QTRY_VERIFY(pair.isConnected());
 
     QByteArray destData;
     QBuffer dest(&destData);
 
-    QIODeviceCopier copier(serverSocket, &dest);
+    QIODeviceCopier copier(pair.server(), &dest);
     copier.setBufferSize(2);
 
     QSignalSpy errorSpy(&copier, SIGNAL(error(QString)));
@@ -86,8 +81,8 @@ void TestQIODeviceCopier::testQTcpSocket()
 
     copier.start();
 
-    clientSocket.write(SampleData);
-    clientSocket.disconnectFromHost();
+    pair.client()->write(SampleData);
+    pair.client()->disconnectFromHost();
 
     QTRY_COMPARE(finishedSpy.count(), 1);
     QCOMPARE(errorSpy.count(), 0);
