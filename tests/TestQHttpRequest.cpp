@@ -31,8 +31,8 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 
+#include "common/qsocketpair.h"
 #include "qhttprequest.h"
-#include "qsocketpair.h"
 
 typedef QPair<QByteArray, QByteArray> Header;
 typedef QList<Header> HeaderList;
