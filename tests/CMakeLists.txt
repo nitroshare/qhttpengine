@@ -4,8 +4,6 @@ add_subdirectory(common)
 
 set(TESTS
     TestQHttpEngine
-    TestQHttpRequest
-    TestQHttpResponse
     TestQHttpServer
     TestQHttpSocket
     TestQIODeviceCopier
