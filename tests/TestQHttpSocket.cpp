@@ -34,7 +34,7 @@
 typedef QPair<QByteArray, QByteArray> Header;
 typedef QList<Header> HeaderList;
 
-const QByteArray TestData = "*";
+const QByteArray TestData = "test";
 
 class TestQHttpSocket : public QObject
 {
@@ -132,20 +132,45 @@ void TestQHttpSocket::testRequestProperties()
 void TestQHttpSocket::testResponseProperties_data()
 {
     QTest::addColumn<QByteArray>("response");
+    QTest::addColumn<QByteArray>("statusCode");
+    QTest::addColumn<HeaderList>("headers");
 
     QTest::newRow("default values")
-            << QByteArray("HTTP/1.0 200 OK\r\n\r\n");
+            << QByteArray("HTTP/1.0 200 OK\r\n\r\n")
+            << QByteArray()
+            << HeaderList();
+
+    QTest::newRow("status code")
+            << QByteArray("HTTP/1.0 404 FILE NOT FOUND\r\n\r\n")
+            << QByteArray("404 FILE NOT FOUND")
+            << HeaderList();
+
+    QTest::newRow("response header")
+            << QByteArray("HTTP/1.0 200 OK\r\nX-Test: test\r\n\r\n")
+            << QByteArray("200 OK")
+            << (HeaderList() << Header("X-Test", "test"));
 }
 
 void TestQHttpSocket::testResponseProperties()
 {
     QFETCH(QByteArray, response);
+    QFETCH(QByteArray, statusCode);
+    QFETCH(HeaderList, headers);
 
     QByteArray data;
     QBuffer buffer(&data);
     buffer.open(QIODevice::WriteOnly);
 
     QHttpSocket socket(&buffer);
+
+    if(!statusCode.isNull()) {
+        socket.setStatusCode(statusCode);
+    }
+
+    foreach(Header header, headers) {
+        socket.setHeader(header.first, header.second);
+    }
+
     socket.writeHeaders();
 
     QTRY_COMPARE(data, response);
