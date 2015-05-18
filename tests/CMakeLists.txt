@@ -7,6 +7,7 @@ set(TESTS
     TestQHttpRequest
     TestQHttpResponse
     TestQHttpServer
+    TestQHttpSocket
     TestQIODeviceCopier
 )
 

@@ -7,6 +7,7 @@ set(INCLUDE
     qhttprequest.h
     qhttpresponse.h
     qhttpserver.h
+    qhttpsocket.h
     qiodevicecopier.h
 )
 
@@ -15,6 +16,7 @@ set(SRC
     qhttprequest.cpp
     qhttpresponse.cpp
     qhttpserver.cpp
+    qhttpsocket.cpp
     qiodevicecopier.cpp
 )
 
