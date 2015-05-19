@@ -44,41 +44,54 @@ void TestQHttpEngine::testSplit_data()
 {
     QTest::addColumn<QByteArray>("original");
     QTest::addColumn<QByteArray>("delimiter");
+    QTest::addColumn<int>("maxSplit");
     QTest::addColumn<QByteArrayList>("list");
 
     QTest::newRow("empty string")
             << QByteArray()
             << QByteArray(",")
+            << 0
             << (QByteArrayList() << "");
 
     QTest::newRow("no delimiter")
             << QByteArray("a")
             << QByteArray(",")
+            << 0
             << (QByteArrayList() << "a");
 
     QTest::newRow("single-char delimiter")
             << QByteArray("a,b,c")
             << QByteArray(",")
+            << 0
             << (QByteArrayList() << "a" << "b" << "c");
 
     QTest::newRow("multi-char delimiter")
             << QByteArray("a::b::c")
             << QByteArray("::")
+            << 0
             << (QByteArrayList() << "a" << "b" << "c");
 
     QTest::newRow("empty parts")
             << QByteArray("a,,")
             << QByteArray(",")
+            << 0
             << (QByteArrayList() << "a" << "" << "");
+
+    QTest::newRow("maxSplit")
+            << QByteArray("a,a,a")
+            << QByteArray(",")
+            << 1
+            << (QByteArrayList() << "a" << "a,a");
 }
 
 void TestQHttpEngine::testSplit()
 {
     QFETCH(QByteArray, original);
     QFETCH(QByteArray, delimiter);
+    QFETCH(int, maxSplit);
     QFETCH(QByteArrayList, list);
 
-    QCOMPARE(QHttpEngine::split(original, delimiter), list);
+    QCOMPARE(QHttpEngine::split(original, delimiter, maxSplit), list);
 }
 
 QTEST_MAIN(TestQHttpEngine)

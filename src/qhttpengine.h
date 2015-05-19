@@ -39,11 +39,14 @@ public:
     /**
      * @brief Split a QByteArray by the provided delimiter
      *
-     * If the delimiter is not present in the QByteArray, a list will be returned
-     * containing the original QByteArray as its only element. The delimiter must
-     * not be empty.
+     * If the delimiter is not present in the QByteArray, a list will be
+     * returned containing the original QByteArray as its only element. The
+     * delimiter must not be empty.
+     *
+     * If a value is provided for maxSplit, the list will contain no more than
+     * maxSplit + 1 items.
      */
-    static QList<QByteArray> split(const QByteArray &data, const QByteArray &delim);
+    static QList<QByteArray> split(const QByteArray &data, const QByteArray &delim, int maxSplit = 0);
 };
 
 #endif // QHTTPENGINE_QHTTPENGINE_H

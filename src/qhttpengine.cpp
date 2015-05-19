@@ -26,23 +26,24 @@
 
 #include "qhttpengine.h"
 
-QList<QByteArray> QHttpEngine::split(const QByteArray &data, const QByteArray &delim)
+QList<QByteArray> QHttpEngine::split(const QByteArray &data, const QByteArray &delim, int maxSplit)
 {
     QList<QByteArray> parts;
     int index = 0;
 
-    forever {
+    for(int i = 0; !maxSplit || i < maxSplit; ++i) {
         int nextIndex = data.indexOf(delim, index);
 
-        // If the delimiter wasn't found, the final part is the remainder of the string
         if(nextIndex == -1) {
-            parts.append(data.mid(index));
             break;
         }
 
         parts.append(data.mid(index, nextIndex - index));
         index = nextIndex + delim.length();
     }
+
+    // Append whatever remains to the list
+    parts.append(data.mid(index));
 
     return parts;
 }
