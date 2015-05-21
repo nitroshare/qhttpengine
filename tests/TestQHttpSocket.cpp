@@ -28,8 +28,11 @@
 #include <QSignalSpy>
 #include <QTest>
 
+#include "common/qiodevicecounter.h"
 #include "common/qsocketpair.h"
+#include "qhttpengine.h"
 #include "qhttpsocket.h"
+#include "qiodevicecopier.h"
 
 typedef QPair<QByteArray, QByteArray> Header;
 typedef QList<Header> HeaderList;
@@ -131,37 +134,46 @@ void TestQHttpSocket::testRequestProperties()
 
 void TestQHttpSocket::testResponseProperties_data()
 {
-    QTest::addColumn<QByteArray>("response");
+    QTest::addColumn<QByteArray>("statusLine");
     QTest::addColumn<QByteArray>("statusCode");
     QTest::addColumn<HeaderList>("headers");
+    QTest::addColumn<QByteArray>("data");
 
     QTest::newRow("default values")
-            << QByteArray("HTTP/1.0 200 OK\r\n\r\n")
+            << QByteArray("HTTP/1.0 200 OK")
             << QByteArray()
-            << HeaderList();
+            << HeaderList()
+            << QByteArray();
 
     QTest::newRow("status code")
-            << QByteArray("HTTP/1.0 404 FILE NOT FOUND\r\n\r\n")
+            << QByteArray("HTTP/1.0 404 FILE NOT FOUND")
             << QByteArray("404 FILE NOT FOUND")
-            << HeaderList();
+            << HeaderList()
+            << QByteArray();
 
     QTest::newRow("response header")
-            << QByteArray("HTTP/1.0 200 OK\r\nX-Test: test\r\n\r\n")
-            << QByteArray("200 OK")
-            << (HeaderList() << Header("X-Test", "test"));
+            << QByteArray("HTTP/1.0 200 OK")
+            << QByteArray()
+            << (HeaderList() << Header("X-Test1", "test") << Header("X-Test2", "test"))
+            << QByteArray();
+
+    QTest::newRow("data")
+            << QByteArray("HTTP/1.0 200 OK")
+            << QByteArray()
+            << HeaderList()
+            << TestData;
 }
 
 void TestQHttpSocket::testResponseProperties()
 {
-    QFETCH(QByteArray, response);
+    QFETCH(QByteArray, statusLine);
     QFETCH(QByteArray, statusCode);
     QFETCH(HeaderList, headers);
+    QFETCH(QByteArray, data);
 
-    QByteArray data;
-    QBuffer buffer(&data);
-    buffer.open(QIODevice::WriteOnly);
-
-    QHttpSocket socket(&buffer);
+    QSocketPair pair;
+    QTRY_VERIFY(pair.isConnected());
+    QHttpSocket socket(pair.server());
 
     if(!statusCode.isNull()) {
         socket.setStatusCode(statusCode);
@@ -171,9 +183,46 @@ void TestQHttpSocket::testResponseProperties()
         socket.setHeader(header.first, header.second);
     }
 
-    socket.writeHeaders();
+    // Create a buffer for storing data received by the HTTP client
+    QByteArray bufferData;
+    QBuffer buffer(&bufferData);
+    buffer.open(QIODevice::WriteOnly);
 
-    QTRY_COMPARE(data, response);
+    // Copy data from the client into the buffer as it becomes available
+    QIODeviceCopier copier(pair.client(), &buffer);
+    copier.start();
+
+    // Write the headers and wait until they are received by the client
+    socket.writeHeaders();
+    QTRY_VERIFY(bufferData.indexOf("\r\n\r\n") != -1);
+
+    // If data was provided, write it and read it back from the client
+    if(!data.isNull()) {
+
+        // Store the length of the headers
+        qint64 headerLength = bufferData.length();
+
+        // Write the data to the socket, counting the amount written
+        QIODeviceCounter counter(&socket);
+        socket.write(data);
+
+        // Verify that the expected amount was written and read
+        QTRY_COMPARE(counter.bytesWritten(), data.length());
+        QTRY_COMPARE(bufferData.length(),  headerLength + data.length());
+    }
+
+    // Split the response into fragments and compare the expected values
+    QList<QByteArray> parts = QHttpEngine::split(bufferData, "\r\n\r\n", 1);
+    QList<QByteArray> lines = QHttpEngine::split(parts.at(0), "\r\n");
+
+    QCOMPARE(lines.takeFirst(), statusLine);
+    QCOMPARE(lines.count(), headers.count());
+
+    foreach(Header header, headers) {
+        QVERIFY(lines.contains(header.first + ": " + header.second));
+    }
+
+    QCOMPARE(parts.at(1), data);
 }
 
 void TestQHttpSocket::testRead()
