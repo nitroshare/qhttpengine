@@ -136,20 +136,26 @@ void TestQHttpSocket::testRequest()
            QCOMPARE(socket.header(header.first), header.second);
         }
 
-        //...
         if(!data.isNull()) {
 
+            // Watch for readyRead() signals as the data is written to the client
+            QSignalSpy readyReadSpy(&socket, SIGNAL(readyRead()));
             pair.client()->write(data);
 
+            // Ensure that the signal was emitted and the data is correct
             QTRY_COMPARE(socket.bytesAvailable(), data.length());
             QCOMPARE(socket.readAll(), data);
+            QVERIFY(readyReadSpy.count() > 0);
         }
 
     } else {
 
+        // Ensure that the errorChanged() signal is emitted
         QSignalSpy errorSpy(&socket, SIGNAL(errorChanged(Error)));
         QTRY_COMPARE(errorSpy.count(), 1);
 
+        // Ensure the error value is correct
+        QCOMPARE(errorSpy.at(0).at(0).value<QHttpSocket::Error>(), error);
         QCOMPARE(socket.error(), error);
     }
 }
@@ -218,7 +224,6 @@ void TestQHttpSocket::testResponse()
     socket.writeHeaders();
     QTRY_VERIFY(bufferData.indexOf("\r\n\r\n") != -1);
 
-    // If data was provided, write it and read it back from the client
     if(!data.isNull()) {
 
         // Store the length of the headers
