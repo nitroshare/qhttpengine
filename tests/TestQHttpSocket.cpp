@@ -47,15 +47,11 @@ private Q_SLOTS:
 
     void initTestCase();
 
-    void testRequestProperties_data();
-    void testRequestProperties();
+    void testRequest_data();
+    void testRequest();
 
-    void testResponseProperties_data();
-    void testResponseProperties();
-
-    void testRead();
-    void testWrite();
-
+    void testResponse_data();
+    void testResponse();
 };
 
 void TestQHttpSocket::initTestCase()
@@ -63,27 +59,38 @@ void TestQHttpSocket::initTestCase()
     qRegisterMetaType<QHttpSocket::Error>("Error");
 }
 
-void TestQHttpSocket::testRequestProperties_data()
+void TestQHttpSocket::testRequest_data()
 {
-    QTest::addColumn<QByteArray>("data");
+    QTest::addColumn<QByteArray>("request");
     QTest::addColumn<QHttpSocket::Error>("error");
     QTest::addColumn<QByteArray>("method");
     QTest::addColumn<QByteArray>("path");
     QTest::addColumn<HeaderList>("headers");
+    QTest::addColumn<QByteArray>("data");
 
     QTest::newRow("simple GET")
             << QByteArray("GET /test HTTP/1.0\r\n\r\n")
             << QHttpSocket::NoError
             << QByteArray("GET")
             << QByteArray("/test")
-            << HeaderList();
+            << HeaderList()
+            << QByteArray();
 
     QTest::newRow("request header")
-            << QByteArray("GET / HTTP/1.0\r\nX-Test: test\r\n\r\n")
+            << QByteArray("GET / HTTP/1.0\r\nX-Test1: test\r\nX-Test2: test\r\n\r\n")
             << QHttpSocket::NoError
             << QByteArray("GET")
             << QByteArray("/")
-            << (HeaderList() << Header("X-Test", "test"));
+            << (HeaderList() << Header("X-Test1", "test") << Header("X-Test2", "test"))
+            << QByteArray();
+
+    QTest::newRow("data")
+            << QByteArray("POST / HTTP/1.0\r\n\r\n")
+            << QHttpSocket::NoError
+            << QByteArray("POST")
+            << QByteArray("/")
+            << HeaderList()
+            << TestData;
 
     QTest::newRow("malformed request line")
             << QByteArray("test\r\n\r\n")
@@ -98,41 +105,56 @@ void TestQHttpSocket::testRequestProperties_data()
             << QHttpSocket::InvalidHttpVersion;
 }
 
-void TestQHttpSocket::testRequestProperties()
+void TestQHttpSocket::testRequest()
 {
-    QFETCH(QByteArray, data);
+    QFETCH(QByteArray, request);
     QFETCH(QHttpSocket::Error, error);
 
-    QBuffer buffer(&data);
-    buffer.open(QIODevice::ReadOnly);
+    QSocketPair pair;
+    QTRY_VERIFY(pair.isConnected());
+    QHttpSocket socket(pair.server());
 
-    QHttpSocket socket(&buffer);
+    pair.client()->write(request);
 
     if(error == QHttpSocket::NoError) {
 
         QFETCH(QByteArray, method);
         QFETCH(QByteArray, path);
         QFETCH(HeaderList, headers);
+        QFETCH(QByteArray, data);
 
-        QTRY_VERIFY(socket.headersParsed());
+        // Ensure that the headersParsedChanged() signal is emitted
+        QSignalSpy hPChangedSpy(&socket, SIGNAL(headersParsedChanged(bool)));
+        QTRY_COMPARE(hPChangedSpy.count(), 1);
 
+        // Compare the parsed properties to their proper values
         QCOMPARE(socket.method(), method);
         QCOMPARE(socket.path(), path);
         QCOMPARE(socket.headers().count(), headers.count());
+
         foreach(Header header, headers) {
            QCOMPARE(socket.header(header.first), header.second);
+        }
+
+        //...
+        if(!data.isNull()) {
+
+            pair.client()->write(data);
+
+            QTRY_COMPARE(socket.bytesAvailable(), data.length());
+            QCOMPARE(socket.readAll(), data);
         }
 
     } else {
 
         QSignalSpy errorSpy(&socket, SIGNAL(errorChanged(Error)));
-
         QTRY_COMPARE(errorSpy.count(), 1);
+
         QCOMPARE(socket.error(), error);
     }
 }
 
-void TestQHttpSocket::testResponseProperties_data()
+void TestQHttpSocket::testResponse_data()
 {
     QTest::addColumn<QByteArray>("statusLine");
     QTest::addColumn<QByteArray>("statusCode");
@@ -164,7 +186,7 @@ void TestQHttpSocket::testResponseProperties_data()
             << TestData;
 }
 
-void TestQHttpSocket::testResponseProperties()
+void TestQHttpSocket::testResponse()
 {
     QFETCH(QByteArray, statusLine);
     QFETCH(QByteArray, statusCode);
@@ -222,48 +244,9 @@ void TestQHttpSocket::testResponseProperties()
         QVERIFY(lines.contains(header.first + ": " + header.second));
     }
 
-    QCOMPARE(parts.at(1), data);
-}
-
-void TestQHttpSocket::testRead()
-{
-    QSocketPair pair;
-    QTRY_VERIFY(pair.isConnected());
-
-    QHttpSocket socket(pair.server());
-
-    QSignalSpy hPChangedSpy(&socket, SIGNAL(headersParsedChanged(bool)));
-    QSignalSpy readyReadSpy(&socket, SIGNAL(readyRead()));
-
-    pair.client()->write("POST /test HTTP/1.0\r\n\r\n");
-
-    QTRY_COMPARE(hPChangedSpy.count(), 1);
-    QTRY_COMPARE(readyReadSpy.count(), 0);
-
-    pair.client()->write(TestData);
-
-    QTRY_COMPARE(readyReadSpy.count(), 1);
-
-    QCOMPARE(socket.bytesAvailable(), TestData.length());
-    QCOMPARE(socket.readAll(), TestData);
-}
-
-void TestQHttpSocket::testWrite()
-{
-    QByteArray data;
-    QBuffer buffer(&data);
-    buffer.open(QIODevice::ReadWrite);
-
-    QHttpSocket socket(&buffer);
-    QSignalSpy bytesWrittenSpy(&socket, SIGNAL(bytesWritten(qint64)));
-
-    socket.writeHeaders();
-    QCOMPARE(bytesWrittenSpy.count(), 0);
-
-    socket.write(TestData);
-
-    QTRY_COMPARE(bytesWrittenSpy.count(), 1);
-    QCOMPARE(bytesWrittenSpy.at(0).at(0).toLongLong(), TestData.length());
+    if(!data.isNull()) {
+        QCOMPARE(parts.at(1), data);
+    }
 }
 
 QTEST_MAIN(TestQHttpSocket)
