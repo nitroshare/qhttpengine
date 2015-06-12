@@ -84,7 +84,7 @@ void QIODeviceCopier::setBufferSize(qint64 size)
 
 void QIODeviceCopier::start()
 {
-    if(!d->src->isReadable()) {
+    if(!d->src->isOpen()) {
         if(!d->src->open(QIODevice::ReadOnly)) {
             Q_EMIT error(tr("Unable to open source device for reading"));
             Q_EMIT finished();
@@ -92,7 +92,7 @@ void QIODeviceCopier::start()
         }
     }
 
-    if(!d->dest->isWritable()) {
+    if(!d->dest->isOpen()) {
         if(!d->dest->open(QIODevice::WriteOnly)) {
             Q_EMIT error(tr("Unable to open destination device for writing"));
             Q_EMIT finished();
