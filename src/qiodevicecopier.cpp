@@ -41,20 +41,42 @@ QIODeviceCopierPrivate::QIODeviceCopierPrivate(QIODeviceCopier *copier, QIODevic
 
 void QIODeviceCopierPrivate::onReadyRead()
 {
-    dest->write(src->readAll());
+    if(dest->write(src->readAll()) == -1) {
+        Q_EMIT q->error(dest->errorString());
+        src->close();
+    }
 }
 
 void QIODeviceCopierPrivate::onReadChannelFinished()
 {
     // Read any data that remains and signal the end of the operation
-    onReadyRead();
+    if(src->bytesAvailable()) {
+        onReadyRead();
+    }
+
     Q_EMIT q->finished();
 }
 
 void QIODeviceCopierPrivate::nextBlock()
 {
-    // Read an amount of data up to the size of the buffer
-    dest->write(src->read(DefaultBufferSize));
+    // Attempt to read an amount of data up to the size of the buffer
+    QByteArray data;
+    data.resize(bufferSize);
+    qint64 dataRead = src->read(data.data(), bufferSize);
+
+    // If an error occurred during the read, emit an error
+    if(dataRead == -1) {
+        Q_EMIT q->error(src->errorString());
+        Q_EMIT q->finished();
+        return;
+    }
+
+    // Write the data to the destination device
+    if(dest->write(data.constData(), dataRead) == -1) {
+        Q_EMIT q->error(dest->errorString());
+        Q_EMIT q->finished();
+        return;
+    }
 
     // Check if the end of the device has been reached - if so,
     // emit the finished signal and if not, continue to read
