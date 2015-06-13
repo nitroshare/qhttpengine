@@ -4,15 +4,19 @@ configure_file(qhttpengine.pc.in "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.pc" @O
 set(INCLUDE
     "${CMAKE_CURRENT_BINARY_DIR}/config.h"
     qhttpengine.h
+    qhttphandler.h
     qhttpserver.h
     qhttpsocket.h
+    qhttpsubhandler.h
     qiodevicecopier.h
 )
 
 set(SRC
     qhttpengine.cpp
+    qhttphandler.cpp
     qhttpserver.cpp
     qhttpsocket.cpp
+    qhttpsubhandler.cpp
     qiodevicecopier.cpp
 )
 
