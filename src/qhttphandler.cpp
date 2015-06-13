@@ -22,44 +22,9 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPHANDLER_H
-#define QHTTPENGINE_QHTTPHANDLER_H
+#include "qhttphandler.h"
 
-#include <QObject>
-
-#include "config.h"
-#include "qhttpsocket.h"
-
-/**
- * @brief Base class for URL handlers
- *
- * When a request is received by a QHttpServer, it is dispatched to a
- * QHttpHandler instance which will then determine what happens to the
- * request. This is done by reimplement the process() method.
- */
-class QHTTPENGINE_EXPORT QHttpHandler : public QObject
+QHttpHandler::QHttpHandler(QObject *parent)
+    : QObject(parent)
 {
-    Q_OBJECT
-
-public:
-
-    /**
-     * @brief Base constructor for a handler
-     *
-     * Because this class is abstract, it cannot be instantiated.
-     */
-    explicit QHttpHandler(QObject *parent = 0);
-
-protected:
-
-    /**
-     * @brief Attempt to process a request
-     *
-     * This method should attempt to process the request if the provided path
-     * matches a resource. If the request could not be processed, this method
-     * should return false and a 404 page will be served.
-     */
-    virtual bool process(QHttpSocket *socket, const QString &path) = 0;
-};
-
-#endif // QHTTPENGINE_QHTTPHANDLER_H
+}
