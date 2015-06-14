@@ -30,7 +30,7 @@
 #include <QTest>
 
 #include "common/qsocketpair.h"
-#include "qiodevicecopier.h"
+#include "util/qiodevicecopier.h"
 
 const QByteArray SampleData = "1234567890";
 
