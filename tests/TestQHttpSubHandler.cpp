@@ -25,7 +25,7 @@
 #include <QRegExp>
 #include <QTest>
 
-#include "qhttpsubhandler.h"
+#include "handler/qhttpsubhandler.h"
 
 class DummyHandler : public QHttpHandler
 {
@@ -59,14 +59,14 @@ void TestQHttpSubHandler::testPatterns_data()
     QTest::addColumn<bool>("match");
 
     QTest::newRow("success")
-            << QRegExp("test")
+            << QRegExp("\\w+")
             << QString("test")
             << QString("")
             << true;
 
     QTest::newRow("failure")
-            << QRegExp("test")
-            << QString("fail")
+            << QRegExp("\\d+")
+            << QString("test")
             << QString("")
             << false;
 
