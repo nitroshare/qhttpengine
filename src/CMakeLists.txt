@@ -5,8 +5,10 @@ set(INCLUDE
     "${CMAKE_CURRENT_BINARY_DIR}/config.h"
     core/qhttpserver.h
     core/qhttpsocket.h
+    handler/qfilesystemhandler.h
     handler/qhttphandler.h
     handler/qhttpsubhandler.h
+    handler/qobjecthandler.h
     util/qiodevicecopier.h
     qhttpengine.h
 )
@@ -14,8 +16,10 @@ set(INCLUDE
 set(SRC
     core/qhttpserver.cpp
     core/qhttpsocket.cpp
+    handler/qfilesystemhandler.cpp
     handler/qhttphandler.cpp
     handler/qhttpsubhandler.cpp
+    handler/qobjecthandler.cpp
     util/qiodevicecopier.cpp
     qhttpengine.cpp
 )
