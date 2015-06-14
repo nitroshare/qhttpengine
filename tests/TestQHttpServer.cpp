@@ -24,7 +24,7 @@
 
 #include <QTest>
 
-#include "qhttpserver.h"
+#include "core/qhttpserver.h"
 
 class TestQHttpServer : public QObject
 {

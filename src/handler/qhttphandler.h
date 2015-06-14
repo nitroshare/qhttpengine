@@ -27,8 +27,8 @@
 
 #include <QObject>
 
+#include "core/qhttpsocket.h"
 #include "config.h"
-#include "qhttpsocket.h"
 
 /**
  * @brief Base class for URL handlers
