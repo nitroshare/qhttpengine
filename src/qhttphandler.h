@@ -50,14 +50,14 @@ public:
      */
     explicit QHttpHandler(QObject *parent = 0);
 
-protected:
-
     /**
      * @brief Attempt to process a request
      *
      * This method should attempt to process the request if the provided path
      * matches a resource. If the request could not be processed, this method
      * should return false and a 404 page will be served.
+     *
+     * Note that the leading "/" will be stripped from the path.
      */
     virtual bool process(QHttpSocket *socket, const QString &path) = 0;
 };

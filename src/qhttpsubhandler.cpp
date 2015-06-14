@@ -44,6 +44,13 @@ void QHttpSubHandler::addHandler(const QRegExp &pattern, QHttpHandler *handler)
 
 bool QHttpSubHandler::process(QHttpSocket *socket, const QString &path)
 {
-    // TODO: implement method
+    // Check each of the patterns for a match
+    foreach(URL url, d->patterns) {
+        if(url.first.indexIn(path) != -1) {
+            return url.second->process(socket, path.mid(url.first.matchedLength()));
+        }
+    }
+
+    // If no match was found, return false
     return false;
 }

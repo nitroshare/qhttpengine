@@ -38,6 +38,9 @@ class QHTTPENGINE_EXPORT QHttpSubHandlerPrivate;
  * This handler maintains a list of patterns that map to other handlers. When
  * a request is received, the list is enumerated (in order) and if the request
  * matches one of the patterns, its handler is invoked.
+ *
+ * When a handler attached to this one is invoked, the portion of the pattern
+ * that matches is removed from the path.
  */
 class QHTTPENGINE_EXPORT QHttpSubHandler : public QHttpHandler
 {
@@ -51,6 +54,11 @@ public:
     explicit QHttpSubHandler(QObject *parent = 0);
 
     /**
+     * @brief Reimplementation of QHttpHandler::process()
+     */
+    virtual bool process(QHttpSocket *socket, const QString &path);
+
+    /**
      * @brief Add a handler for a specific pattern
      *
      * The pattern and handler will be added to an internal list that will be
@@ -58,13 +66,6 @@ public:
      * request matches any patterns. Order is preserved.
      */
     void addHandler(const QRegExp &pattern, QHttpHandler *handler);
-
-protected:
-
-    /**
-     * @brief Reimplementation of QHttpHandler::process()
-     */
-    virtual bool process(QHttpSocket *socket, const QString &path);
 
 private:
 
