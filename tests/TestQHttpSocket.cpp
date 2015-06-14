@@ -30,9 +30,9 @@
 
 #include "common/qiodevicecounter.h"
 #include "common/qsocketpair.h"
+#include "util/qiodevicecopier.h"
 #include "qhttpengine.h"
 #include "qhttpsocket.h"
-#include "qiodevicecopier.h"
 
 typedef QPair<QByteArray, QByteArray> Header;
 typedef QList<Header> HeaderList;
