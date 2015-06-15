@@ -25,6 +25,7 @@
 #ifndef QHTTPENGINE_QFILESYSTEMHANDLERPRIVATE_H
 #define QHTTPENGINE_QFILESYSTEMHANDLERPRIVATE_H
 
+#include <QDir>
 #include <QObject>
 
 #include "qfilesystemhandler.h"
@@ -35,7 +36,12 @@ class QFilesystemHandlerPrivate : public QObject
 
 public:
 
-    explicit QFilesystemHandlerPrivate(QFilesystemHandler *handler);
+    QFilesystemHandlerPrivate(QFilesystemHandler *handler, const QString &root);
+
+    QString absolutePath(const QString &path);
+    QByteArray mimeType(const QString &path);
+
+    QDir root;
 
 private:
 

@@ -30,6 +30,9 @@
 
 class QHTTPENGINE_EXPORT QFilesystemHandlerPrivate;
 
+/**
+ * @brief Handler for filesystem requests
+ */
 class QHTTPENGINE_EXPORT QFilesystemHandler : public QHttpHandler
 {
     Q_OBJECT
@@ -38,8 +41,11 @@ public:
 
     /**
      * @brief Create a new filesystem handler
+     *
+     * The root path provided is used to resolve each of the requests when
+     * they are received.
      */
-    explicit QFilesystemHandler(QObject *parent = 0);
+    explicit QFilesystemHandler(const QString &root, QObject *parent = 0);
 
     /**
      * @brief Reimplementation of QHttpHandler::process()

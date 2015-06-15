@@ -22,23 +22,75 @@
  * IN THE SOFTWARE.
  */
 
+#include <QFile>
+#include <QFileInfo>
+
+#include "../util/qiodevicecopier.h"
 #include "qfilesystemhandler.h"
 #include "qfilesystemhandler_p.h"
 
-QFilesystemHandlerPrivate::QFilesystemHandlerPrivate(QFilesystemHandler *handler)
+QFilesystemHandlerPrivate::QFilesystemHandlerPrivate(QFilesystemHandler *handler, const QString &root)
     : QObject(handler),
-      q(handler)
+      q(handler),
+      root(root)
 {
 }
 
-QFilesystemHandler::QFilesystemHandler(QObject *parent)
+QString QFilesystemHandlerPrivate::absolutePath(const QString &path)
+{
+    // Clean the path and make it absolute
+    QString absolutePath = root.absoluteFilePath(QDir::cleanPath(path));
+
+    // Ensure that the absolute path is within the root
+    return absolutePath.startsWith(root.absolutePath()) ? absolutePath : QString();
+}
+
+QByteArray QFilesystemHandlerPrivate::mimeType(const QString &path)
+{
+    // TODO: use libmagic or the Windows registry when possible
+
+    QFileInfo info(path);
+    QString extension = info.completeSuffix();
+
+    if(extension == "css") { return "text/css"; }
+    else if(extension == "js") { return "application/javascript"; }
+    else if(extension == "jpg") { return "image/jpeg"; }
+    else if(extension == "png") { return "image/png"; }
+    else { return "application/octet-stream"; }
+}
+
+QFilesystemHandler::QFilesystemHandler(const QString &root, QObject *parent)
     : QHttpHandler(parent),
-      d(new QFilesystemHandlerPrivate(this))
+      d(new QFilesystemHandlerPrivate(this, root))
 {
 }
 
 bool QFilesystemHandler::process(QHttpSocket *socket, const QString &path)
 {
-    // TODO
-    return false;
+    // Attempt to retrieve the absolute path
+    QString absolutePath = d->absolutePath(path);
+    if(absolutePath.isNull()) {
+        return false;
+    }
+
+    // Attempt to open the file for reading
+    QFile *file = new QFile(absolutePath);
+    if(!file->open(QIODevice::ReadOnly)) {
+        delete file;
+        return false;
+    }
+
+    // Create a QIODeviceCopier to copy the file contents to the socket
+    QIODeviceCopier *copier = new QIODeviceCopier(file, socket);
+    connect(copier, SIGNAL(finished()), file, SLOT(deleteLater()));
+    connect(copier, SIGNAL(finished()), copier, SLOT(deleteLater()));
+    connect(copier, SIGNAL(finished()), socket, SLOT(deleteLater()));
+
+    // Set the mimetype and contentlength
+    socket->setHeader("Content-Type", d->mimeType(absolutePath));
+    socket->setHeader("Content-Length", QByteArray::number(file->size()));
+
+    // Start the copy and indicate success
+    copier->start();
+    return true;
 }
