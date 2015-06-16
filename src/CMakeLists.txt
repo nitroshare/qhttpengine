@@ -9,8 +9,8 @@ set(INCLUDE
     handler/qhttphandler.h
     handler/qhttpsubhandler.h
     handler/qobjecthandler.h
+    util/byteutils.h
     util/qiodevicecopier.h
-    qhttpengine.h
 )
 
 set(SRC
@@ -20,8 +20,8 @@ set(SRC
     handler/qhttphandler.cpp
     handler/qhttpsubhandler.cpp
     handler/qobjecthandler.cpp
+    util/byteutils.cpp
     util/qiodevicecopier.cpp
-    qhttpengine.cpp
 )
 
 add_library(qhttpengine SHARED ${SRC})

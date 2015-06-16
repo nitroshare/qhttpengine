@@ -22,17 +22,18 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPENGINE_H
-#define QHTTPENGINE_QHTTPENGINE_H
+#ifndef QHTTPENGINE_BYTEUTILS_H
+#define QHTTPENGINE_BYTEUTILS_H
 
 #include <QList>
 
+#include "../core/qhttpheader.h"
 #include "config.h"
 
 /**
- * @brief Utility functions
+ * @brief Utility methods for working with QByteArray
  */
-class QHTTPENGINE_EXPORT QHttpEngine
+class QHTTPENGINE_EXPORT ByteUtils
 {
 public:
 
@@ -47,6 +48,11 @@ public:
      * maxSplit + 1 items.
      */
     static QList<QByteArray> split(const QByteArray &data, const QByteArray &delim, int maxSplit = 0);
+
+    /**
+     * @brief Parse an HTTP response into its components
+     */
+    static bool parseRequest(const QByteArray &data, QByteArray &method, QByteArray &path, QList<QHttpHeader> &headers);
 };
 
-#endif // QHTTPENGINE_QHTTPENGINE_H
+#endif // QHTTPENGINE_BYTEUTILS_H

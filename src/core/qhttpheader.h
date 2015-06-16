@@ -44,8 +44,8 @@ public:
           value(value)
     {}
 
-    const QByteArray name;
-    const QByteArray value;
+    QByteArray name;
+    QByteArray value;
 };
 
 #endif // QHTTPENGINE_QHTTPHEADER_H

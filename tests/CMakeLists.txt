@@ -3,8 +3,8 @@ find_package(Qt5Test REQUIRED)
 add_subdirectory(common)
 
 set(TESTS
+    TestByteUtils
     TestQFilesystemHandler
-    TestQHttpEngine
     TestQHttpServer
     TestQHttpSocket
     TestQHttpSubHandler

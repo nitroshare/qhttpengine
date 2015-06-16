@@ -26,11 +26,11 @@
 #include <QObject>
 #include <QTest>
 
-#include <qhttpengine.h>
+#include "util/byteutils.h"
 
 typedef QList<QByteArray> QByteArrayList;
 
-class TestQHttpEngine : public QObject
+class TestByteUtils : public QObject
 {
     Q_OBJECT
 
@@ -40,7 +40,7 @@ private Q_SLOTS:
     void testSplit();
 };
 
-void TestQHttpEngine::testSplit_data()
+void TestByteUtils::testSplit_data()
 {
     QTest::addColumn<QByteArray>("original");
     QTest::addColumn<QByteArray>("delimiter");
@@ -84,15 +84,15 @@ void TestQHttpEngine::testSplit_data()
             << (QByteArrayList() << "a" << "a,a");
 }
 
-void TestQHttpEngine::testSplit()
+void TestByteUtils::testSplit()
 {
     QFETCH(QByteArray, original);
     QFETCH(QByteArray, delimiter);
     QFETCH(int, maxSplit);
     QFETCH(QByteArrayList, list);
 
-    QCOMPARE(QHttpEngine::split(original, delimiter, maxSplit), list);
+    QCOMPARE(ByteUtils::split(original, delimiter, maxSplit), list);
 }
 
-QTEST_MAIN(TestQHttpEngine)
-#include "TestQHttpEngine.moc"
+QTEST_MAIN(TestByteUtils)
+#include "TestByteUtils.moc"
