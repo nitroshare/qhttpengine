@@ -39,7 +39,7 @@ QFilesystemHandlerPrivate::QFilesystemHandlerPrivate(QFilesystemHandler *handler
 QString QFilesystemHandlerPrivate::absolutePath(const QString &path)
 {
     // Clean the path and make it absolute
-    QString absolutePath = root.absoluteFilePath(QDir::cleanPath(path));
+    QString absolutePath = QDir(root.absoluteFilePath(path)).canonicalPath();
 
     // Ensure that the absolute path is within the root
     return absolutePath.startsWith(root.absolutePath()) ? absolutePath : QString();
