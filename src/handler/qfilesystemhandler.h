@@ -32,6 +32,11 @@ class QHTTPENGINE_EXPORT QFilesystemHandlerPrivate;
 
 /**
  * @brief Handler for filesystem requests
+ *
+ * This handler responds to requests for resources on a local filesystem. The
+ * constructor is provided with a path to the root directory, which will be
+ * used to resolve all paths. Requests for resources outside the root will be
+ * ignored.
  */
 class QHTTPENGINE_EXPORT QFilesystemHandler : public QHttpHandler
 {
