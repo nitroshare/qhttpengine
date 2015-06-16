@@ -44,6 +44,16 @@ public:
           value(value)
     {}
 
+    /**
+     * @brief Comparison operator
+     *
+     * Note that comparison between header names is case-insensitive.
+     */
+    bool operator==(const QHttpHeader &rhs) const
+    {
+        return name.toLower() == rhs.name.toLower() && value == rhs.value;
+    }
+
     QByteArray name;
     QByteArray value;
 };
