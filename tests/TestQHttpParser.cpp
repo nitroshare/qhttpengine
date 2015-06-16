@@ -26,11 +26,15 @@
 #include <QObject>
 #include <QTest>
 
+#include "core/qhttpheader.h"
 #include "util/qhttpparser.h"
 
 typedef QList<QByteArray> QByteArrayList;
+typedef QList<QHttpHeader> QHttpHeaderList;
 
-class TestByteUtils : public QObject
+Q_DECLARE_METATYPE(QHttpHeaderList)
+
+class TestQHttpParser : public QObject
 {
     Q_OBJECT
 
@@ -38,9 +42,12 @@ private Q_SLOTS:
 
     void testSplit_data();
     void testSplit();
+
+    void testParseRequest_data();
+    void testParseRequest();
 };
 
-void TestByteUtils::testSplit_data()
+void TestQHttpParser::testSplit_data()
 {
     QTest::addColumn<QByteArray>("original");
     QTest::addColumn<QByteArray>("delimiter");
@@ -84,7 +91,7 @@ void TestByteUtils::testSplit_data()
             << (QByteArrayList() << "a" << "a,a");
 }
 
-void TestByteUtils::testSplit()
+void TestQHttpParser::testSplit()
 {
     QFETCH(QByteArray, original);
     QFETCH(QByteArray, delimiter);
@@ -94,5 +101,58 @@ void TestByteUtils::testSplit()
     QCOMPARE(QHttpParser::split(original, delimiter, maxSplit), list);
 }
 
-QTEST_MAIN(TestByteUtils)
-#include "TestByteUtils.moc"
+void TestQHttpParser::testParseRequest_data()
+{
+    QTest::addColumn<QByteArray>("data");
+    QTest::addColumn<bool>("success");
+    QTest::addColumn<QByteArray>("method");
+    QTest::addColumn<QByteArray>("path");
+    QTest::addColumn<QHttpHeaderList>("headers");
+
+    QTest::newRow("empty request")
+            << QByteArray("")
+            << false;
+
+    QTest::newRow("bad request")
+            << QByteArray("BAD REQUEST")
+            << false;
+
+    QTest::newRow("no headers")
+            << QByteArray("GET /path HTTP/1.0")
+            << true
+            << QByteArray("GET")
+            << QByteArray("/path")
+            << QHttpHeaderList();
+
+    QTest::newRow("multiple headers")
+            << QByteArray("GET / HTTP/1.0\r\nX-Test1: test\r\nX-Test2: test")
+            << true
+            << QByteArray("GET")
+            << QByteArray("/")
+            << (QHttpHeaderList() << QHttpHeader("X-Test1", "test") << QHttpHeader("X-Test2", "test"));
+}
+
+void TestQHttpParser::testParseRequest()
+{
+    QFETCH(QByteArray, data);
+    QFETCH(bool, success);
+
+    QByteArray outMethod;
+    QByteArray outPath;
+    QHttpHeaderList outHeaders;
+
+    QCOMPARE(QHttpParser::parseRequest(data, outMethod, outPath, outHeaders), success);
+
+    if(success) {
+        QFETCH(QByteArray, method);
+        QFETCH(QByteArray, path);
+        QFETCH(QHttpHeaderList, headers);
+
+        QCOMPARE(outMethod, method);
+        QCOMPARE(outPath, path);
+        QCOMPARE(outHeaders, headers);
+    }
+}
+
+QTEST_MAIN(TestQHttpParser)
+#include "TestQHttpParser.moc"
