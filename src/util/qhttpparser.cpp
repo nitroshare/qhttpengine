@@ -24,9 +24,9 @@
 
 #include <QByteArray>
 
-#include "byteutils.h"
+#include "qhttpparser.h"
 
-QList<QByteArray> ByteUtils::split(const QByteArray &data, const QByteArray &delim, int maxSplit)
+QList<QByteArray> QHttpParser::split(const QByteArray &data, const QByteArray &delim, int maxSplit)
 {
     QList<QByteArray> parts;
     int index = 0;
@@ -48,7 +48,7 @@ QList<QByteArray> ByteUtils::split(const QByteArray &data, const QByteArray &del
     return parts;
 }
 
-bool ByteUtils::parseRequest(const QByteArray &data, QByteArray &method, QByteArray &path, QList<QHttpHeader> &headers)
+bool QHttpParser::parseRequest(const QByteArray &data, QByteArray &method, QByteArray &path, QList<QHttpHeader> &headers)
 {
     // Split the data into individual lines
     QList<QByteArray> lines = split(data, "\r\n");

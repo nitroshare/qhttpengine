@@ -26,7 +26,7 @@
 #include <QObject>
 #include <QTest>
 
-#include "util/byteutils.h"
+#include "util/qhttpparser.h"
 
 typedef QList<QByteArray> QByteArrayList;
 
@@ -91,7 +91,7 @@ void TestByteUtils::testSplit()
     QFETCH(int, maxSplit);
     QFETCH(QByteArrayList, list);
 
-    QCOMPARE(ByteUtils::split(original, delimiter, maxSplit), list);
+    QCOMPARE(QHttpParser::split(original, delimiter, maxSplit), list);
 }
 
 QTEST_MAIN(TestByteUtils)

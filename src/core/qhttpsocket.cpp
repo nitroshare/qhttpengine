@@ -26,7 +26,7 @@
 
 #include <QTimer>
 
-#include "../util/byteutils.h"
+#include "../util/qhttpparser.h"
 #include "qhttpsocket.h"
 #include "qhttpsocket_p.h"
 
@@ -113,7 +113,7 @@ void QHttpSocketPrivate::onBytesWritten(qint64 bytes)
 void QHttpSocketPrivate::parseHeaders(const QByteArray &data)
 {
     // Split the header into individual lines
-    QList<QByteArray> lines = ByteUtils::split(data, "\r\n");
+    QList<QByteArray> lines = QHttpParser::split(data, "\r\n");
 
     // Parse the status line
     parseStatusLine(lines.takeFirst());

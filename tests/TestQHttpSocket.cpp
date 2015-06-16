@@ -31,7 +31,7 @@
 #include "common/qiodevicecounter.h"
 #include "common/qsocketpair.h"
 #include "core/qhttpsocket.h"
-#include "util/byteutils.h"
+#include "util/qhttpparser.h"
 #include "util/qiodevicecopier.h"
 
 typedef QPair<QByteArray, QByteArray> Header;
@@ -239,8 +239,8 @@ void TestQHttpSocket::testResponse()
     }
 
     // Split the response into fragments and compare the expected values
-    QList<QByteArray> parts = ByteUtils::split(bufferData, "\r\n\r\n", 1);
-    QList<QByteArray> lines = ByteUtils::split(parts.at(0), "\r\n");
+    QList<QByteArray> parts = QHttpParser::split(bufferData, "\r\n\r\n", 1);
+    QList<QByteArray> lines = QHttpParser::split(parts.at(0), "\r\n");
 
     QCOMPARE(lines.takeFirst(), statusLine);
     QCOMPARE(lines.count(), headers.count());
