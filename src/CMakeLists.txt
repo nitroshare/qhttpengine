@@ -10,6 +10,7 @@ set(INCLUDE
     handler/qhttpsubhandler.h
     handler/qobjecthandler.h
     util/qhttpparser.h
+    util/qibytearray.h
     util/qiodevicecopier.h
 )
 
@@ -21,6 +22,7 @@ set(SRC
     handler/qhttpsubhandler.cpp
     handler/qobjecthandler.cpp
     util/qhttpparser.cpp
+    util/qibytearray.cpp
     util/qiodevicecopier.cpp
 )
 
