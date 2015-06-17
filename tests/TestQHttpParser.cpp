@@ -22,11 +22,14 @@
  * IN THE SOFTWARE.
  */
 
+#include <QList>
 #include <QObject>
 #include <QTest>
 
 #include "util/qhttpparser.h"
 #include "util/qibytearray.h"
+
+typedef QList<QByteArray> QByteArrayList;
 
 Q_DECLARE_METATYPE(QHttpHeaderMap)
 
