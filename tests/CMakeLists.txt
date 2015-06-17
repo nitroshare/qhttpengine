@@ -8,6 +8,7 @@ set(TESTS
     TestQHttpServer
     TestQHttpSocket
     TestQHttpSubHandler
+    TestQIByteArray
     TestQIODeviceCopier
 )
 

@@ -1,0 +1,52 @@
+/**
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2015 Nathan Osman
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
+
+#ifndef QHTTPENGINE_QIBYTEARRAY_H
+#define QHTTPENGINE_QIBYTEARRAY_H
+
+#include <QByteArray>
+
+#include "config.h"
+
+/**
+ * @brief Case-insensitive subclass of QByteArray
+ */
+class QHTTPENGINE_EXPORT QIByteArray : public QByteArray
+{
+public:
+
+    QIByteArray();
+    QIByteArray(const QByteArray &other);
+    QIByteArray(const char * data, int size = -1);
+};
+
+QHTTPENGINE_EXPORT bool operator==(const QIByteArray &a1, const QIByteArray &a2);
+QHTTPENGINE_EXPORT bool operator==(const QIByteArray &a1, const QString &a2);
+QHTTPENGINE_EXPORT bool operator==(const QString &a1, const QIByteArray &a2);
+QHTTPENGINE_EXPORT bool operator==(const QIByteArray &a1, const QByteArray &a2);
+QHTTPENGINE_EXPORT bool operator==(const QByteArray &a1, const QIByteArray &a2);
+QHTTPENGINE_EXPORT bool operator==(const QIByteArray &a1, const char *a2);
+QHTTPENGINE_EXPORT bool operator==(const char *a1, const QIByteArray &a2);
+
+#endif // QHTTPENGINE_QIBYTEARRAY_H
