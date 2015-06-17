@@ -26,9 +26,8 @@
 
 #include "qhttpparser.h"
 
-QList<QByteArray> QHttpParser::split(const QByteArray &data, const QByteArray &delim, int maxSplit)
+void QHttpParser::split(const QByteArray &data, const QByteArray &delim, int maxSplit, QList<QByteArray> &parts)
 {
-    QList<QByteArray> parts;
     int index = 0;
 
     for(int i = 0; !maxSplit || i < maxSplit; ++i) {
@@ -44,57 +43,37 @@ QList<QByteArray> QHttpParser::split(const QByteArray &data, const QByteArray &d
 
     // Append whatever remains to the list
     parts.append(data.mid(index));
-
-    return parts;
 }
 
-bool QHttpParser::parseHeaderList(const QList<QByteArray> &lines, QList<QHttpHeader> &headers)
+bool QHttpParser::parseHeaderList(const QList<QByteArray> &lines, QHttpHeaderMap &headers)
 {
-    for(QList<QByteArray>::const_iterator i = lines.constBegin();
-            i != lines.constEnd(); ++i) {
+    for(QList<QByteArray>::const_iterator i = lines.constBegin(); i != lines.constEnd(); ++i) {
 
-        QList<QByteArray> parts = split(*i, ":", 1);
+        QList<QByteArray> parts;
+        split(*i, ":", 1, parts);
+
+        // Ensure that the delimiter (":") was encountered at least once
         if(parts.count() != 2) {
             return false;
         }
 
-        headers.append(QHttpHeader(parts[0].trimmed(), parts[1].trimmed()));
+        headers.insert(parts[0].trimmed(), parts[1].trimmed());
     }
 
     return true;
 }
 
-bool QHttpParser::parseRequest(const QByteArray &data, QByteArray &method, QByteArray &path, QList<QHttpHeader> &headers)
+bool QHttpParser::parseHeaders(const QByteArray &data, QList<QByteArray> &parts, QHttpHeaderMap &headers)
 {
     // Split the data into individual lines
-    QList<QByteArray> lines = split(data, "\r\n");
+    QList<QByteArray> lines;
+    split(data, "\r\n", 0, lines);
 
-    // Separate the status line into its three components
-    QList<QByteArray> parts = split(lines.takeFirst(), " ");
+    // Split the status line into a maximum of three parts
+    split(lines.takeFirst(), " ", 2, parts);
     if(parts.count() != 3) {
         return false;
     }
 
-    method = parts[0];
-    path = parts[1];
-
-    // Parse the request headers
-    return parseHeaderList(lines, headers);
-}
-
-bool QHttpParser::parseResponse(const QByteArray &data, QByteArray &statusCode, QList<QHttpHeader> &headers)
-{
-    // Split the data into individual lines
-    QList<QByteArray> lines = split(data, "\r\n");
-
-    // Separate the status line into its three components
-    QList<QByteArray> parts = split(lines.takeFirst(), " ", 1);
-    if(parts.count() != 2) {
-        return false;
-    }
-
-    statusCode = parts[1];
-
-    // Parse the response headers
     return parseHeaderList(lines, headers);
 }

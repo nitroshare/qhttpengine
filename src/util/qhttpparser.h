@@ -26,12 +26,25 @@
 #define QHTTPENGINE_QHTTPPARSER_H
 
 #include <QList>
+#include <QMap>
 
-#include "../core/qhttpheader.h"
 #include "config.h"
+#include "qibytearray.h"
+
+/**
+ * @brief Map consisting of HTTP headers
+ *
+ * The key used for the map is the QIByteArray class, which allows for
+ * case-insensitive comparison.
+ */
+typedef QMap<QIByteArray, QByteArray> QHttpHeaderMap;
 
 /**
  * @brief Utility methods for parsing HTTP requests and responses
+ *
+ * This class provides a set of static methods for parsing HTTP request and
+ * response headers. Functionality is broken up into smaller methods in order
+ * to make the unit tests simpler.
  */
 class QHTTPENGINE_EXPORT QHttpParser
 {
@@ -44,33 +57,27 @@ public:
      * returned containing the original QByteArray as its only element. The
      * delimiter must not be empty.
      *
-     * If a value is provided for maxSplit, the list will contain no more than
-     * maxSplit + 1 items.
+     * If maxSplit is nonzero, the list will contain no more than maxSplit + 1
+     * items.
      */
-    static QList<QByteArray> split(const QByteArray &data, const QByteArray &delim, int maxSplit = 0);
+    static void split(const QByteArray &data, const QByteArray &delim, int maxSplit, QList<QByteArray> &parts);
 
     /**
      * @brief Parse a list of lines containing HTTP headers
+     *
+     * Each line is expected to be in the format "name: value". Parsing is
+     * immediately aborted if an invalid line is encountered.
      */
-    static bool parseHeaderList(const QList<QByteArray> &lines, QList<QHttpHeader> &headers);
+    static bool parseHeaderList(const QList<QByteArray> &lines, QHttpHeaderMap &headers);
 
     /**
-     * @brief Parse an HTTP request into its components
+     * @brief Parse a request or response header
      *
-     * This method will parse the headers from an HTTP request (everything up
-     * to the "\r\n\r\n" terminator) and store the values in the specified
-     * references.
+     * The specified header data is parsed into a status line and HTTP
+     * headers. The parts list will contain the three parts of the status
+     * line.
      */
-    static bool parseRequest(const QByteArray &data, QByteArray &method, QByteArray &path, QList<QHttpHeader> &headers);
-
-    /**
-     * @brief Parse an HTTP response into its components
-     *
-     * This method will parse the headers from an HTTP response (everything up
-     * to the "\r\n\r\n" terminator) and store the values in the specified
-     * references.
-     */
-    static bool parseResponse(const QByteArray &data, QByteArray &statusCode, QList<QHttpHeader> &headers);
+    static bool parseHeaders(const QByteArray &data, QList<QByteArray> &parts, QHttpHeaderMap &headers);
 };
 
 #endif // QHTTPENGINE_QHTTPPARSER_H
