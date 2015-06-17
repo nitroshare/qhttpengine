@@ -26,8 +26,9 @@
 #define QHTTPENGINE_QHTTPSOCKETPRIVATE_H
 
 #include <QIODevice>
-#include <QMap>
+#include <QList>
 
+#include "../util/qhttpparser.h"
 #include "qhttpsocket.h"
 
 class QHttpSocketPrivate : public QObject
@@ -41,14 +42,12 @@ public:
     QIODevice *const device;
     QByteArray buffer;
 
-    QHttpSocket::Error error;
-
     QByteArray method;
     QByteArray path;
     QByteArray statusCode;
 
-    QMap<QByteArray, QByteArray> requestHeaders;
-    QMap<QByteArray, QByteArray> responseHeaders;
+    QHttpHeaderMap requestHeaders;
+    QHttpHeaderMap responseHeaders;
 
     qint64 headerLength;
 
@@ -61,10 +60,6 @@ private Q_SLOTS:
     void onBytesWritten(qint64 bytes);
 
 private:
-
-    void parseHeaders(const QByteArray &data);
-    void parseStatusLine(const QByteArray &line);
-    void parseHeader(const QByteArray &line);
 
     QHttpSocket *const q;
 };

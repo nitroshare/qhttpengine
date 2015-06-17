@@ -28,6 +28,7 @@
 #include <QIODevice>
 #include <QList>
 
+#include "../util/qibytearray.h"
 #include "config.h"
 
 class QHTTPENGINE_EXPORT QHttpSocketPrivate;
@@ -40,14 +41,12 @@ class QHTTPENGINE_EXPORT QHttpSocketPrivate;
  * provided in the constructor.
  *
  * Once the headersParsedChanged() signal is emitted, information about the
- * request can be retrieved using the appropriate properties. This includes
- * the method, path, and headers. As data is received, the readyRead() signal
- * is emitted and any available data can be read using QIODevice's read()
- * method.
+ * request can be retrieved using the appropriate methods. This includes the
+ * method, path, and headers. As data is received, the readyRead() signal is
+ * emitted and any available data can be read using QIODevice's read() method.
  *
- * If an error is encountered while parsing the headers, the errorChanged()
- * signal is emitted. A human-readable description of the error can be
- * obtained through the errorString() method.
+ * If an error is encountered while parsing the headers, the error() signal is
+ * emitted.
  *
  * The status code and headers may be set as long as no data has been written
  * to the device and the writeHeaders() method has not been called. The
@@ -57,23 +56,8 @@ class QHTTPENGINE_EXPORT QHttpSocketPrivate;
 class QHTTPENGINE_EXPORT QHttpSocket : public QIODevice
 {
     Q_OBJECT
-    Q_PROPERTY(Error error READ error NOTIFY errorChanged)
-    Q_PROPERTY(QByteArray method READ method)
-    Q_PROPERTY(QByteArray path READ path)
-    Q_PROPERTY(bool headersParsed READ headersParsed NOTIFY headersParsedChanged)
-    Q_ENUMS(Error)
 
 public:
-
-    /**
-     * @brief Error encountered while parsing request headers
-     */
-    enum Error {
-        NoError = 0,
-        MalformedRequestLine,
-        MalformedRequestHeader,
-        InvalidHttpVersion
-    };
 
     /**
      * @brief Create a new QHttpSocket from a QIODevice
@@ -94,11 +78,6 @@ public:
      * This method will always return true.
      */
     virtual bool isSequential() const;
-
-    /**
-     * @brief Retrieve the most recent error
-     */
-    Error error() const;
 
     /**
      * @brief Retrieve the request method
@@ -125,18 +104,19 @@ public:
      * @brief Retrieve a list of request headers
      *
      * This method may only be called after the request headers have been
-     * parsed.
+     * parsed. The original case of the headers is preserved but comparisons
+     * will be performed in a case-insensitive manner.
      */
-    Q_INVOKABLE QList<QByteArray> headers() const;
+    QList<QIByteArray> headers() const;
 
     /**
      * @brief Retrieve the value of a specific request header
      *
      * This method may only be called after the request headers have been
      * parsed. Headers are case-insensitive. If the specified header was not
-     * provided, then a null byte array is returned.
+     * provided, then an empty byte array is returned.
      */
-    Q_INVOKABLE QByteArray header(const QByteArray &name) const;
+    QByteArray header(const QByteArray &name) const;
 
     /**
      * @brief Set the response code
@@ -145,19 +125,19 @@ public:
      * If no response status code is explicitly set, it will assume a default
      * value of "200 OK".
      */
-    Q_INVOKABLE void setStatusCode(const QByteArray &statusCode);
+    void setStatusCode(const QByteArray &statusCode);
 
     /**
      * @brief Set a response header to a specific value
      *
      * This method may only be called before the response headers are written.
      */
-    Q_INVOKABLE void setHeader(const QByteArray &name, const QByteArray &value);
+    void setHeader(const QByteArray &name, const QByteArray &value);
 
     /**
      * @brief Write response headers to the device
      */
-    Q_INVOKABLE void writeHeaders();
+    void writeHeaders();
 
 Q_SIGNALS:
 
@@ -165,10 +145,9 @@ Q_SIGNALS:
      * @brief Indicate that a parsing error has occurred
      *
      * Any attempts to read from or write to the device after this point may
-     * fail. A brief description of the error condition can be retrieved with
-     * the errorString() method.
+     * fail.
      */
-    void errorChanged(Error error);
+    void error();
 
     /**
      * @brief Indicate that request headers have been parsed
@@ -176,17 +155,17 @@ Q_SIGNALS:
      * Once this signal is emitted, it is safe to begin reading request data.
      * The readyRead() signal will be emitted as request data is received.
      */
-    void headersParsedChanged(bool headersParsed);
+    void headersParsedChanged();
 
-private:
+protected:
 
     virtual qint64 readData(char *data, qint64 maxlen);
     virtual qint64 writeData(const char *data, qint64 len);
 
+private:
+
     QHttpSocketPrivate *const d;
     friend class QHttpSocketPrivate;
 };
-
-Q_DECLARE_METATYPE(QHttpSocket::Error)
 
 #endif // QHTTPENGINE_QHTTPSOCKET_H

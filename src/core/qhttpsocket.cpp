@@ -34,7 +34,6 @@ QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *socket, QIODevice *baseDevic
     : QObject(socket),
       q(socket),
       device(baseDevice),
-      error(QHttpSocket::NoError),
       statusCode("200 OK"),
       headersParsed(false),
       headersWritten(false)
@@ -58,33 +57,22 @@ void QHttpSocketPrivate::onReadyRead()
         if(index != -1) {
 
             // Parse the headers and remove them from the data
-            parseHeaders(buffer.left(index));
-            buffer.remove(0, index + 4);
+            QList<QByteArray> parts;
+            if(QHttpParser::parseHeaders(buffer.left(index), parts, requestHeaders)) {
 
-            // Check to see if an error occurred during parsing
-            if(error != QHttpSocket::NoError) {
+                // Remove the headers from the buffer
+                buffer.remove(0, index + 4);
 
-                // Set a descriptive error message
-                switch(error) {
-                case QHttpSocket::MalformedRequestLine:
-                    q->setErrorString(tr("Malformed request line"));
-                    break;
-                case QHttpSocket::MalformedRequestHeader:
-                    q->setErrorString(tr("Malformed request header"));
-                    break;
-                case QHttpSocket::InvalidHttpVersion:
-                    q->setErrorString(tr("Invalid HTTP version"));
-                    break;
-                default:
-                    break;
-                }
-
-                Q_EMIT q->errorChanged(error);
-
-            } else {
+                // Store the method and path
+                method = parts[0];
+                path = parts[1];
 
                 // Indicate that the request headers were parsed
-                Q_EMIT q->headersParsedChanged(headersParsed = true);
+                headersParsed = true;
+                Q_EMIT q->headersParsedChanged();
+
+            } else {
+                Q_EMIT q->error();
             }
 
         } else {
@@ -110,59 +98,6 @@ void QHttpSocketPrivate::onBytesWritten(qint64 bytes)
     }
 }
 
-void QHttpSocketPrivate::parseHeaders(const QByteArray &data)
-{
-    // Split the header into individual lines
-    QList<QByteArray> lines = QHttpParser::split(data, "\r\n");
-
-    // Parse the status line
-    parseStatusLine(lines.takeFirst());
-
-    // Parse each of the remaining lines (the headers)
-    foreach(const QByteArray &line, lines) {
-        parseHeader(line);
-    }
-}
-
-void QHttpSocketPrivate::parseStatusLine(const QByteArray &line)
-{
-    // The request line consists of three parts separated by space
-    QList<QByteArray> parts = line.split(' ');
-
-    // If 3 parts are not supplied, then stop parsing the line
-    // to avoid invalid array indices later on
-    if(parts.count() != 3) {
-        error = QHttpSocket::MalformedRequestLine;
-        return;
-    }
-
-    // Only HTTP versions 1.0 and 1.1 are currently supported
-    if(parts[2] != "HTTP/1.0" && parts[2] != "HTTP/1.1") {
-        error = QHttpSocket::InvalidHttpVersion;
-    }
-
-    method = parts[0];
-    path = parts[1];
-}
-
-void QHttpSocketPrivate::parseHeader(const QByteArray &line)
-{
-    // Each header consists of the key, ":", and the value
-    int index = line.indexOf(":");
-
-    // If the colon was not found, then stop parsing the header
-    if(index == -1) {
-        error = QHttpSocket::MalformedRequestHeader;
-        return;
-    }
-
-    // Trim each part and add it to the map
-    requestHeaders.insert(
-        line.left(index).trimmed(),
-        line.mid(index + 1).trimmed()
-    );
-}
-
 QHttpSocket::QHttpSocket(QIODevice *device, QObject *parent)
     : QIODevice(parent),
       d(new QHttpSocketPrivate(this, device))
@@ -180,11 +115,6 @@ bool QHttpSocket::isSequential() const
     return true;
 }
 
-QHttpSocket::Error QHttpSocket::error() const
-{
-    return d->error;
-}
-
 QByteArray QHttpSocket::method() const
 {
     return d->method;
@@ -200,21 +130,14 @@ bool QHttpSocket::headersParsed() const
     return d->headersParsed;
 }
 
-QList<QByteArray> QHttpSocket::headers() const
+QList<QIByteArray> QHttpSocket::headers() const
 {
     return d->requestHeaders.keys();
 }
 
 QByteArray QHttpSocket::header(const QByteArray &name) const
 {
-    for(QMap<QByteArray, QByteArray>::const_iterator i = d->requestHeaders.constBegin();
-            i != d->requestHeaders.constEnd(); ++i) {
-        if(i.key().toLower() == name.toLower()) {
-            return i.value();
-        }
-    }
-
-    return QByteArray();
+    return d->requestHeaders.value(name);
 }
 
 void QHttpSocket::setStatusCode(const QByteArray &statusCode)
@@ -239,8 +162,7 @@ void QHttpSocket::writeHeaders()
     header.append("\r\n");
 
     // Append each of the headers followed by a CRLF
-    for(QMap<QByteArray, QByteArray>::const_iterator i = d->responseHeaders.constBegin();
-            i != d->responseHeaders.constEnd(); ++i) {
+    for(QHttpHeaderMap::const_iterator i = d->responseHeaders.constBegin(); i != d->responseHeaders.constEnd(); ++i) {
         header.append(i.key());
         header.append(": ");
         header.append(i.value());
