@@ -48,36 +48,53 @@ QList<QByteArray> QHttpParser::split(const QByteArray &data, const QByteArray &d
     return parts;
 }
 
-bool QHttpParser::parseRequest(const QByteArray &data, QByteArray &method, QByteArray &path, QList<QHttpHeader> &headers)
+bool QHttpParser::parseHeaderList(const QList<QByteArray> &lines, QList<QHttpHeader> &headers)
 {
-    // Split the data into individual lines
-    QList<QByteArray> lines = split(data, "\r\n");
+    for(QList<QByteArray>::const_iterator i = lines.constBegin();
+            i != lines.constEnd(); ++i) {
 
-    // Separate the status line into three components
-    QList<QByteArray> parts = split(lines.takeFirst(), " ");
-    if(parts.count() != 3) {
-        return false;
-    }
-
-    // Check the HTTP version
-    if(parts[2] != "HTTP/1.0" && parts[2] != "HTTP/1.1") {
-        return false;
-    }
-
-    method = parts[0];
-    path = parts[1];
-
-    // Parse each of the headers
-    foreach(QByteArray line, lines) {
-
-        // Split each header by ":" and ignore any invalid ones
-        parts = split(line, ":", 1);
+        QList<QByteArray> parts = split(*i, ":", 1);
         if(parts.count() != 2) {
-            continue;
+            return false;
         }
 
         headers.append(QHttpHeader(parts[0].trimmed(), parts[1].trimmed()));
     }
 
     return true;
+}
+
+bool QHttpParser::parseRequest(const QByteArray &data, QByteArray &method, QByteArray &path, QList<QHttpHeader> &headers)
+{
+    // Split the data into individual lines
+    QList<QByteArray> lines = split(data, "\r\n");
+
+    // Separate the status line into its three components
+    QList<QByteArray> parts = split(lines.takeFirst(), " ");
+    if(parts.count() != 3) {
+        return false;
+    }
+
+    method = parts[0];
+    path = parts[1];
+
+    // Parse the request headers
+    return parseHeaderList(lines, headers);
+}
+
+bool QHttpParser::parseResponse(const QByteArray &data, QByteArray &statusCode, QList<QHttpHeader> &headers)
+{
+    // Split the data into individual lines
+    QList<QByteArray> lines = split(data, "\r\n");
+
+    // Separate the status line into its three components
+    QList<QByteArray> parts = split(lines.takeFirst(), " ", 1);
+    if(parts.count() != 2) {
+        return false;
+    }
+
+    statusCode = parts[1];
+
+    // Parse the response headers
+    return parseHeaderList(lines, headers);
 }

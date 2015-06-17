@@ -50,6 +50,11 @@ public:
     static QList<QByteArray> split(const QByteArray &data, const QByteArray &delim, int maxSplit = 0);
 
     /**
+     * @brief Parse a list of lines containing HTTP headers
+     */
+    static bool parseHeaderList(const QList<QByteArray> &lines, QList<QHttpHeader> &headers);
+
+    /**
      * @brief Parse an HTTP request into its components
      *
      * This method will parse the headers from an HTTP request (everything up
@@ -57,6 +62,15 @@ public:
      * references.
      */
     static bool parseRequest(const QByteArray &data, QByteArray &method, QByteArray &path, QList<QHttpHeader> &headers);
+
+    /**
+     * @brief Parse an HTTP response into its components
+     *
+     * This method will parse the headers from an HTTP response (everything up
+     * to the "\r\n\r\n" terminator) and store the values in the specified
+     * references.
+     */
+    static bool parseResponse(const QByteArray &data, QByteArray &statusCode, QList<QHttpHeader> &headers);
 };
 
 #endif // QHTTPENGINE_QHTTPPARSER_H
