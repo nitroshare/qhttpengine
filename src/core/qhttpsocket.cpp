@@ -30,16 +30,17 @@
 #include "qhttpsocket.h"
 #include "qhttpsocket_p.h"
 
-QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *socket, QTcpSocket *baseSocket)
+QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket, QTcpSocket *tcpSocket)
     : QObject(socket),
-      q(socket),
-      socket(baseSocket),
+      q(httpSocket),
+      socket(tcpSocket),
       statusCode("200 OK"),
       headersParsed(false),
       headersWritten(false)
 {
     connect(socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
     connect(socket, SIGNAL(bytesWritten(qint64)), this, SLOT(onBytesWritten(qint64)));
+    connect(socket, SIGNAL(QAbstractSocket::SocketError), this, SLOT(onError(QAbstractSocket::SocketError)));
 
     // Attempt to read data from the device the next time the event loop is entered
     QTimer::singleShot(0, this, SLOT(onReadyRead()));
@@ -69,18 +70,23 @@ void QHttpSocketPrivate::onReadyRead()
 
                 // Indicate that the request headers were parsed
                 headersParsed = true;
-                Q_EMIT q->headersParsedChanged();
+                Q_EMIT q->headersParsed();
 
             } else {
+
+                // Indicate an error and immediately abort the connection
                 Q_EMIT q->error();
+                socket->abort();
             }
 
         } else {
+
+            // If the rest of the headers haven't been read yet, return
             return;
         }
     }
 
-    // If there is data remaining in the buffer, emit the readyRead signal
+    // If there is any data in the buffer, emit the readyRead signal
     if(buffer.length()) {
         Q_EMIT q->readyRead();
     }
@@ -88,13 +94,22 @@ void QHttpSocketPrivate::onReadyRead()
 
 void QHttpSocketPrivate::onBytesWritten(qint64 bytes)
 {
-    // Since this signal may be emitted even if no actual data was written,
-    // the number of bytes needs to be subtracted from the header length
+    // The bytesWritten() signal should only be emitted if actual data was
+    // written and should not include any header data
     if(headerLength - bytes >= 0) {
         headerLength -= bytes;
     } else {
         Q_EMIT q->bytesWritten(bytes - headerLength);
         headerLength = 0;
+    }
+}
+
+void QHttpSocketPrivate::onError(QAbstractSocket::SocketError socketError)
+{
+    // A disconnect should be followed by the read
+    if(socketError == QAbstractSocket::RemoteHostClosedError) {
+    } else {
+        Q_EMIT q->error();
     }
 }
 
@@ -123,11 +138,6 @@ QByteArray QHttpSocket::method() const
 QByteArray QHttpSocket::path() const
 {
     return d->path;
-}
-
-bool QHttpSocket::headersParsed() const
-{
-    return d->headersParsed;
 }
 
 QList<QIByteArray> QHttpSocket::headers() const
@@ -182,7 +192,7 @@ void QHttpSocket::writeHeaders()
 qint64 QHttpSocket::readData(char *data, qint64 maxlen)
 {
     // Data can only be read from the device once the request headers are parsed
-    if(!headersParsed()) {
+    if(!d->headersParsed) {
         return 0;
     }
 

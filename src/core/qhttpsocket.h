@@ -38,20 +38,50 @@ class QHTTPENGINE_EXPORT QHttpSocketPrivate;
  *
  * QHttpSocket provides a class derived from QIODevice that can be used to
  * read data from and write data to an HTTP client through a QTcpSocket
- * provided in the constructor.
+ * provided in the constructor. The QHttpSocket will assume ownership of the
+ * socket and ensure it is properly deleted. Consequently, the QTcpSocket must
+ * have been allocated on the heap.
  *
- * Once the headersParsedChanged() signal is emitted, information about the
- * request can be retrieved using the appropriate methods. This includes the
- * method, path, and headers. As data is received, the readyRead() signal is
- * emitted and any available data can be read using QIODevice's read() method.
+ * @code
+ * QTcpSocket *tcpSock = new QTcpSocket;
+ * tcpSock->connectToHost(...);
+ * tcpSock->waitForConnected();
  *
- * If an error is encountered while parsing the headers, the error() signal is
- * emitted.
+ * QHttpSocket *httpSock = new QHttpSocket(tcpSock);
+ * @endcode
+ *
+ * Once the headersParsed() signal is emitted, information about the request
+ * can be retrieved using the appropriate methods. This includes the method,
+ * path, and headers. As data is received, the readyRead() signal is emitted
+ * and any available data can be read using QIODevice's read*() methods.
+ *
+ * @code
+ * connect(httpSock, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
+ *
+ * void MyClass::onReadyRead()
+ * {
+ *     data += httpSock->readAll();
+ * }
+ * @endcode
+ *
+ * If the client sets the `Content-Length` header, the readChannelFinished()
+ * signal will be emitted when the specified amount of data is read from the
+ * client. Otherwise the readChannelFinished() signal will be emitted
+ * immediately after the headers are read.
  *
  * The status code and headers may be set as long as no data has been written
  * to the device and the writeHeaders() method has not been called. The
  * headers are written either when the writeHeaders() method is called or when
  * data is first written to the device.
+ *
+ * @code
+ * httpSock->setStatusCode("200 OK");
+ * httpSock->setHeader("Content-Length", 13);
+ * httpSock->write("Hello, world!");
+ * @endcode
+ *
+ * If an error is encountered during parsing or a socket error occurs, the
+ * error() signal is emitted.
  */
 class QHTTPENGINE_EXPORT QHttpSocket : public QIODevice
 {
@@ -70,6 +100,9 @@ public:
 
     /**
      * @brief Retrieve the number of bytes available for reading
+     *
+     * This method indicates the number of bytes that could immediately be
+     * read by a call to QIODevice::readAll().
      */
     virtual qint64 bytesAvailable() const;
 
@@ -95,11 +128,6 @@ public:
      * parsed.
      */
     QByteArray path() const;
-
-    /**
-     * @brief Determine if request headers have been parsed yet
-     */
-    bool headersParsed() const;
 
     /**
      * @brief Retrieve a list of request headers
@@ -137,30 +165,43 @@ public:
 
     /**
      * @brief Write response headers to the device
+     *
+     * This method should not be invoked after the response headers have been
+     * written.
      */
     void writeHeaders();
 
 Q_SIGNALS:
 
     /**
-     * @brief Indicate that a parsing error has occurred
+     * @brief Indicate that an error has occurred
      *
-     * Any attempts to read from or write to the device after this point may
-     * fail.
+     * This signal is emitted when an error occurs during parsing or when the
+     * underlying socket encounters an error. The connection will immediately
+     * be aborted.
      */
     void error();
 
     /**
      * @brief Indicate that request headers have been parsed
      *
-     * Once this signal is emitted, it is safe to begin reading request data.
-     * The readyRead() signal will be emitted as request data is received.
+     * This signal is emitted when the request headers have been received from
+     * the client and parsing is complete. It is then safe to begin reading
+     * request data. The readyRead() signal will be emitted as request data is
+     * received.
      */
-    void headersParsedChanged();
+    void headersParsed();
 
 protected:
 
+    /**
+     * @brief Implementation of QIODevice::readData()
+     */
     virtual qint64 readData(char *data, qint64 maxlen);
+
+    /**
+     * @brief Implementation of QIODevice::writeData()
+     */
     virtual qint64 writeData(const char *data, qint64 len);
 
 private:
