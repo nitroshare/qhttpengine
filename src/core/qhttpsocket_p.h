@@ -25,8 +25,8 @@
 #ifndef QHTTPENGINE_QHTTPSOCKETPRIVATE_H
 #define QHTTPENGINE_QHTTPSOCKETPRIVATE_H
 
-#include <QIODevice>
 #include <QList>
+#include <QTcpSocket>
 
 #include "../util/qhttpparser.h"
 #include "qhttpsocket.h"
@@ -37,9 +37,9 @@ class QHttpSocketPrivate : public QObject
 
 public:
 
-    QHttpSocketPrivate(QHttpSocket *socket, QIODevice *baseDevice);
+    QHttpSocketPrivate(QHttpSocket *socket, QTcpSocket *baseSocket);
 
-    QIODevice *const device;
+    QTcpSocket *const socket;
     QByteArray buffer;
 
     QByteArray method;

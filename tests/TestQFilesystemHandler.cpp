@@ -29,6 +29,7 @@
 #include <QTemporaryDir>
 #include <QTest>
 
+#include "common/qsocketpair.h"
 #include "core/qhttpsocket.h"
 #include "handler/qfilesystemhandler.h"
 
@@ -85,8 +86,10 @@ void TestQFilesystemHandler::testRequests()
 
     QFilesystemHandler handler(QDir(dir.path()).absoluteFilePath("root"));
 
-    QBuffer buffer;
-    QHttpSocket socket(&buffer);
+    QSocketPair pair;
+    QTRY_VERIFY(pair.isConnected());
+
+    QHttpSocket socket(pair.server());
 
     QCOMPARE(handler.process(&socket, path), process);
 }

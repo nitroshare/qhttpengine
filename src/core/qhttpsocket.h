@@ -25,8 +25,8 @@
 #ifndef QHTTPENGINE_QHTTPSOCKET_H
 #define QHTTPENGINE_QHTTPSOCKET_H
 
-#include <QIODevice>
 #include <QList>
+#include <QTcpSocket>
 
 #include "../util/qibytearray.h"
 #include "config.h"
@@ -37,7 +37,7 @@ class QHTTPENGINE_EXPORT QHttpSocketPrivate;
  * @brief Implementation of the HTTP protocol
  *
  * QHttpSocket provides a class derived from QIODevice that can be used to
- * read data from and write data to an HTTP client through a QIODevice
+ * read data from and write data to an HTTP client through a QTcpSocket
  * provided in the constructor.
  *
  * Once the headersParsedChanged() signal is emitted, information about the
@@ -60,12 +60,13 @@ class QHTTPENGINE_EXPORT QHttpSocket : public QIODevice
 public:
 
     /**
-     * @brief Create a new QHttpSocket from a QIODevice
+     * @brief Create a new QHttpSocket from a QTcpSocket
      *
-     * It is assumed that the device is already opened for reading and
-     * writing.
+     * This instance will assume ownership of the socket. That is, it will
+     * make itself the parent of the socket. It is assumed that the socket
+     * is already opened for reading and writing.
      */
-    QHttpSocket(QIODevice *device, QObject *parent = 0);
+    QHttpSocket(QTcpSocket *socket, QObject *parent = 0);
 
     /**
      * @brief Retrieve the number of bytes available for reading

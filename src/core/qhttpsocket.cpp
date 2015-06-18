@@ -30,16 +30,16 @@
 #include "qhttpsocket.h"
 #include "qhttpsocket_p.h"
 
-QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *socket, QIODevice *baseDevice)
+QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *socket, QTcpSocket *baseSocket)
     : QObject(socket),
       q(socket),
-      device(baseDevice),
+      socket(baseSocket),
       statusCode("200 OK"),
       headersParsed(false),
       headersWritten(false)
 {
-    connect(device, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
-    connect(device, SIGNAL(bytesWritten(qint64)), this, SLOT(onBytesWritten(qint64)));
+    connect(socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
+    connect(socket, SIGNAL(bytesWritten(qint64)), this, SLOT(onBytesWritten(qint64)));
 
     // Attempt to read data from the device the next time the event loop is entered
     QTimer::singleShot(0, this, SLOT(onReadyRead()));
@@ -48,7 +48,7 @@ QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *socket, QIODevice *baseDevic
 void QHttpSocketPrivate::onReadyRead()
 {
     // Add the new data to the internal buffer
-    buffer.append(device->readAll());
+    buffer.append(socket->readAll());
 
     // If the request headers have not yet been parsed, check for two CRLFs
     if(!headersParsed) {
@@ -98,9 +98,9 @@ void QHttpSocketPrivate::onBytesWritten(qint64 bytes)
     }
 }
 
-QHttpSocket::QHttpSocket(QIODevice *device, QObject *parent)
+QHttpSocket::QHttpSocket(QTcpSocket *socket, QObject *parent)
     : QIODevice(parent),
-      d(new QHttpSocketPrivate(this, device))
+      d(new QHttpSocketPrivate(this, socket))
 {
     setOpenMode(QIODevice::ReadWrite);
 }
@@ -172,11 +172,11 @@ void QHttpSocket::writeHeaders()
     // Append an extra CRLF
     header.append("\r\n");
 
-    // Write the header
-    d->device->write(header);
-
     d->headerLength = header.length();
     d->headersWritten = true;
+
+    // Write the header
+    d->socket->write(header);
 }
 
 qint64 QHttpSocket::readData(char *data, qint64 maxlen)
@@ -198,11 +198,11 @@ qint64 QHttpSocket::readData(char *data, qint64 maxlen)
 
 qint64 QHttpSocket::writeData(const char *data, qint64 len)
 {
-    // If the response headers have not yet been written, they
-    // must immediately be written before the data can be
+    // If the response headers have not yet been written, they must
+    // immediately be written before the data can be
     if(!d->headersWritten) {
         writeHeaders();
     }
 
-    return d->device->write(data, len);
+    return d->socket->write(data, len);
 }
