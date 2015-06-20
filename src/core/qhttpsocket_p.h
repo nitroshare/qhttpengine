@@ -25,6 +25,7 @@
 #ifndef QHTTPENGINE_QHTTPSOCKETPRIVATE_H
 #define QHTTPENGINE_QHTTPSOCKETPRIVATE_H
 
+#include <QObject>
 #include <QTcpSocket>
 
 #include "../util/qhttpparser.h"
@@ -38,28 +39,42 @@ public:
 
     QHttpSocketPrivate(QHttpSocket *httpSocket, QTcpSocket *tcpSocket);
 
-    QTcpSocket *const socket;
-    QByteArray buffer;
+    QTcpSocket *socket;
+    QByteArray readBuffer;
 
-    QByteArray method;
-    QByteArray path;
-    QByteArray statusCode;
+    enum {
+        ReadHeaders,
+        ReadData,
+        ReadFinished
+    } readState;
 
+    QByteArray requestMethod;
+    QByteArray requestPath;
     QHttpHeaderMap requestHeaders;
+    qint64 requestDataRead;
+    qint64 requestDataTotal;
+
+    enum {
+        WriteNone,
+        WriteHeaders,
+        WriteData,
+        WriteFinished
+    } writeState;
+
+    QByteArray responseStatusCode;
     QHttpHeaderMap responseHeaders;
-
-    qint64 headerLength;
-
-    bool headersParsed;
-    bool headersWritten;
+    qint64 responseHeaderRemaining;
 
 private Q_SLOTS:
 
     void onReadyRead();
     void onBytesWritten(qint64 bytes);
-    void onError(QAbstractSocket::SocketError socketError);
+    void onDisconnected();
 
 private:
+
+    bool readHeaders();
+    void readData();
 
     QHttpSocket *const q;
 };
