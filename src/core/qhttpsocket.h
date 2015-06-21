@@ -114,6 +114,14 @@ public:
     virtual bool isSequential() const;
 
     /**
+     * @brief Close the device and underlying socket
+     *
+     * Invoking this method signifies that no more data will be written to the
+     * device.
+     */
+    virtual void close();
+
+    /**
      * @brief Retrieve the request method
      *
      * This method may only be called after the request headers have been
@@ -191,6 +199,14 @@ Q_SIGNALS:
      * received.
      */
     void headersParsed();
+
+    /**
+     * @brief Indicate that the socket has disconnected
+     *
+     * This signal is emitted when the underlying socket is disconnected. Once
+     * this occurs, it is safe to delete this device.
+     */
+    void disconnected();
 
 protected:
 

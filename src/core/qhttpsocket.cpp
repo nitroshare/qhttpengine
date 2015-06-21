@@ -89,6 +89,8 @@ void QHttpSocketPrivate::onDisconnected()
         Q_EMIT q->error();
         q->setOpenMode(QIODevice::NotOpen);
     }
+
+    Q_EMIT q->disconnected();
 }
 
 bool QHttpSocketPrivate::readHeaders()
@@ -152,6 +154,17 @@ qint64 QHttpSocket::bytesAvailable() const
 bool QHttpSocket::isSequential() const
 {
     return true;
+}
+
+void QHttpSocket::close()
+{
+    // Invoke the parent method
+    QIODevice::close();
+
+    d->readState = QHttpSocketPrivate::ReadFinished;
+    d->writeState = QHttpSocketPrivate::WriteFinished;
+
+    d->socket->close();
 }
 
 QByteArray QHttpSocket::method() const
