@@ -95,3 +95,15 @@ bool QHttpParser::parseRequestHeaders(const QByteArray &data, QByteArray &method
 
     return true;
 }
+
+bool QHttpParser::parseResponseHeaders(const QByteArray &data, QByteArray &statusCode, QHttpHeaderMap &headers)
+{
+    QList<QByteArray> parts;
+
+    if(!parseHeaders(data, parts, headers)) {
+        return false;
+    }
+
+    statusCode = parts[1] + " " + parts[2];
+    return true;
+}

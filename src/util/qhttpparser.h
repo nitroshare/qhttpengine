@@ -86,7 +86,7 @@ public:
     /**
      * @brief Parse HTTP response headers
      */
-    static bool parseResponseHeaders(const QByteArray &data, const QByteArray &statusCode, QHttpHeaderMap &headers);
+    static bool parseResponseHeaders(const QByteArray &data, QByteArray &statusCode, QHttpHeaderMap &headers);
 };
 
 #endif // QHTTPENGINE_QHTTPPARSER_H

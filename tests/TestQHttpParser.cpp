@@ -63,6 +63,9 @@ private Q_SLOTS:
     void testParseRequestHeaders_data();
     void testParseRequestHeaders();
 
+    void testParseResponseHeaders_data();
+    void testParseResponseHeaders();
+
 private:
 
     QHttpHeaderMap headers;
@@ -208,6 +211,12 @@ void TestQHttpParser::testParseRequestHeaders_data()
     QTest::newRow("bad HTTP version")
             << QByteArray("GET / HTTP/0.9")
             << false;
+
+    QTest::newRow("GET request")
+            << QByteArray("GET / HTTP/1.0")
+            << true
+            << QByteArray("GET")
+            << QByteArray("/");
 }
 
 void TestQHttpParser::testParseRequestHeaders()
@@ -227,6 +236,34 @@ void TestQHttpParser::testParseRequestHeaders()
 
         QCOMPARE(method, outMethod);
         QCOMPARE(path, outPath);
+    }
+}
+
+void TestQHttpParser::testParseResponseHeaders_data()
+{
+    QTest::addColumn<QByteArray>("data");
+    QTest::addColumn<bool>("success");
+    QTest::addColumn<QByteArray>("statusCode");
+
+    QTest::newRow("200 response")
+            << QByteArray("HTTP/1.0 200 OK")
+            << true
+            << QByteArray("200 OK");
+}
+
+void TestQHttpParser::testParseResponseHeaders()
+{
+    QFETCH(QByteArray, data);
+    QFETCH(bool, success);
+
+    QByteArray outStatusCode;
+    QHttpHeaderMap outHeaders;
+
+    QCOMPARE(QHttpParser::parseResponseHeaders(data, outStatusCode, outHeaders), success);
+
+    if(success) {
+        QFETCH(QByteArray, statusCode);
+        QCOMPARE(statusCode, outStatusCode);
     }
 }
 
