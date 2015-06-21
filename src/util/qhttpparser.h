@@ -71,13 +71,22 @@ public:
     static bool parseHeaderList(const QList<QByteArray> &lines, QHttpHeaderMap &headers);
 
     /**
-     * @brief Parse a request or response header
+     * @brief Parse HTTP headers
      *
      * The specified header data is parsed into a status line and HTTP
-     * headers. The parts list will contain the three parts of the status
-     * line.
+     * headers. The parts list will contain the parts from the status line.
      */
     static bool parseHeaders(const QByteArray &data, QList<QByteArray> &parts, QHttpHeaderMap &headers);
+
+    /**
+     * @brief Parse HTTP request headers
+     */
+    static bool parseRequestHeaders(const QByteArray &data, QByteArray &method, QByteArray &path, QHttpHeaderMap &headers);
+
+    /**
+     * @brief Parse HTTP response headers
+     */
+    static bool parseResponseHeaders(const QByteArray &data, const QByteArray &statusCode, QHttpHeaderMap &headers);
 };
 
 #endif // QHTTPENGINE_QHTTPPARSER_H

@@ -60,6 +60,9 @@ private Q_SLOTS:
     void testParseHeaders_data();
     void testParseHeaders();
 
+    void testParseRequestHeaders_data();
+    void testParseRequestHeaders();
+
 private:
 
     QHttpHeaderMap headers;
@@ -192,6 +195,38 @@ void TestQHttpParser::testParseHeaders()
 
         QCOMPARE(outParts, parts);
         QCOMPARE(outHeaders, headers);
+    }
+}
+
+void TestQHttpParser::testParseRequestHeaders_data()
+{
+    QTest::addColumn<QByteArray>("data");
+    QTest::addColumn<bool>("success");
+    QTest::addColumn<QByteArray>("method");
+    QTest::addColumn<QByteArray>("path");
+
+    QTest::newRow("bad HTTP version")
+            << QByteArray("GET / HTTP/0.9")
+            << false;
+}
+
+void TestQHttpParser::testParseRequestHeaders()
+{
+    QFETCH(QByteArray, data);
+    QFETCH(bool, success);
+
+    QByteArray outMethod;
+    QByteArray outPath;
+    QHttpHeaderMap outHeaders;
+
+    QCOMPARE(QHttpParser::parseRequestHeaders(data, outMethod, outPath, outHeaders), success);
+
+    if(success) {
+        QFETCH(QByteArray, method);
+        QFETCH(QByteArray, path);
+
+        QCOMPARE(method, outMethod);
+        QCOMPARE(path, outPath);
     }
 }
 

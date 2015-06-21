@@ -77,3 +77,21 @@ bool QHttpParser::parseHeaders(const QByteArray &data, QList<QByteArray> &parts,
 
     return parseHeaderList(lines, headers);
 }
+
+bool QHttpParser::parseRequestHeaders(const QByteArray &data, QByteArray &method, QByteArray &path, QHttpHeaderMap &headers)
+{
+    QList<QByteArray> parts;
+
+    if(!parseHeaders(data, parts, headers)) {
+        return false;
+    }
+
+    if(parts[2] != "HTTP/1.0" && parts[2] != "HTTP/1.1") {
+        return false;
+    }
+
+    method = parts[0];
+    path = parts[1];
+
+    return true;
+}
