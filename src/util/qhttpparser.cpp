@@ -47,16 +47,17 @@ void QHttpParser::split(const QByteArray &data, const QByteArray &delim, int max
 
 bool QHttpParser::parseHeaderList(const QList<QByteArray> &lines, QHttpHeaderMap &headers)
 {
-    for(QList<QByteArray>::const_iterator i = lines.constBegin(); i != lines.constEnd(); ++i) {
+    foreach(const QByteArray &line, lines) {
 
         QList<QByteArray> parts;
-        split(*i, ":", 1, parts);
+        split(line, ":", 1, parts);
 
         // Ensure that the delimiter (":") was encountered at least once
         if(parts.count() != 2) {
             return false;
         }
 
+        // Trim excess whitespace and add the header to the list
         headers.insert(parts[0].trimmed(), parts[1].trimmed());
     }
 
@@ -69,7 +70,7 @@ bool QHttpParser::parseHeaders(const QByteArray &data, QList<QByteArray> &parts,
     QList<QByteArray> lines;
     split(data, "\r\n", 0, lines);
 
-    // Split the status line into a maximum of three parts
+    // Split the first line into a maximum of three parts
     split(lines.takeFirst(), " ", 2, parts);
     if(parts.count() != 3) {
         return false;
@@ -81,11 +82,11 @@ bool QHttpParser::parseHeaders(const QByteArray &data, QList<QByteArray> &parts,
 bool QHttpParser::parseRequestHeaders(const QByteArray &data, QByteArray &method, QByteArray &path, QHttpHeaderMap &headers)
 {
     QList<QByteArray> parts;
-
     if(!parseHeaders(data, parts, headers)) {
         return false;
     }
 
+    // Only HTTP/1.x versions are supported for now
     if(parts[2] != "HTTP/1.0" && parts[2] != "HTTP/1.1") {
         return false;
     }
@@ -96,14 +97,16 @@ bool QHttpParser::parseRequestHeaders(const QByteArray &data, QByteArray &method
     return true;
 }
 
-bool QHttpParser::parseResponseHeaders(const QByteArray &data, QByteArray &statusCode, QHttpHeaderMap &headers)
+bool QHttpParser::parseResponseHeaders(const QByteArray &data, int &statusCode, QByteArray &statusReason, QHttpHeaderMap &headers)
 {
     QList<QByteArray> parts;
-
     if(!parseHeaders(data, parts, headers)) {
         return false;
     }
 
-    statusCode = parts[1] + " " + parts[2];
-    return true;
+    statusCode = parts[1].toInt();
+    statusReason = parts[2];
+
+    // Ensure a valid status code
+    return statusCode >= 100 && statusCode <= 599;
 }

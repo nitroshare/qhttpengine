@@ -53,12 +53,13 @@ public:
     /**
      * @brief Split a QByteArray by the provided delimiter
      *
-     * If the delimiter is not present in the QByteArray, a list will be
-     * returned containing the original QByteArray as its only element. The
-     * delimiter must not be empty.
+     * If the delimiter is not present in the QByteArray, the resulting list
+     * will contain the original QByteArray as its only element. The delimiter
+     * must not be empty.
      *
      * If maxSplit is nonzero, the list will contain no more than maxSplit + 1
-     * items.
+     * items. If maxSplit is equal to zero, there will be no limit on the
+     * number of splits performed.
      */
     static void split(const QByteArray &data, const QByteArray &delim, int maxSplit, QList<QByteArray> &parts);
 
@@ -73,8 +74,9 @@ public:
     /**
      * @brief Parse HTTP headers
      *
-     * The specified header data is parsed into a status line and HTTP
-     * headers. The parts list will contain the parts from the status line.
+     * The specified header data (everything up to the double CRLF) is parsed
+     * into a status line and HTTP headers. The parts list will contain the
+     * parts from the status line.
      */
     static bool parseHeaders(const QByteArray &data, QList<QByteArray> &parts, QHttpHeaderMap &headers);
 
@@ -86,7 +88,7 @@ public:
     /**
      * @brief Parse HTTP response headers
      */
-    static bool parseResponseHeaders(const QByteArray &data, QByteArray &statusCode, QHttpHeaderMap &headers);
+    static bool parseResponseHeaders(const QByteArray &data, int &statusCode, QByteArray &statusReason, QHttpHeaderMap &headers);
 };
 
 #endif // QHTTPENGINE_QHTTPPARSER_H

@@ -130,24 +130,24 @@ void TestQHttpParser::testSplit()
 
 void TestQHttpParser::testParseHeaderList_data()
 {
-    QTest::addColumn<QByteArrayList>("lines");
     QTest::addColumn<bool>("success");
+    QTest::addColumn<QByteArrayList>("lines");
     QTest::addColumn<QHttpHeaderMap>("headers");
 
     QTest::newRow("empty line")
-            << (QByteArrayList() << "")
-            << false;
+            << false
+            << (QByteArrayList() << "");
 
     QTest::newRow("multiple lines")
-            << (QByteArrayList() << Line1 << Line2)
             << true
+            << (QByteArrayList() << Line1 << Line2)
             << headers;
 }
 
 void TestQHttpParser::testParseHeaderList()
 {
-    QFETCH(QByteArrayList, lines);
     QFETCH(bool, success);
+    QFETCH(QByteArrayList, lines);
 
     QHttpHeaderMap outHeaders;
     QCOMPARE(QHttpParser::parseHeaderList(lines, outHeaders), success);
@@ -160,32 +160,24 @@ void TestQHttpParser::testParseHeaderList()
 
 void TestQHttpParser::testParseHeaders_data()
 {
-    QTest::addColumn<QByteArray>("data");
     QTest::addColumn<bool>("success");
+    QTest::addColumn<QByteArray>("data");
     QTest::addColumn<QByteArrayList>("parts");
-    QTest::addColumn<QHttpHeaderMap>("headers");
 
     QTest::newRow("empty headers")
-            << QByteArray("")
-            << false;
+            << false
+            << QByteArray("");
 
-    QTest::newRow("request")
-            << QByteArray("GET / HTTP/1.0\r\n" + Line1 + "\r\n" + Line2)
+    QTest::newRow("simple GET request")
             << true
-            << (QByteArrayList() << "GET" << "/" << "HTTP/1.0")
-            << headers;
-
-    QTest::newRow("response")
-            << QByteArray("HTTP/1.0 404 NOT FOUND\r\n" + Line1 + "\r\n" + Line2)
-            << true
-            << (QByteArrayList() << "HTTP/1.0" << "404" << "NOT FOUND")
-            << headers;
+            << QByteArray("GET / HTTP/1.0")
+            << (QByteArrayList() << "GET" << "/" << "HTTP/1.0");
 }
 
 void TestQHttpParser::testParseHeaders()
 {
-    QFETCH(QByteArray, data);
     QFETCH(bool, success);
+    QFETCH(QByteArray, data);
 
     QByteArrayList outParts;
     QHttpHeaderMap outHeaders;
@@ -194,35 +186,32 @@ void TestQHttpParser::testParseHeaders()
 
     if(success) {
         QFETCH(QByteArrayList, parts);
-        QFETCH(QHttpHeaderMap, headers);
-
         QCOMPARE(outParts, parts);
-        QCOMPARE(outHeaders, headers);
     }
 }
 
 void TestQHttpParser::testParseRequestHeaders_data()
 {
-    QTest::addColumn<QByteArray>("data");
     QTest::addColumn<bool>("success");
+    QTest::addColumn<QByteArray>("data");
     QTest::addColumn<QByteArray>("method");
     QTest::addColumn<QByteArray>("path");
 
     QTest::newRow("bad HTTP version")
-            << QByteArray("GET / HTTP/0.9")
-            << false;
+            << false
+            << QByteArray("GET / HTTP/0.9");
 
     QTest::newRow("GET request")
-            << QByteArray("GET / HTTP/1.0")
             << true
+            << QByteArray("GET / HTTP/1.0")
             << QByteArray("GET")
             << QByteArray("/");
 }
 
 void TestQHttpParser::testParseRequestHeaders()
 {
-    QFETCH(QByteArray, data);
     QFETCH(bool, success);
+    QFETCH(QByteArray, data);
 
     QByteArray outMethod;
     QByteArray outPath;
@@ -241,29 +230,39 @@ void TestQHttpParser::testParseRequestHeaders()
 
 void TestQHttpParser::testParseResponseHeaders_data()
 {
-    QTest::addColumn<QByteArray>("data");
     QTest::addColumn<bool>("success");
-    QTest::addColumn<QByteArray>("statusCode");
+    QTest::addColumn<QByteArray>("data");
+    QTest::addColumn<int>("statusCode");
+    QTest::addColumn<QByteArray>("statusReason");
 
-    QTest::newRow("200 response")
-            << QByteArray("HTTP/1.0 200 OK")
+    QTest::newRow("invalid status code")
+            << false
+            << QByteArray("HTTP/1.0 600 BAD RESPONSE");
+
+    QTest::newRow("404 response")
             << true
-            << QByteArray("200 OK");
+            << QByteArray("HTTP/1.0 404 NOT FOUND")
+            << 404
+            << QByteArray("NOT FOUND");
 }
 
 void TestQHttpParser::testParseResponseHeaders()
 {
-    QFETCH(QByteArray, data);
     QFETCH(bool, success);
+    QFETCH(QByteArray, data);
 
-    QByteArray outStatusCode;
+    int outStatusCode;
+    QByteArray outStatusReason;
     QHttpHeaderMap outHeaders;
 
-    QCOMPARE(QHttpParser::parseResponseHeaders(data, outStatusCode, outHeaders), success);
+    QCOMPARE(QHttpParser::parseResponseHeaders(data, outStatusCode, outStatusReason, outHeaders), success);
 
     if(success) {
-        QFETCH(QByteArray, statusCode);
+        QFETCH(int, statusCode);
+        QFETCH(QByteArray, statusReason);
+
         QCOMPARE(statusCode, outStatusCode);
+        QCOMPARE(statusReason, outStatusReason);
     }
 }
 
