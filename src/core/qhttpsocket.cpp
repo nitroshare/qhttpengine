@@ -177,14 +177,9 @@ QByteArray QHttpSocket::path() const
     return d->requestPath;
 }
 
-QList<QIByteArray> QHttpSocket::headers() const
+QHttpHeaderMap &QHttpSocket::headers() const
 {
-    return d->requestHeaders.keys();
-}
-
-QByteArray QHttpSocket::header(const QByteArray &name) const
-{
-    return d->requestHeaders.value(name);
+    return d->requestHeaders;
 }
 
 void QHttpSocket::setStatusCode(const QByteArray &statusCode)
@@ -195,6 +190,11 @@ void QHttpSocket::setStatusCode(const QByteArray &statusCode)
 void QHttpSocket::setHeader(const QByteArray &name, const QByteArray &value)
 {
     d->responseHeaders.insert(name, value);
+}
+
+void QHttpSocket::setHeaders(const QHttpHeaderMap &headers)
+{
+    d->responseHeaders = headers;
 }
 
 void QHttpSocket::writeHeaders()

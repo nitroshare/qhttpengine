@@ -25,16 +25,61 @@
 #include <QObject>
 #include <QTest>
 
+#include "common/qsimplehttpclient.h"
+#include "common/qsocketpair.h"
 #include "core/qhttpsocket.h"
+#include "util/qhttpparser.h"
+
+const QByteArray Method = "GET";
+const QByteArray Path = "/test";
+const int StatusCode = 404;
+const QByteArray StatusReason = "NOT FOUND";
 
 class TestQHttpSocket : public QObject
 {
     Q_OBJECT
 
+public:
+
+    TestQHttpSocket();
+
 private Q_SLOTS:
 
-    //...
+    void testProperties();
+
+private:
+
+    QHttpHeaderMap headers;
 };
+
+TestQHttpSocket::TestQHttpSocket()
+{
+    headers.insert("a", "b");
+    headers.insert("c", "d");
+}
+
+void TestQHttpSocket::testProperties()
+{
+    QSocketPair pair;
+    QTRY_VERIFY(pair.isConnected());
+
+    QSimpleHttpClient client(pair.client());
+    QHttpSocket server(pair.server());
+
+    client.sendHeaders(Method, Path, headers);
+
+    QTRY_COMPARE(server.method(), Method);
+    QCOMPARE(server.path(), Path);
+    QCOMPARE(server.headers(), headers);
+
+    server.setStatusCode(QByteArray::number(StatusCode) + " " + StatusReason);
+    server.setHeaders(headers);
+    server.writeHeaders();
+
+    QTRY_COMPARE(client.statusCode(), StatusCode);
+    QCOMPARE(client.statusReason(), StatusReason);
+    QCOMPARE(client.headers(), headers);
+}
 
 QTEST_MAIN(TestQHttpSocket)
 #include "TestQHttpSocket.moc"

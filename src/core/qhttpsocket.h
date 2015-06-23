@@ -28,7 +28,7 @@
 #include <QList>
 #include <QTcpSocket>
 
-#include "../util/qibytearray.h"
+#include "../util/qhttpparser.h"
 #include "config.h"
 
 class QHTTPENGINE_EXPORT QHttpSocketPrivate;
@@ -138,22 +138,13 @@ public:
     QByteArray path() const;
 
     /**
-     * @brief Retrieve a list of request headers
+     * @brief Retrieve a map of request headers
      *
      * This method may only be called after the request headers have been
      * parsed. The original case of the headers is preserved but comparisons
-     * will be performed in a case-insensitive manner.
+     * are performed in a case-insensitive manner.
      */
-    QList<QIByteArray> headers() const;
-
-    /**
-     * @brief Retrieve the value of a specific request header
-     *
-     * This method may only be called after the request headers have been
-     * parsed. Headers are case-insensitive. If the specified header was not
-     * provided, then an empty byte array is returned.
-     */
-    QByteArray header(const QByteArray &name) const;
+    QHttpHeaderMap &headers() const;
 
     /**
      * @brief Set the response code
@@ -170,6 +161,13 @@ public:
      * This method may only be called before the response headers are written.
      */
     void setHeader(const QByteArray &name, const QByteArray &value);
+
+    /**
+     * @brief Set the response headers
+     *
+     * This method may only be called before the response headers are written.
+     */
+    void setHeaders(const QHttpHeaderMap &headers);
 
     /**
      * @brief Write response headers to the device
