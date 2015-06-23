@@ -22,6 +22,7 @@
  * IN THE SOFTWARE.
  */
 
+#include <QBuffer>
 #include <QObject>
 #include <QTest>
 
@@ -29,11 +30,22 @@
 #include "common/qsocketpair.h"
 #include "core/qhttpsocket.h"
 #include "util/qhttpparser.h"
+#include "util/qiodevicecopier.h"
 
-const QByteArray Method = "GET";
+// Utility macro (avoids duplication) that creates a pair of connected
+// sockets, a QSimpleHttpClient for the client and a QHttpSocket for the
+// server
+#define CREATE_SOCKET_PAIR() \
+    QSocketPair pair; \
+    QTRY_VERIFY(pair.isConnected()); \
+    QSimpleHttpClient client(pair.client()); \
+    QHttpSocket server(pair.server());
+
+const QByteArray Method = "POST";
 const QByteArray Path = "/test";
 const int StatusCode = 404;
 const QByteArray StatusReason = "NOT FOUND";
+const QByteArray Data = "test";
 
 class TestQHttpSocket : public QObject
 {
@@ -46,6 +58,7 @@ public:
 private Q_SLOTS:
 
     void testProperties();
+    void testData();
 
 private:
 
@@ -54,17 +67,13 @@ private:
 
 TestQHttpSocket::TestQHttpSocket()
 {
-    headers.insert("a", "b");
-    headers.insert("c", "d");
+    headers.insert("Content-Type", "text/plain");
+    headers.insert("Content-Length", QByteArray::number(Data.length()));
 }
 
 void TestQHttpSocket::testProperties()
 {
-    QSocketPair pair;
-    QTRY_VERIFY(pair.isConnected());
-
-    QSimpleHttpClient client(pair.client());
-    QHttpSocket server(pair.server());
+    CREATE_SOCKET_PAIR()
 
     client.sendHeaders(Method, Path, headers);
 
@@ -79,6 +88,25 @@ void TestQHttpSocket::testProperties()
     QTRY_COMPARE(client.statusCode(), StatusCode);
     QCOMPARE(client.statusReason(), StatusReason);
     QCOMPARE(client.headers(), headers);
+}
+
+void TestQHttpSocket::testData()
+{
+    CREATE_SOCKET_PAIR()
+
+    client.sendHeaders(Method, Path, headers);
+    client.sendData(Data);
+
+    QBuffer buffer;
+    QIODeviceCopier copier(&server, &buffer);
+    copier.start();
+
+    QTRY_COMPARE(buffer.data(), Data);
+
+    server.writeHeaders();
+    server.write(Data);
+
+    QTRY_COMPARE(client.data(), Data);
 }
 
 QTEST_MAIN(TestQHttpSocket)
