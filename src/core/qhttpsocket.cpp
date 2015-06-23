@@ -109,6 +109,9 @@ bool QHttpSocketPrivate::readHeaders()
         return false;
     }
 
+    // Remove the headers from the buffer
+    readBuffer.remove(0, index + 4);
+
     // Check for the content-length header - if it is present, then
     // prepare to read the specified amount of data, otherwise, no data
     // should be read from the socket and the read channel is finished
