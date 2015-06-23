@@ -1,7 +1,10 @@
 set(SRC
     qiodevicecounter.cpp
+    qsimplehttpclient.cpp
     qsocketpair.cpp
 )
 
 add_library(common STATIC ${SRC})
+target_link_libraries(common qhttpengine)
+
 qt5_use_modules(common Network)
