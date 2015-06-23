@@ -24,6 +24,7 @@
 
 #include <QBuffer>
 #include <QObject>
+#include <QSignalSpy>
 #include <QTest>
 
 #include "common/qsimplehttpclient.h"
@@ -39,7 +40,7 @@
     QSocketPair pair; \
     QTRY_VERIFY(pair.isConnected()); \
     QSimpleHttpClient client(pair.client()); \
-    QHttpSocket server(pair.server());
+    QHttpSocket server(pair.server())
 
 const QByteArray Method = "POST";
 const QByteArray Path = "/test";
@@ -59,6 +60,7 @@ private Q_SLOTS:
 
     void testProperties();
     void testData();
+    void testSignals();
 
 private:
 
@@ -73,7 +75,7 @@ TestQHttpSocket::TestQHttpSocket()
 
 void TestQHttpSocket::testProperties()
 {
-    CREATE_SOCKET_PAIR()
+    CREATE_SOCKET_PAIR();
 
     client.sendHeaders(Method, Path, headers);
 
@@ -92,7 +94,7 @@ void TestQHttpSocket::testProperties()
 
 void TestQHttpSocket::testData()
 {
-    CREATE_SOCKET_PAIR()
+    CREATE_SOCKET_PAIR();
 
     client.sendHeaders(Method, Path, headers);
     client.sendData(Data);
@@ -107,6 +109,43 @@ void TestQHttpSocket::testData()
     server.write(Data);
 
     QTRY_COMPARE(client.data(), Data);
+}
+
+void TestQHttpSocket::testSignals()
+{
+    CREATE_SOCKET_PAIR();
+
+    QSignalSpy headersParsedSpy(&server, SIGNAL(headersParsed()));
+    QSignalSpy readyReadSpy(&server, SIGNAL(readyRead()));
+    QSignalSpy readChannelFinishedSpy(&server, SIGNAL(readChannelFinished()));
+    QSignalSpy bytesWrittenSpy(&server, SIGNAL(bytesWritten(qint64)));
+    QSignalSpy disconnectedSpy(&server, SIGNAL(disconnected()));
+
+    client.sendHeaders(Method, Path, headers);
+
+    QTRY_COMPARE(headersParsedSpy.count(), 1);
+    QCOMPARE(readyReadSpy.count(), 0);
+
+    client.sendData(Data);
+
+    QTRY_COMPARE(server.bytesAvailable(), Data.length());
+    QVERIFY(readyReadSpy.count() > 0);
+    QCOMPARE(readChannelFinishedSpy.count(), 1);
+
+    server.writeHeaders();
+    server.write(Data);
+
+    QTRY_COMPARE(client.data(), Data);
+    QVERIFY(bytesWrittenSpy.count() > 0);
+
+    qint64 bytesWritten = 0;
+    for(int i = 0; i < bytesWrittenSpy.count(); ++i) {
+        bytesWritten += bytesWrittenSpy.at(i).at(0).toLongLong();
+    }
+    QCOMPARE(bytesWritten, Data.length());
+
+    server.close();
+    QTRY_COMPARE(disconnectedSpy.count(), 1);
 }
 
 QTEST_MAIN(TestQHttpSocket)
