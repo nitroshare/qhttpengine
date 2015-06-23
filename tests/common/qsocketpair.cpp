@@ -25,8 +25,7 @@
 #include "qsocketpair.h"
 
 QSocketPair::QSocketPair()
-    : mClientSocket(0),
-      mServerSocket(0)
+    : mServerSocket(0)
 {
     connect(&mServer, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
 

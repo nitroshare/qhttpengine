@@ -31,6 +31,10 @@
 
 /**
  * @brief Create a pair of connected TCP sockets
+ *
+ * This class simplifies the process of creating two TCP sockets that are
+ * connected to each other. Once isConnected() returns true, data can be
+ * written and read from each socket.
  */
 class QSocketPair : public QObject
 {
@@ -41,7 +45,7 @@ public:
     QSocketPair();
 
     bool isConnected() const {
-        return mServerSocket && mClientSocket.isValid() && mServerSocket->isValid();
+        return mClientSocket.isValid() && mServerSocket && mServerSocket->isValid();
     }
 
     QTcpSocket *client() {

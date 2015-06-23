@@ -44,14 +44,10 @@ class QSimpleHttpClient : public QObject
 
 public:
 
-    QSimpleHttpClient(const QHostAddress &address, quint16 port);
+    QSimpleHttpClient(QTcpSocket *socket);
 
     void sendHeaders(const QByteArray &method, const QByteArray &path, const QHttpHeaderMap &headers);
     void sendData(const QByteArray &data);
-
-    bool isConnected() const {
-        return mSocket.isValid();
-    }
 
     int statusCode() const {
         return mStatusCode;
@@ -75,7 +71,7 @@ private Q_SLOTS:
 
 private:
 
-    QTcpSocket mSocket;
+    QTcpSocket *mSocket;
 
     QByteArray mBuffer;
     bool mHeadersParsed;

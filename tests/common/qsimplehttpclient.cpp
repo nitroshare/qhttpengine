@@ -24,13 +24,15 @@
 
 #include "qsimplehttpclient.h"
 
-QSimpleHttpClient::QSimpleHttpClient(const QHostAddress &address, quint16 port)
-    : mHeadersParsed(false),
+QSimpleHttpClient::QSimpleHttpClient(QTcpSocket *socket)
+    : mSocket(socket),
+      mHeadersParsed(false),
       mStatusCode(0)
 {
-    connect(&mSocket, SIGNAL(readyRead()), this, SLOT(onReadyRead));
+    connect(mSocket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 
-    mSocket.connectToHost(address, port);
+    // Immediately trigger a read
+    onReadyRead();
 }
 
 void QSimpleHttpClient::sendHeaders(const QByteArray &method, const QByteArray &path, const QHttpHeaderMap &headers)
@@ -41,20 +43,20 @@ void QSimpleHttpClient::sendHeaders(const QByteArray &method, const QByteArray &
     }
     data.append("\r\n");
 
-    mSocket.write(data);
+    mSocket->write(data);
 }
 
 void QSimpleHttpClient::sendData(const QByteArray &data)
 {
-    mSocket.write(data);
+    mSocket->write(data);
 }
 
 void QSimpleHttpClient::onReadyRead()
 {
     if(mHeadersParsed) {
-        mData.append(mSocket.readAll());
+        mData.append(mSocket->readAll());
     } else {
-        mBuffer.append(mSocket.readAll());
+        mBuffer.append(mSocket->readAll());
 
         // Parse the headers if the double CRLF sequence was found
         int index = mBuffer.indexOf("\r\n\r\n");
