@@ -57,9 +57,7 @@ void QHttpSocketPrivate::onReadyRead()
 
     if(readState == ReadData) {
         readData();
-    }
-
-    if(readState == ReadFinished) {
+    } else if(readState == ReadFinished) {
         readBuffer.clear();
     }
 }
@@ -131,7 +129,10 @@ bool QHttpSocketPrivate::readHeaders()
 
 void QHttpSocketPrivate::readData()
 {
-    Q_EMIT q->readyRead();
+    // Emit the readyRead() signal if any data is available in the buffer
+    if(readBuffer.size()) {
+        Q_EMIT q->readyRead();
+    }
 
     // Check to see if the specified amount of data has been read from the
     // socket, if so, emit the readChannelFinished() signal
