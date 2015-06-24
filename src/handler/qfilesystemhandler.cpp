@@ -36,13 +36,13 @@ QFilesystemHandlerPrivate::QFilesystemHandlerPrivate(QFilesystemHandler *handler
 {
 }
 
-QString QFilesystemHandlerPrivate::absolutePath(const QString &path)
+bool QFilesystemHandlerPrivate::absolutePath(const QString &path, QString &absolutePath)
 {
     // Clean the path and make it absolute
-    QString absolutePath = QDir(root.absoluteFilePath(path)).canonicalPath();
+    absolutePath = QDir(root.absoluteFilePath(path)).canonicalPath();
 
     // Ensure that the absolute path is within the root
-    return absolutePath.startsWith(root.absolutePath()) ? absolutePath : QString();
+    return absolutePath.startsWith(root.absolutePath());
 }
 
 QByteArray QFilesystemHandlerPrivate::mimeType(const QString &path)
@@ -68,8 +68,8 @@ QFilesystemHandler::QFilesystemHandler(const QString &root, QObject *parent)
 bool QFilesystemHandler::process(QHttpSocket *socket, const QString &path)
 {
     // Attempt to retrieve the absolute path
-    QString absolutePath = d->absolutePath(path);
-    if(absolutePath.isNull()) {
+    QString absolutePath;
+    if(!d->absolutePath(path, absolutePath)) {
         return false;
     }
 
@@ -82,13 +82,14 @@ bool QFilesystemHandler::process(QHttpSocket *socket, const QString &path)
 
     // Create a QIODeviceCopier to copy the file contents to the socket
     QIODeviceCopier *copier = new QIODeviceCopier(file, socket);
-    connect(copier, SIGNAL(finished()), file, SLOT(deleteLater()));
     connect(copier, SIGNAL(finished()), copier, SLOT(deleteLater()));
+    connect(copier, SIGNAL(finished()), file, SLOT(deleteLater()));
     connect(copier, SIGNAL(finished()), socket, SLOT(deleteLater()));
 
     // Set the mimetype and contentlength
     socket->setHeader("Content-Type", d->mimeType(absolutePath));
     socket->setHeader("Content-Length", QByteArray::number(file->size()));
+    socket->writeHeaders();
 
     // Start the copy and indicate success
     copier->start();

@@ -22,18 +22,19 @@
  * IN THE SOFTWARE.
  */
 
-#include <QBuffer>
 #include <QDir>
 #include <QFile>
 #include <QObject>
+#include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QTest>
 
+#include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"
 #include "core/qhttpsocket.h"
 #include "handler/qfilesystemhandler.h"
 
-const QByteArray TestData = "test";
+const QByteArray Data = "test";
 
 class TestQFilesystemHandler : public QObject
 {
@@ -63,37 +64,44 @@ void TestQFilesystemHandler::initTestCase()
 
 void TestQFilesystemHandler::testRequests_data()
 {
+    QTest::addColumn<bool>("success");
     QTest::addColumn<QString>("path");
-    QTest::addColumn<bool>("process");
-
-    QTest::newRow("outside document root")
-            << "../outside"
-            << false;
-
-    QTest::newRow("inside document root")
-            << "inside"
-            << true;
 
     QTest::newRow("nonexistent resource")
-            << "nonexistent"
-            << false;
+            << false
+            << "nonexistent";
+
+    QTest::newRow("outside document root")
+            << false
+            << "../outside";
+
+    QTest::newRow("inside document root")
+            << true
+            << "inside";
 }
 
 void TestQFilesystemHandler::testRequests()
 {
-    /*
+    QFETCH(bool, success);
     QFETCH(QString, path);
-    QFETCH(bool, process);
 
     QFilesystemHandler handler(QDir(dir.path()).absoluteFilePath("root"));
 
     QSocketPair pair;
     QTRY_VERIFY(pair.isConnected());
 
-    QHttpSocket socket(pair.server());
+    QSimpleHttpClient client(pair.client());
+    QHttpSocket *socket = new QHttpSocket(pair.server(), &pair);
 
-    QCOMPARE(handler.process(&socket, path), process);
-    */
+    QCOMPARE(handler.process(socket, path), success);
+
+    if(success) {
+        QSignalSpy destroyedSpy(socket, SIGNAL(destroyed()));
+
+        QTRY_COMPARE(client.statusCode(), 200);
+        QTRY_COMPARE(client.data(), Data);
+        QTRY_COMPARE(destroyedSpy.count(), 1);
+    }
 }
 
 bool TestQFilesystemHandler::createFile(const QString &path)
@@ -103,7 +111,7 @@ bool TestQFilesystemHandler::createFile(const QString &path)
         return false;
     }
 
-    file.write(TestData);
+    file.write(Data);
     return true;
 }
 

@@ -38,7 +38,7 @@ public:
 
     QFilesystemHandlerPrivate(QFilesystemHandler *handler, const QString &root);
 
-    QString absolutePath(const QString &path);
+    bool absolutePath(const QString &path, QString &absolutePath);
     QByteArray mimeType(const QString &path);
 
     QDir root;
