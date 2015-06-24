@@ -198,14 +198,6 @@ Q_SIGNALS:
      */
     void headersParsed();
 
-    /**
-     * @brief Indicate that the socket has disconnected
-     *
-     * This signal is emitted when the underlying socket is disconnected. Once
-     * this occurs, it is safe to delete this device.
-     */
-    void disconnected();
-
 protected:
 
     /**

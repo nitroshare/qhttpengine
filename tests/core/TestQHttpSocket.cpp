@@ -115,7 +115,7 @@ void TestQHttpSocket::testSignals()
     QSignalSpy readyReadSpy(&server, SIGNAL(readyRead()));
     QSignalSpy readChannelFinishedSpy(&server, SIGNAL(readChannelFinished()));
     QSignalSpy bytesWrittenSpy(&server, SIGNAL(bytesWritten(qint64)));
-    QSignalSpy disconnectedSpy(&server, SIGNAL(disconnected()));
+    QSignalSpy aboutToCloseSpy(&server, SIGNAL(aboutToClose()));
 
     client.sendHeaders(Method, Path, headers);
 
@@ -141,7 +141,7 @@ void TestQHttpSocket::testSignals()
     QCOMPARE(bytesWritten, Data.length());
 
     server.close();
-    QTRY_COMPARE(disconnectedSpy.count(), 1);
+    QTRY_COMPARE(aboutToCloseSpy.count(), 1);
 }
 
 QTEST_MAIN(TestQHttpSocket)

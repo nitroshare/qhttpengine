@@ -85,10 +85,9 @@ void QHttpSocketPrivate::onDisconnected()
     // writing have completed - if so, an error has occurred
     if(readState != ReadFinished || writeState != WriteFinished) {
         Q_EMIT q->error();
-        q->setOpenMode(QIODevice::NotOpen);
     }
 
-    Q_EMIT q->disconnected();
+    q->close();
 }
 
 bool QHttpSocketPrivate::readHeaders()
