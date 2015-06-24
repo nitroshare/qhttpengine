@@ -42,7 +42,7 @@ bool QFilesystemHandlerPrivate::absolutePath(const QString &path, QString &absol
     absolutePath = QDir(root.absoluteFilePath(path)).canonicalPath();
 
     // Ensure that the absolute path is within the root
-    return absolutePath.startsWith(root.absolutePath());
+    return absolutePath.startsWith(root.canonicalPath());
 }
 
 QByteArray QFilesystemHandlerPrivate::mimeType(const QString &path)
