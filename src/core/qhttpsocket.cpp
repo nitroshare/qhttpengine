@@ -233,7 +233,7 @@ void QHttpSocket::writeHeaders()
 qint64 QHttpSocket::readData(char *data, qint64 maxlen)
 {
     // Ensure the connection is in the correct state for reading data
-    if(d->readState != QHttpSocketPrivate::ReadData) {
+    if(d->readState == QHttpSocketPrivate::ReadHeaders) {
         return 0;
     }
 
