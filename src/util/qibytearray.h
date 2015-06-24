@@ -31,6 +31,9 @@
 
 /**
  * @brief Case-insensitive subclass of QByteArray
+ *
+ * The QIByteArray is identical to the QByteArray class in all aspects except
+ * that it performs comparisons in a case-insensitive manner.
  */
 class QHTTPENGINE_EXPORT QIByteArray : public QByteArray
 {

@@ -53,43 +53,43 @@ private Q_SLOTS:
 
 void TestQHttpSubHandler::testPatterns_data()
 {
+    QTest::addColumn<bool>("success");
     QTest::addColumn<QRegExp>("pattern");
     QTest::addColumn<QString>("path");
     QTest::addColumn<QString>("pathRemainder");
-    QTest::addColumn<bool>("match");
 
-    QTest::newRow("success")
+    QTest::newRow("match")
+            << true
             << QRegExp("\\w+")
             << QString("test")
-            << QString("")
-            << true;
+            << QString("");
 
-    QTest::newRow("failure")
+    QTest::newRow("no match")
+            << false
             << QRegExp("\\d+")
             << QString("test")
-            << QString("")
-            << false;
+            << QString("");
 
     QTest::newRow("path")
+            << true
             << QRegExp("one/")
             << QString("one/two")
-            << QString("two")
-            << true;
+            << QString("two");
 }
 
 void TestQHttpSubHandler::testPatterns()
 {
+    QFETCH(bool, success);
     QFETCH(QRegExp, pattern);
     QFETCH(QString, path);
     QFETCH(QString, pathRemainder);
-    QFETCH(bool, match);
 
     DummyHandler handler;
 
     QHttpSubHandler subHandler;
     subHandler.addHandler(pattern, &handler);
 
-    QCOMPARE(subHandler.process(0, path), match);
+    QCOMPARE(subHandler.process(0, path), success);
     QCOMPARE(handler.pathRemainder, pathRemainder);
 }
 
