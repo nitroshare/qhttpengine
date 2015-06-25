@@ -22,6 +22,10 @@
  * IN THE SOFTWARE.
  */
 
+#include <QMetaMethod>
+#include <QMetaObject>
+#include <QMetaType>
+
 #include "qobjecthandler.h"
 #include "qobjecthandler_p.h"
 
@@ -39,6 +43,23 @@ QObjectHandler::QObjectHandler(QObject *parent)
 
 bool QObjectHandler::process(QHttpSocket *socket, const QString &path)
 {
-    // TODO
-    return false;
+    // Determine the index of the slot with the specified name - note that we
+    // don't need to worry about retrieving the index for deleteLater() since
+    // we specify the "QVariant" parameter type, which no parent slots use
+    int index = metaObject()->indexOfSlot(QString("%1(QVariant)").arg(path).toUtf8().data());
+
+    // Ensure that the index is valid
+    if(index == -1) {
+        return false;
+    }
+
+    // Ensure that the return type is correct
+    QMetaMethod method = metaObject()->method(index);
+    if(method.returnType() != QMetaType::QVariant) {
+        return false;
+    }
+
+    // TODO: invoke the slot as soon as the response data is read
+
+    return true;
 }
