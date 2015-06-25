@@ -35,7 +35,9 @@ class DummyHandler : public QObjectHandler
 private Q_SLOTS:
 
     void invalidSignature(QVariant) {}
-    QVariant validSlot(QVariant) {}
+    QVariant validSlot(QVariant) {
+        return QVariant();
+    }
 };
 
 class TestQObjectHandler : public QObject
