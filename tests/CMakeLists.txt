@@ -7,6 +7,7 @@ set(TESTS
     core/TestQHttpSocket.cpp
     handler/TestQFilesystemHandler.cpp
     handler/TestQHttpSubHandler.cpp
+    handler/TestQObjectHandler.cpp
     util/TestQHttpParser.cpp
     util/TestQIByteArray.cpp
     util/TestQIODeviceCopier.cpp
