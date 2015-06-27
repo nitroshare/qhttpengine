@@ -1,5 +1,4 @@
 set(SRC
-    qiodevicecounter.cpp
     qsimplehttpclient.cpp
     qsocketpair.cpp
 )
