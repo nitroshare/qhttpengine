@@ -31,6 +31,7 @@
 class QHTTPENGINE_EXPORT QObjectHandlerPrivate;
 
 /**
+ * @class QObjectHandler qobjecthandler.h QObjectHandler
  * @brief Handler for invoking slots
  *
  * This handler enables incoming requests to invoke a matching slot in a
@@ -38,6 +39,25 @@ class QHTTPENGINE_EXPORT QObjectHandlerPrivate;
  * encoded as a JSON object. This object is then passed to the slot as a
  * single QVariantMap argument. The slot should return a QVariantMap
  * containing the response.
+ *
+ * To use this class, it must be subclassed and one or more slots must be
+ * created. The name of the slot will be used to determine the path. For
+ * example, the following handler consists of a single method that can be
+ * invoked by using the `/doSomething` path.
+ *
+ * @code
+ * class TestHandler : public QObjectHandler
+ * {
+ *     Q_OBJECT
+ * private slots:
+ *     QVariantMap doSomething(QVariantMap params);
+ * };
+ * @endcode
+ *
+ * The request body must contain valid JSON which will be decoded and passed
+ * to the doSomething() slot as a QVariantMap. The slot should return a
+ * QVariantMap which will then be encoded as JSON and written to the socket as
+ * the response body.
  */
 class QHTTPENGINE_EXPORT QObjectHandler : public QHttpHandler
 {
