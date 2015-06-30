@@ -25,6 +25,7 @@
 #ifndef QHTTPENGINE_QOBJECTHANDLERPRIVATE_H
 #define QHTTPENGINE_QOBJECTHANDLERPRIVATE_H
 
+#include <QMap>
 #include <QObject>
 
 #include "qobjecthandler.h"
@@ -36,6 +37,12 @@ class QObjectHandlerPrivate : public QObject
 public:
 
     explicit QObjectHandlerPrivate(QObjectHandler *handler);
+
+    QMap<QObject*, int> map;
+
+private Q_SLOTS:
+
+    void onReadChannelFinished();
 
 private:
 

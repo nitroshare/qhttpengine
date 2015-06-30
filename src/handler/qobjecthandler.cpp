@@ -22,9 +22,13 @@
  * IN THE SOFTWARE.
  */
 
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonParseError>
 #include <QMetaMethod>
 #include <QMetaObject>
 #include <QMetaType>
+#include <QVariantMap>
 
 #include "qobjecthandler.h"
 #include "qobjecthandler_p.h"
@@ -33,6 +37,38 @@ QObjectHandlerPrivate::QObjectHandlerPrivate(QObjectHandler *handler)
     : QObject(handler),
       q(handler)
 {
+}
+
+void QObjectHandlerPrivate::onReadChannelFinished()
+{
+    // Obtain the pointer to the socket emitting the signal
+    QHttpSocket *socket = qobject_cast<QHttpSocket*>(sender());
+
+    // Obtain the index and remove it from the map
+    int index = map.take(socket);
+
+    // Attempt to decode the JSON from the socket
+    QJsonParseError error;
+    QJsonDocument document = QJsonDocument::fromJson(socket->readAll(), &error);
+
+    // TODO: check document.isObject()
+    // TODO: check "error" variable for a problem
+
+    // Invoke the slot
+    QVariantMap retVal;
+    q->metaObject()->method(index).invoke(q,
+        Q_RETURN_ARG(QVariantMap, retVal),
+        Q_ARG(QVariantMap, document.object().toVariantMap()));
+
+    // Convert the return value to JSON and write it to the socket
+    QByteArray data = QJsonDocument(QJsonObject::fromVariantMap(retVal)).toJson();
+    socket->setHeader("Content-Length", QByteArray::number(data.length()));
+    socket->setHeader("Content-Type", "application/json");
+    socket->write(data);
+
+    // Close the socket and delete it
+    socket->close();
+    socket->deleteLater();
 }
 
 QObjectHandler::QObjectHandler(QObject *parent)
@@ -45,8 +81,8 @@ bool QObjectHandler::process(QHttpSocket *socket, const QString &path)
 {
     // Determine the index of the slot with the specified name - note that we
     // don't need to worry about retrieving the index for deleteLater() since
-    // we specify the "QVariant" parameter type, which no parent slots use
-    int index = metaObject()->indexOfSlot(QString("%1(QVariant)").arg(path).toUtf8().data());
+    // we specify the "QVariantMap" parameter type, which no parent slots use
+    int index = metaObject()->indexOfSlot(QString("%1(QVariantMap)").arg(path).toUtf8().data());
 
     // Ensure that the index is valid
     if(index == -1) {
@@ -55,11 +91,13 @@ bool QObjectHandler::process(QHttpSocket *socket, const QString &path)
 
     // Ensure that the return type is correct
     QMetaMethod method = metaObject()->method(index);
-    if(method.returnType() != QMetaType::QVariant) {
+    if(method.returnType() != QMetaType::QVariantMap) {
         return false;
     }
 
-    // TODO: invoke the slot as soon as the response data is read
+    // Add the socket to the map
+    d->map.insert(socket, index);
+    connect(socket, SIGNAL(readChannelFinished()), d, SLOT(onReadChannelFinished()));
 
     return true;
 }

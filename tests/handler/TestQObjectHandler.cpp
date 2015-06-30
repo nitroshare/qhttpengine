@@ -22,10 +22,14 @@
  * IN THE SOFTWARE.
  */
 
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QObject>
 #include <QTest>
-#include <QVariant>
+#include <QVariantMap>
 
+#include "common/qsimplehttpclient.h"
+#include "common/qsocketpair.h"
 #include "handler/qobjecthandler.h"
 
 class DummyHandler : public QObjectHandler
@@ -34,9 +38,9 @@ class DummyHandler : public QObjectHandler
 
 private Q_SLOTS:
 
-    void invalidSignature(QVariant) {}
-    QVariant validSlot(QVariant) {
-        return QVariant();
+    void invalidSignature(QVariantMap) {}
+    QVariantMap validSlot(QVariantMap params) {
+        return params;
     }
 };
 
@@ -75,7 +79,32 @@ void TestQObjectHandler::testRequests()
 
     DummyHandler handler;
 
-    QCOMPARE(handler.process(0, path), success);
+    QSocketPair pair;
+    QTRY_VERIFY(pair.isConnected());
+
+    QSimpleHttpClient client(pair.client());
+    QHttpSocket *socket = new QHttpSocket(pair.server(), &pair);
+
+    QCOMPARE(handler.process(socket, path), success);
+
+    if(success) {
+
+        QVariantMap map;
+        map.insert("param1", 1);
+        map.insert("param2", 2);
+
+        QByteArray data = QJsonDocument(QJsonObject::fromVariantMap(map)).toJson();
+
+        QHttpHeaderMap headers;
+        headers.insert("Content-Length", QByteArray::number(data.length()));
+
+        client.sendHeaders("POST", "/", headers);
+        client.sendData(data);
+
+        QTRY_VERIFY(client.headers().contains("Content-Length"));
+        QTRY_COMPARE(client.data().length(), client.headers().value("Content-Length").toInt());
+        QCOMPARE(QJsonDocument::fromJson(client.data()).object().toVariantMap(), map);
+    }
 }
 
 QTEST_MAIN(TestQObjectHandler)

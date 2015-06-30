@@ -36,8 +36,8 @@ class QHTTPENGINE_EXPORT QObjectHandlerPrivate;
  * This handler enables incoming requests to invoke a matching slot in a
  * QObject-derived class. The request body is expected to contain parameters
  * encoded as a JSON object. This object is then passed to the slot as a
- * single QVariant argument. The slot should return a QVariant containing the
- * response.
+ * single QVariantMap argument. The slot should return a QVariantMap
+ * containing the response.
  */
 class QHTTPENGINE_EXPORT QObjectHandler : public QHttpHandler
 {
