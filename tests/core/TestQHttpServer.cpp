@@ -61,7 +61,7 @@ void TestQHttpServer::testServer()
     DummyHandler handler;
     QHttpServer server(&handler);
 
-    QVERIFY(server.listen());
+    QVERIFY(server.listen(QHostAddress::LocalHost));
 
     QTcpSocket socket;
     socket.connectToHost(server.address(), server.port());
