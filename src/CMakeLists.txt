@@ -12,6 +12,15 @@ set(INCLUDE
     util/qhttpparser.h
     util/qibytearray.h
     util/qiodevicecopier.h
+    QHttpServer
+    QHttpSocket
+    QFilesystemHandler
+    QHttpHandler
+    QHttpSubHandler
+    QObjectHandler
+    QHttpParser
+    QIByteArray
+    QIODeviceCopier
 )
 
 set(SRC
