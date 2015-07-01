@@ -27,12 +27,29 @@
 
 #include <QObject>
 
+#include "../handler/qhttphandler.h"
 #include "config.h"
 
 class QHTTPENGINE_EXPORT QHttpServerPrivate;
 
 /**
+ * @class QHttpServer qhttpserver.h QHttpServer
  * @brief HTTP server
+ *
+ * This class provides an HTTP server capable of receiving incoming requests
+ * and routing them to the appropriate handler based on their request paths.
+ * The handler is provided as an argument to the constructor. The following
+ * example creates a server that will respond to requests for files in the
+ * /var/www directory:
+ *
+ * @code
+ * QFileSystemHandler fshandler("/var/www");
+ * QHttpServer server(&fshandler);
+ * @endcode
+ *
+ * The QHttpSubHandler class allows multiple handlers to be used with a single
+ * server while using the request path to route requests to the appropriate
+ * handler.
  */
 class QHTTPENGINE_EXPORT QHttpServer : public QObject
 {
@@ -40,7 +57,10 @@ class QHTTPENGINE_EXPORT QHttpServer : public QObject
 
 public:
 
-    explicit QHttpServer(QObject *parent = 0);
+    /**
+     * @brief Create an HTTP server with the specified handler
+     */
+    QHttpServer(QHttpHandler *handler, QObject *parent = 0);
 
 private:
 

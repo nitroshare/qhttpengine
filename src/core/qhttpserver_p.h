@@ -26,6 +26,7 @@
 #define QHTTPENGINE_QHTTPSERVERPRIVATE_H
 
 #include <QObject>
+#include <QTcpServer>
 
 #include "qhttpserver.h"
 
@@ -36,6 +37,13 @@ class QHttpServerPrivate : public QObject
 public:
 
     QHttpServerPrivate(QHttpServer *httpServer);
+
+    QTcpServer server;
+
+private Q_SLOTS:
+
+    void onIncomingConnection();
+    void onHeadersParsed();
 
 private:
 

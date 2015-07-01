@@ -24,15 +24,30 @@
 
 #include "qhttpserver.h"
 #include "qhttpserver_p.h"
+#include "qhttpsocket.h"
 
 QHttpServerPrivate::QHttpServerPrivate(QHttpServer *httpServer)
     : QObject(httpServer),
       q(httpServer)
 {
+    connect(&server, SIGNAL(newConnection()), this, SLOT(onIncomingConnection()));
+}
+
+void QHttpServerPrivate::onIncomingConnection()
+{
+    // Obtain the next pending connection and create a QHttpSocket from it
+    QHttpSocket *socket = new QHttpSocket(server.nextPendingConnection(), this);
+
+    // Wait until the socket finishes reading the HTTP headers to continue
+    connect(socket, SIGNAL(headersParsed()), this, SLOT(onHeadersParsed()));
+}
+
+void QHttpServerPrivate::onHeadersParsed()
+{
     //...
 }
 
-QHttpServer::QHttpServer(QObject *parent)
+QHttpServer::QHttpServer(QHttpHandler *handler, QObject *parent)
     : QObject(parent),
       d(new QHttpServerPrivate(this))
 {
