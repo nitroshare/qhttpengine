@@ -65,7 +65,7 @@ void TestQHttpServer::testServer()
 
     QTcpSocket socket;
     socket.connectToHost(server.address(), server.port());
-    QTRY_VERIFY(socket.isValid());
+    QTRY_COMPARE(socket.state(), QAbstractSocket::ConnectedState);
 
     QSimpleHttpClient client(&socket);
     client.sendHeaders("GET", "/test", QHttpHeaderMap());
