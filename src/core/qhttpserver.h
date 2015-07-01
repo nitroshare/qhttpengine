@@ -25,6 +25,7 @@
 #ifndef QHTTPENGINE_QHTTPSERVER_H
 #define QHTTPENGINE_QHTTPSERVER_H
 
+#include <QHostAddress>
 #include <QObject>
 
 #include "../handler/qhttphandler.h"
@@ -61,6 +62,21 @@ public:
      * @brief Create an HTTP server with the specified handler
      */
     QHttpServer(QHttpHandler *handler, QObject *parent = 0);
+
+    /**
+     * @brief Listen for incoming HTTP connections
+     */
+    bool listen(const QHostAddress &address = QHostAddress::Any, quint16 port = 0);
+
+    /**
+     * @brief Retrieve the address that the server is listening on
+     */
+    QHostAddress address() const;
+
+    /**
+     * @brief Retrieve the port that the server is listening on
+     */
+    quint16 port() const;
 
 private:
 

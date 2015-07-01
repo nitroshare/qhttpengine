@@ -26,9 +26,10 @@
 #include "qhttpserver_p.h"
 #include "qhttpsocket.h"
 
-QHttpServerPrivate::QHttpServerPrivate(QHttpServer *httpServer)
+QHttpServerPrivate::QHttpServerPrivate(QHttpServer *httpServer, QHttpHandler *httpHandler)
     : QObject(httpServer),
-      q(httpServer)
+      q(httpServer),
+      handler(httpHandler)
 {
     connect(&server, SIGNAL(newConnection()), this, SLOT(onIncomingConnection()));
 }
@@ -44,12 +45,30 @@ void QHttpServerPrivate::onIncomingConnection()
 
 void QHttpServerPrivate::onHeadersParsed()
 {
-    //...
+    // Obtain the socket that corresponds with the sender of the signal
+    QHttpSocket *socket = qobject_cast<QHttpSocket*>(sender());
+
+    // Obtain the path and pass it along to the handler
+    handler->process(socket, QString(socket->path().mid(1)));
 }
 
 QHttpServer::QHttpServer(QHttpHandler *handler, QObject *parent)
     : QObject(parent),
-      d(new QHttpServerPrivate(this))
+      d(new QHttpServerPrivate(this, handler))
 {
-    //...
+}
+
+bool QHttpServer::listen(const QHostAddress &address, quint16 port)
+{
+    return d->server.listen(address, port);
+}
+
+QHostAddress QHttpServer::address() const
+{
+    return d->server.serverAddress();
+}
+
+quint16 QHttpServer::port() const
+{
+    return d->server.serverPort();
 }

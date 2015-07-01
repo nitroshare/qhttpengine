@@ -28,6 +28,7 @@
 #include <QObject>
 #include <QTcpServer>
 
+#include "../handler/qhttphandler.h"
 #include "qhttpserver.h"
 
 class QHttpServerPrivate : public QObject
@@ -36,9 +37,10 @@ class QHttpServerPrivate : public QObject
 
 public:
 
-    QHttpServerPrivate(QHttpServer *httpServer);
+    QHttpServerPrivate(QHttpServer *httpServer, QHttpHandler *httpHandler);
 
     QTcpServer server;
+    QHttpHandler *handler;
 
 private Q_SLOTS:
 

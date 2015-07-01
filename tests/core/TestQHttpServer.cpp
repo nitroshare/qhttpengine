@@ -22,9 +22,30 @@
  * IN THE SOFTWARE.
  */
 
+#include <QTcpSocket>
 #include <QTest>
 
+#include "common/qsimplehttpclient.h"
 #include "core/qhttpserver.h"
+#include "handler/qhttphandler.h"
+
+class DummyHandler : public QHttpHandler
+{
+    Q_OBJECT
+
+public:
+
+    DummyHandler() : mSocket(0) {}
+
+    virtual bool process(QHttpSocket *socket, const QString &path) {
+        mSocket = socket;
+        mPath = path;
+        return true;
+    }
+
+    QHttpSocket *mSocket;
+    QString mPath;
+};
 
 class TestQHttpServer : public QObject
 {
@@ -32,8 +53,26 @@ class TestQHttpServer : public QObject
 
 private Q_SLOTS:
 
-    //...
+    void testServer();
 };
+
+void TestQHttpServer::testServer()
+{
+    DummyHandler handler;
+    QHttpServer server(&handler);
+
+    QVERIFY(server.listen());
+
+    QTcpSocket socket;
+    socket.connectToHost(server.address(), server.port());
+    QTRY_VERIFY(socket.isValid());
+
+    QSimpleHttpClient client(&socket);
+    client.sendHeaders("GET", "/test", QHttpHeaderMap());
+
+    QTRY_VERIFY(handler.mSocket != 0);
+    QCOMPARE(handler.mPath, QString("test"));
+}
 
 QTEST_MAIN(TestQHttpServer)
 #include "TestQHttpServer.moc"
