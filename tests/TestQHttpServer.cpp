@@ -22,34 +22,58 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPSERVERPRIVATE_H
-#define QHTTPENGINE_QHTTPSERVERPRIVATE_H
+#include <QTcpSocket>
+#include <QTest>
 
-#include <QObject>
-#include <QTcpServer>
+#include <QHttpServer>
+#include <QHttpHandler>
 
-#include "../handler/qhttphandler.h"
-#include "qhttpserver.h"
+#include "common/qsimplehttpclient.h"
 
-class QHttpServerPrivate : public QObject
+class DummyHandler : public QHttpHandler
 {
     Q_OBJECT
 
 public:
 
-    QHttpServerPrivate(QHttpServer *httpServer, QHttpHandler *httpHandler);
+    DummyHandler() : mSocket(0) {}
 
-    QTcpServer server;
-    QHttpHandler *handler;
+    virtual bool process(QHttpSocket *socket, const QString &path) {
+        mSocket = socket;
+        mPath = path;
+        return true;
+    }
+
+    QHttpSocket *mSocket;
+    QString mPath;
+};
+
+class TestQHttpServer : public QObject
+{
+    Q_OBJECT
 
 private Q_SLOTS:
 
-    void onIncomingConnection();
-    void onHeadersParsed();
-
-private:
-
-    QHttpServer *const q;
+    void testServer();
 };
 
-#endif // QHTTPENGINE_QHTTPSERVERPRIVATE_H
+void TestQHttpServer::testServer()
+{
+    DummyHandler handler;
+    QHttpServer server(&handler);
+
+    QVERIFY(server.listen(QHostAddress::LocalHost));
+
+    QTcpSocket socket;
+    socket.connectToHost(server.address(), server.port());
+    QTRY_COMPARE(socket.state(), QAbstractSocket::ConnectedState);
+
+    QSimpleHttpClient client(&socket);
+    client.sendHeaders("GET", "/test", QHttpHeaderMap());
+
+    QTRY_VERIFY(handler.mSocket != 0);
+    QCOMPARE(handler.mPath, QString("test"));
+}
+
+QTEST_MAIN(TestQHttpServer)
+#include "TestQHttpServer.moc"

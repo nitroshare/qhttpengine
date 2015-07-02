@@ -3,36 +3,36 @@ configure_file(qhttpengine.pc.in "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.pc" @O
 
 set(INCLUDE
     "${CMAKE_CURRENT_BINARY_DIR}/config.h"
-    core/qhttpserver.h
-    core/qhttpsocket.h
-    handler/qfilesystemhandler.h
-    handler/qhttphandler.h
-    handler/qhttpsubhandler.h
-    handler/qobjecthandler.h
-    util/qhttpparser.h
-    util/qibytearray.h
-    util/qiodevicecopier.h
-    QHttpServer
-    QHttpSocket
     QFilesystemHandler
+    qfilesystemhandler.h
     QHttpHandler
-    QHttpSubHandler
-    QObjectHandler
+    qhttphandler.h
     QHttpParser
+    qhttpparser.h
+    QHttpServer
+    qhttpserver.h
+    QHttpSocket
+    qhttpsocket.h
+    QHttpSubHandler
+    qhttpsubhandler.h
     QIByteArray
+    qibytearray.h
     QIODeviceCopier
+    qiodevicecopier.h
+    QObjectHandler
+    qobjecthandler.h
 )
 
 set(SRC
-    core/qhttpserver.cpp
-    core/qhttpsocket.cpp
-    handler/qfilesystemhandler.cpp
-    handler/qhttphandler.cpp
-    handler/qhttpsubhandler.cpp
-    handler/qobjecthandler.cpp
-    util/qhttpparser.cpp
-    util/qibytearray.cpp
-    util/qiodevicecopier.cpp
+    qfilesystemhandler.cpp
+    qhttphandler.cpp
+    qhttpparser.cpp
+    qhttpserver.cpp
+    qhttpsocket.cpp
+    qhttpsubhandler.cpp
+    qibytearray.cpp
+    qiodevicecopier.cpp
+    qobjecthandler.cpp
 )
 
 add_library(qhttpengine SHARED ${SRC})

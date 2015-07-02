@@ -29,8 +29,9 @@
 #include <QTcpSocket>
 #include <QTest>
 
+#include <QIODeviceCopier>
+
 #include "common/qsocketpair.h"
-#include "util/qiodevicecopier.h"
 
 const QByteArray SampleData = "1234567890";
 

@@ -25,7 +25,7 @@
 #include <QRegExp>
 #include <QTest>
 
-#include "handler/qhttpsubhandler.h"
+#include <QHttpSubHandler>
 
 class DummyHandler : public QHttpHandler
 {

@@ -27,10 +27,11 @@
 #include <QSignalSpy>
 #include <QTest>
 
+#include <QHttpSocket>
+#include <QHttpParser>
+
 #include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"
-#include "core/qhttpsocket.h"
-#include "util/qhttpparser.h"
 
 // Utility macro (avoids duplication) that creates a pair of connected
 // sockets, a QSimpleHttpClient for the client and a QHttpSocket for the

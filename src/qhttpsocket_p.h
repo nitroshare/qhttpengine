@@ -22,42 +22,61 @@
  * IN THE SOFTWARE.
  */
 
+#ifndef QHTTPENGINE_QHTTPSOCKETPRIVATE_H
+#define QHTTPENGINE_QHTTPSOCKETPRIVATE_H
+
 #include <QObject>
-#include <QTest>
+#include <QTcpSocket>
 
-#include "util/qibytearray.h"
+#include "qhttpparser.h"
+#include "qhttpsocket.h"
 
-const char *Value1 = "test";
-const char *Value2 = "TEST";
-
-class TestQIByteArray : public QObject
+class QHttpSocketPrivate : public QObject
 {
     Q_OBJECT
 
+public:
+
+    QHttpSocketPrivate(QHttpSocket *httpSocket, QTcpSocket *tcpSocket);
+
+    QTcpSocket *socket;
+    QByteArray readBuffer;
+
+    enum {
+        ReadHeaders,
+        ReadData,
+        ReadFinished
+    } readState;
+
+    QByteArray requestMethod;
+    QByteArray requestPath;
+    QHttpHeaderMap requestHeaders;
+    qint64 requestDataRead;
+    qint64 requestDataTotal;
+
+    enum {
+        WriteNone,
+        WriteHeaders,
+        WriteData,
+        WriteFinished
+    } writeState;
+
+    QByteArray responseStatusCode;
+    QHttpHeaderMap responseHeaders;
+    qint64 responseHeaderRemaining;
+
 private Q_SLOTS:
 
-    void testQString();
-    void testQByteArray();
-    void testCharPtr();
+    void onReadyRead();
+    void onBytesWritten(qint64 bytes);
+    void onDisconnected();
+
+private:
+
+    bool readHeaders();
+    void readData();
+
+    QHttpSocket *const q;
 };
 
-void TestQIByteArray::testQString()
-{
-    QVERIFY(QIByteArray(Value1) == QString(Value2));
-    QVERIFY(QString(Value1) == QIByteArray(Value2));
-}
-
-void TestQIByteArray::testQByteArray()
-{
-    QVERIFY(QIByteArray(Value1) == QByteArray(Value2));
-    QVERIFY(QByteArray(Value1) == QIByteArray(Value2));
-}
-
-void TestQIByteArray::testCharPtr()
-{
-    QVERIFY(QIByteArray(Value1) == Value2);
-    QVERIFY(Value1 == QIByteArray(Value2));
-}
-
-QTEST_MAIN(TestQIByteArray)
-#include "TestQIByteArray.moc"
+#endif // QHTTPENGINE_QHTTPSOCKETPRIVATE_H

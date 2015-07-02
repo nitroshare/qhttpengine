@@ -28,8 +28,8 @@
 #include <QHostAddress>
 #include <QObject>
 
-#include "../handler/qhttphandler.h"
 #include "config.h"
+#include "qhttphandler.h"
 
 class QHTTPENGINE_EXPORT QHttpServerPrivate;
 

@@ -22,44 +22,42 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPHANDLER_H
-#define QHTTPENGINE_QHTTPHANDLER_H
-
 #include <QObject>
+#include <QTest>
 
-#include "core/qhttpsocket.h"
-#include "config.h"
+#include <QIByteArray>
 
-/**
- * @brief Base class for URL handlers
- *
- * When a request is received by a QHttpServer, it is dispatched to a
- * QHttpHandler instance which will then determine what happens to the
- * request. This is done by reimplement the process() method.
- */
-class QHTTPENGINE_EXPORT QHttpHandler : public QObject
+const char *Value1 = "test";
+const char *Value2 = "TEST";
+
+class TestQIByteArray : public QObject
 {
     Q_OBJECT
 
-public:
+private Q_SLOTS:
 
-    /**
-     * @brief Base constructor for a handler
-     *
-     * Because this class is abstract, it cannot be instantiated.
-     */
-    explicit QHttpHandler(QObject *parent = 0);
-
-    /**
-     * @brief Attempt to process a request
-     *
-     * This method should attempt to process the request if the provided path
-     * matches a resource. If the request could not be processed, this method
-     * should return false and a 404 page will be served.
-     *
-     * Note that the leading "/" will be stripped from the path.
-     */
-    virtual bool process(QHttpSocket *socket, const QString &path) = 0;
+    void testQString();
+    void testQByteArray();
+    void testCharPtr();
 };
 
-#endif // QHTTPENGINE_QHTTPHANDLER_H
+void TestQIByteArray::testQString()
+{
+    QVERIFY(QIByteArray(Value1) == QString(Value2));
+    QVERIFY(QString(Value1) == QIByteArray(Value2));
+}
+
+void TestQIByteArray::testQByteArray()
+{
+    QVERIFY(QIByteArray(Value1) == QByteArray(Value2));
+    QVERIFY(QByteArray(Value1) == QIByteArray(Value2));
+}
+
+void TestQIByteArray::testCharPtr()
+{
+    QVERIFY(QIByteArray(Value1) == Value2);
+    QVERIFY(Value1 == QIByteArray(Value2));
+}
+
+QTEST_MAIN(TestQIByteArray)
+#include "TestQIByteArray.moc"

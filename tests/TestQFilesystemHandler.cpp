@@ -29,10 +29,11 @@
 #include <QTemporaryDir>
 #include <QTest>
 
+#include <QHttpSocket>
+#include <QFilesystemHandler>
+
 #include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"
-#include "core/qhttpsocket.h"
-#include "handler/qfilesystemhandler.h"
 
 const QByteArray Data = "test";
 

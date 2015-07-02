@@ -22,61 +22,44 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPSOCKETPRIVATE_H
-#define QHTTPENGINE_QHTTPSOCKETPRIVATE_H
+#ifndef QHTTPENGINE_QHTTPHANDLER_H
+#define QHTTPENGINE_QHTTPHANDLER_H
 
 #include <QObject>
-#include <QTcpSocket>
 
-#include "../util/qhttpparser.h"
+#include "config.h"
 #include "qhttpsocket.h"
 
-class QHttpSocketPrivate : public QObject
+/**
+ * @brief Base class for URL handlers
+ *
+ * When a request is received by a QHttpServer, it is dispatched to a
+ * QHttpHandler instance which will then determine what happens to the
+ * request. This is done by reimplement the process() method.
+ */
+class QHTTPENGINE_EXPORT QHttpHandler : public QObject
 {
     Q_OBJECT
 
 public:
 
-    QHttpSocketPrivate(QHttpSocket *httpSocket, QTcpSocket *tcpSocket);
+    /**
+     * @brief Base constructor for a handler
+     *
+     * Because this class is abstract, it cannot be instantiated.
+     */
+    explicit QHttpHandler(QObject *parent = 0);
 
-    QTcpSocket *socket;
-    QByteArray readBuffer;
-
-    enum {
-        ReadHeaders,
-        ReadData,
-        ReadFinished
-    } readState;
-
-    QByteArray requestMethod;
-    QByteArray requestPath;
-    QHttpHeaderMap requestHeaders;
-    qint64 requestDataRead;
-    qint64 requestDataTotal;
-
-    enum {
-        WriteNone,
-        WriteHeaders,
-        WriteData,
-        WriteFinished
-    } writeState;
-
-    QByteArray responseStatusCode;
-    QHttpHeaderMap responseHeaders;
-    qint64 responseHeaderRemaining;
-
-private Q_SLOTS:
-
-    void onReadyRead();
-    void onBytesWritten(qint64 bytes);
-    void onDisconnected();
-
-private:
-
-    bool readHeaders();
-    void readData();
-
-    QHttpSocket *const q;
+    /**
+     * @brief Attempt to process a request
+     *
+     * This method should attempt to process the request if the provided path
+     * matches a resource. If the request could not be processed, this method
+     * should return false and a 404 page will be served.
+     *
+     * Note that the leading "/" will be stripped from the path.
+     */
+    virtual bool process(QHttpSocket *socket, const QString &path) = 0;
 };
 
-#endif // QHTTPENGINE_QHTTPSOCKETPRIVATE_H
+#endif // QHTTPENGINE_QHTTPHANDLER_H

@@ -28,8 +28,8 @@
 #include <QList>
 #include <QTcpSocket>
 
-#include "../util/qhttpparser.h"
 #include "config.h"
+#include "qhttpparser.h"
 
 class QHTTPENGINE_EXPORT QHttpSocketPrivate;
 

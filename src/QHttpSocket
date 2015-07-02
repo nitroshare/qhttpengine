@@ -1,1 +1,1 @@
-#include "core/qhttpsocket.h"
+#include "qhttpsocket.h"

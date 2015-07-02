@@ -25,9 +25,9 @@
 #include <QFile>
 #include <QFileInfo>
 
-#include "../util/qiodevicecopier.h"
 #include "qfilesystemhandler.h"
 #include "qfilesystemhandler_p.h"
+#include "qiodevicecopier.h"
 
 QFilesystemHandlerPrivate::QFilesystemHandlerPrivate(QFilesystemHandler *handler, const QString &root)
     : QObject(handler),

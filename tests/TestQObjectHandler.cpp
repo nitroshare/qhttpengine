@@ -28,9 +28,10 @@
 #include <QTest>
 #include <QVariantMap>
 
+#include <QObjectHandler>
+
 #include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"
-#include "handler/qobjecthandler.h"
 
 class DummyHandler : public QObjectHandler
 {

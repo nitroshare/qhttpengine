@@ -29,7 +29,7 @@
 #include <QObject>
 #include <QTcpSocket>
 
-#include "util/qhttpparser.h"
+#include <QHttpParser>
 
 /**
  * @brief Simple HTTP client for testing purposes
