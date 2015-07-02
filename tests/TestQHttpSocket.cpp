@@ -58,6 +58,7 @@ private Q_SLOTS:
 
     void testProperties();
     void testData();
+    void testRedirect();
     void testSignals();
 
 private:
@@ -104,6 +105,17 @@ void TestQHttpSocket::testData()
     server.write(Data);
 
     QTRY_COMPARE(client.data(), Data);
+}
+
+void TestQHttpSocket::testRedirect()
+{
+    CREATE_SOCKET_PAIR();
+
+    server.writeRedirect(Path, true);
+
+    QTRY_COMPARE(client.statusCode(), static_cast<int>(QHttpSocket::MovedPermanently));
+    QVERIFY(client.headers().contains("Location"));
+    QCOMPARE(client.headers().value("Location"), Path);
 }
 
 void TestQHttpSocket::testSignals()
