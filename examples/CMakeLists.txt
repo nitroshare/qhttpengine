@@ -1,7 +1,9 @@
-find_package(Qt5Gui 5.1)
+find_package(Qt5Widgets 5.1)
 
 set(EXAMPLES_INSTALL_DIR lib/qhttpengine/examples)
 
-if(Qt5Gui_FOUND)
+if(Qt5Widgets_FOUND)
     add_subdirectory(fileserver)
+else()
+    message(WARNING "Qt5Widgets not found, GUI examples will not be built")
 endif()
