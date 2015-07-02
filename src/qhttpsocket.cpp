@@ -25,6 +25,16 @@
 #include "qhttpsocket.h"
 #include "qhttpsocket_p.h"
 
+// Predefined error response requires a simple HTML template to be returned to
+// the client describing the error condition
+const QString ErrorTemplate =
+        "<!DOCTYPE html><html><head><meta charset=\"utf-8\">"
+        "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
+        "<title>%1</title></head><body><h1>%1 %2</h1><p>"
+        "An error has occurred while trying to display the requested resource. "
+        "Please contact the website owner if this error persists."
+        "</p><hr><p><em>QHttpEngine %3</em></p></body></html>";
+
 QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket, QTcpSocket *tcpSocket)
     : QObject(httpSocket),
       q(httpSocket),
@@ -32,7 +42,8 @@ QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket, QTcpSocket *tcpS
       readState(ReadHeaders),
       requestDataRead(0),
       writeState(WriteNone),
-      responseStatusCode("200 OK")
+      responseStatusCode(200),
+      responseStatusReason(statusReason(200))
 {
     connect(socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
     connect(socket, SIGNAL(bytesWritten(qint64)), this, SLOT(onBytesWritten(qint64)));
@@ -198,8 +209,8 @@ QHttpHeaderMap &QHttpSocket::headers() const
 
 void QHttpSocket::setStatusCode(int statusCode, const QByteArray &statusReason)
 {
-    d->responseStatusCode = QByteArray::number(statusCode) + " " +
-            (statusReason.isNull() ? d->statusReason(statusCode) : statusReason);
+    d->responseStatusCode = statusCode;
+    d->responseStatusReason = statusReason.isNull() ? d->statusReason(statusCode) : statusReason;
 }
 
 void QHttpSocket::setHeader(const QByteArray &name, const QByteArray &value)
@@ -220,7 +231,7 @@ void QHttpSocket::writeHeaders()
 
     // Append the status line
     header.append("HTTP/1.0 ");
-    header.append(d->responseStatusCode);
+    header.append(QByteArray::number(d->responseStatusCode) + " " + d->responseStatusReason);
     header.append("\r\n");
 
     // Append each of the headers followed by a CRLF
@@ -239,6 +250,33 @@ void QHttpSocket::writeHeaders()
 
     // Write the header
     d->socket->write(header);
+}
+
+void QHttpSocket::writeRedirect(const QByteArray &path, bool permanent)
+{
+    setStatusCode(permanent ? MovedPermanently : Found);
+    setHeader("Location", path);
+    writeHeaders();
+    close();
+}
+
+void QHttpSocket::writeError(int statusCode, const QByteArray &statusReason)
+{
+    setStatusCode(statusCode, statusReason);
+
+    // Build the template that will be sent to the client
+    QByteArray data = ErrorTemplate
+            .arg(statusCode)
+            .arg(statusReason.constData())
+            .arg(QHTTPENGINE_VERSION)
+            .toUtf8();
+
+    setHeader("Content-Length", QByteArray::number(data.length()));
+    setHeader("Content-Type", "text/html");
+
+    writeHeaders();
+    write(data);
+    close();
 }
 
 qint64 QHttpSocket::readData(char *data, qint64 maxlen)

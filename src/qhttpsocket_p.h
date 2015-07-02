@@ -61,7 +61,8 @@ public:
         WriteFinished
     } writeState;
 
-    QByteArray responseStatusCode;
+    int responseStatusCode;
+    QByteArray responseStatusReason;
     QHttpHeaderMap responseHeaders;
     qint64 responseHeaderRemaining;
 

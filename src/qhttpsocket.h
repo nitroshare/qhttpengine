@@ -190,12 +190,22 @@ public:
     void setHeaders(const QHttpHeaderMap &headers);
 
     /**
-     * @brief Write response headers to the device
+     * @brief Write response headers to the socket
      *
      * This method should not be invoked after the response headers have been
      * written.
      */
     void writeHeaders();
+
+    /**
+     * @brief Write an HTTP 3xx redirect to the socket
+     */
+    void writeRedirect(const QByteArray &path, bool permanent = false);
+
+    /**
+     * @brief Write an HTTP error code to the socket
+     */
+    void writeError(int statusCode, const QByteArray &statusReason = QByteArray());
 
 Q_SIGNALS:
 
