@@ -1,6 +1,4 @@
-/**
- * The MIT License (MIT)
- *
+/*
  * Copyright (c) 2015 Nathan Osman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -31,8 +29,8 @@
 class QHTTPENGINE_EXPORT QObjectHandlerPrivate;
 
 /**
- * @class QObjectHandler qobjecthandler.h QObjectHandler
  * @brief Handler for invoking slots
+ * @headerfile qobjecthandler.h QObjectHandler
  *
  * This handler enables incoming requests to invoke a matching slot in a
  * QObject-derived class. The request body is expected to contain parameters

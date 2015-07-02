@@ -1,6 +1,4 @@
-/**
- * The MIT License (MIT)
- *
+/*
  * Copyright (c) 2015 Nathan Osman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -48,6 +46,7 @@ bool QFilesystemHandlerPrivate::absolutePath(const QString &path, QString &absol
 QByteArray QFilesystemHandlerPrivate::mimeType(const QString &path)
 {
     // TODO: use libmagic or the Windows registry when possible
+    // TODO: determine what the equivalent is on OS X (libmagic?)
 
     QFileInfo info(path);
     QString extension = info.completeSuffix();

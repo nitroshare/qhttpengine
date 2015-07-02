@@ -1,6 +1,4 @@
-/**
- * The MIT License (MIT)
- *
+/*
  * Copyright (c) 2015 Nathan Osman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -41,6 +39,7 @@ typedef QMap<QIByteArray, QByteArray> QHttpHeaderMap;
 
 /**
  * @brief Utility methods for parsing HTTP requests and responses
+ * @headerfile qhttpparser.h QHttpParser
  *
  * This class provides a set of static methods for parsing HTTP request and
  * response headers. Functionality is broken up into smaller methods in order

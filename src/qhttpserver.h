@@ -1,6 +1,4 @@
-/**
- * The MIT License (MIT)
- *
+/*
  * Copyright (c) 2015 Nathan Osman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -34,8 +32,8 @@
 class QHTTPENGINE_EXPORT QHttpServerPrivate;
 
 /**
- * @class QHttpServer qhttpserver.h QHttpServer
  * @brief HTTP server
+ * @headerfile qhttpserver.h QHttpServer
  *
  * This class provides an HTTP server capable of receiving incoming requests
  * and routing them to the appropriate handler based on their request paths.

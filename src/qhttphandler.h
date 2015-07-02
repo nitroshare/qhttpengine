@@ -1,6 +1,4 @@
-/**
- * The MIT License (MIT)
- *
+/*
  * Copyright (c) 2015 Nathan Osman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -31,11 +29,12 @@
 #include "qhttpsocket.h"
 
 /**
+ * @class QHttpHandler qhttphandler.h QHttpHandler
  * @brief Base class for URL handlers
  *
  * When a request is received by a QHttpServer, it is dispatched to a
  * QHttpHandler instance which will then determine what happens to the
- * request. This is done by reimplement the process() method.
+ * request. This is done by reimplementing the process() method.
  */
 class QHTTPENGINE_EXPORT QHttpHandler : public QObject
 {

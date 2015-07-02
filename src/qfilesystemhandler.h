@@ -1,6 +1,4 @@
-/**
- * The MIT License (MIT)
- *
+/*
  * Copyright (c) 2015 Nathan Osman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -31,12 +29,19 @@
 class QHTTPENGINE_EXPORT QFilesystemHandlerPrivate;
 
 /**
+ * @class QFilesystemHandler qfilesystemhandler.h QFilesystemHandler
  * @brief Handler for filesystem requests
  *
  * This handler responds to requests for resources on a local filesystem. The
  * constructor is provided with a path to the root directory, which will be
- * used to resolve all paths. Requests for resources outside the root will be
- * ignored.
+ * used to resolve all paths. The following example creates a handler that
+ * serves files from the /var/www directory:
+ *
+ * @code
+ * QFilesystemHandler handler("/var/www");
+ * @endcode
+ *
+ * Requests for resources outside the root will be ignored.
  */
 class QHTTPENGINE_EXPORT QFilesystemHandler : public QHttpHandler
 {
@@ -50,7 +55,7 @@ public:
      * The root path provided is used to resolve each of the requests when
      * they are received.
      */
-    explicit QFilesystemHandler(const QString &root, QObject *parent = 0);
+    QFilesystemHandler(const QString &root, QObject *parent = 0);
 
     /**
      * @brief Reimplementation of QHttpHandler::process()

@@ -1,6 +1,4 @@
-/**
- * The MIT License (MIT)
- *
+/*
  * Copyright (c) 2015 Nathan Osman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -34,6 +32,7 @@ class QHTTPENGINE_EXPORT QSubHandlerPrivate;
 
 /**
  * @brief Parent handler for routing requests
+ * @headerfile qsubhandler.h QSubHandler
  *
  * This handler maintains a list of patterns that map to other handlers. When
  * a request is received, the list is enumerated (in order) and if the request
