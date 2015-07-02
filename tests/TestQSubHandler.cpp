@@ -25,7 +25,7 @@
 #include <QRegExp>
 #include <QTest>
 
-#include <QHttpSubHandler>
+#include <QSubHandler>
 
 class DummyHandler : public QHttpHandler
 {
@@ -41,7 +41,7 @@ public:
     QString pathRemainder;
 };
 
-class TestQHttpSubHandler : public QObject
+class TestQSubHandler : public QObject
 {
     Q_OBJECT
 
@@ -51,7 +51,7 @@ private Q_SLOTS:
     void testPatterns();
 };
 
-void TestQHttpSubHandler::testPatterns_data()
+void TestQSubHandler::testPatterns_data()
 {
     QTest::addColumn<bool>("success");
     QTest::addColumn<QRegExp>("pattern");
@@ -77,7 +77,7 @@ void TestQHttpSubHandler::testPatterns_data()
             << QString("two");
 }
 
-void TestQHttpSubHandler::testPatterns()
+void TestQSubHandler::testPatterns()
 {
     QFETCH(bool, success);
     QFETCH(QRegExp, pattern);
@@ -86,12 +86,12 @@ void TestQHttpSubHandler::testPatterns()
 
     DummyHandler handler;
 
-    QHttpSubHandler subHandler;
+    QSubHandler subHandler;
     subHandler.addHandler(pattern, &handler);
 
     QCOMPARE(subHandler.process(0, path), success);
     QCOMPARE(handler.pathRemainder, pathRemainder);
 }
 
-QTEST_MAIN(TestQHttpSubHandler)
-#include "TestQHttpSubHandler.moc"
+QTEST_MAIN(TestQSubHandler)
+#include "TestQSubHandler.moc"

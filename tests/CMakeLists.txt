@@ -7,10 +7,10 @@ set(TESTS
     TestQHttpParser.cpp
     TestQHttpServer.cpp
     TestQHttpSocket.cpp
-    TestQHttpSubHandler.cpp
     TestQIByteArray.cpp
     TestQIODeviceCopier.cpp
     TestQObjectHandler.cpp
+    TestQSubHandler.cpp
 )
 
 foreach(TEST ${TESTS})

@@ -22,15 +22,15 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPSUBHANDLER_H
-#define QHTTPENGINE_QHTTPSUBHANDLER_H
+#ifndef QHTTPENGINE_QSUBHANDLER_H
+#define QHTTPENGINE_QSUBHANDLER_H
 
 #include <QRegExp>
 
 #include "config.h"
 #include "qhttphandler.h"
 
-class QHTTPENGINE_EXPORT QHttpSubHandlerPrivate;
+class QHTTPENGINE_EXPORT QSubHandlerPrivate;
 
 /**
  * @brief Parent handler for routing requests
@@ -42,7 +42,7 @@ class QHTTPENGINE_EXPORT QHttpSubHandlerPrivate;
  * When a handler attached to this one is invoked, the portion of the pattern
  * that matches is removed from the path.
  */
-class QHTTPENGINE_EXPORT QHttpSubHandler : public QHttpHandler
+class QHTTPENGINE_EXPORT QSubHandler : public QHttpHandler
 {
     Q_OBJECT
 
@@ -51,7 +51,7 @@ public:
     /**
      * @brief Create a new sub handler
      */
-    explicit QHttpSubHandler(QObject *parent = 0);
+    explicit QSubHandler(QObject *parent = 0);
 
     /**
      * @brief Reimplementation of QHttpHandler::process()
@@ -69,7 +69,7 @@ public:
 
 private:
 
-    QHttpSubHandlerPrivate *const d;
+    QSubHandlerPrivate *const d;
 };
 
-#endif // QHTTPENGINE_QHTTPSUBHANDLER_H
+#endif // QHTTPENGINE_QSUBHANDLER_H

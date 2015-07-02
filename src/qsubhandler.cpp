@@ -22,27 +22,27 @@
  * IN THE SOFTWARE.
  */
 
-#include "qhttpsubhandler.h"
-#include "qhttpsubhandler_p.h"
+#include "qsubhandler.h"
+#include "qsubhandler_p.h"
 
-QHttpSubHandlerPrivate::QHttpSubHandlerPrivate(QHttpSubHandler *handler)
+QSubHandlerPrivate::QSubHandlerPrivate(QSubHandler *handler)
     : QObject(handler),
       q(handler)
 {
 }
 
-QHttpSubHandler::QHttpSubHandler(QObject *parent)
+QSubHandler::QSubHandler(QObject *parent)
     : QHttpHandler(parent),
-      d(new QHttpSubHandlerPrivate(this))
+      d(new QSubHandlerPrivate(this))
 {
 }
 
-void QHttpSubHandler::addHandler(const QRegExp &pattern, QHttpHandler *handler)
+void QSubHandler::addHandler(const QRegExp &pattern, QHttpHandler *handler)
 {
     d->patterns.append(URL(pattern, handler));
 }
 
-bool QHttpSubHandler::process(QHttpSocket *socket, const QString &path)
+bool QSubHandler::process(QHttpSocket *socket, const QString &path)
 {
     // Check each of the patterns for a match
     foreach(URL url, d->patterns) {

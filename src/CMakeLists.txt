@@ -13,14 +13,14 @@ set(INCLUDE
     qhttpserver.h
     QHttpSocket
     qhttpsocket.h
-    QHttpSubHandler
-    qhttpsubhandler.h
     QIByteArray
     qibytearray.h
     QIODeviceCopier
     qiodevicecopier.h
     QObjectHandler
     qobjecthandler.h
+    QSubHandler
+    qsubhandler.h
 )
 
 set(SRC
@@ -29,10 +29,10 @@ set(SRC
     qhttpparser.cpp
     qhttpserver.cpp
     qhttpsocket.cpp
-    qhttpsubhandler.cpp
     qibytearray.cpp
     qiodevicecopier.cpp
     qobjecthandler.cpp
+    qsubhandler.cpp
 )
 
 add_library(qhttpengine SHARED ${SRC})
