@@ -46,7 +46,7 @@ class QHTTPENGINE_EXPORT QHttpServerPrivate;
  * QHttpServer server(&fshandler);
  * @endcode
  *
- * The QHttpSubHandler class allows multiple handlers to be used with a single
+ * The QSubHandler class allows multiple handlers to be used with a single
  * server while using the request path to route requests to the appropriate
  * handler.
  */

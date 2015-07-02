@@ -35,6 +35,16 @@
  * When a request is received by a QHttpServer, it is dispatched to a
  * QHttpHandler instance which will then determine what happens to the
  * request. This is done by reimplementing the process() method.
+ *
+ * This method is invoked either by a QHttpServer or a QSubHandler and is
+ * passed two arguments:
+ *
+ * \li the socket (request headers already parsed)
+ * \li the relative request path (leading slash removed)
+ *
+ * For example, if a QHttpServer is initialized with a QFilesystemHandler, the
+ * process() method will be invoked each time a request comes in and the path
+ * will be set to QHttpSocket::path() (with the leading slash removed).
  */
 class QHTTPENGINE_EXPORT QHttpHandler : public QObject
 {

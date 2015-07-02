@@ -74,7 +74,7 @@ class QHTTPENGINE_EXPORT QHttpSocketPrivate;
  * data is first written to the device.
  *
  * @code
- * httpSock->setStatusCode("200 OK");
+ * httpSock->setStatusCode(QHttpSocket::OK);
  * httpSock->setHeader("Content-Length", 13);
  * httpSock->write("Hello, world!");
  * @endcode
