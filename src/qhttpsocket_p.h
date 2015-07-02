@@ -37,6 +37,8 @@ public:
 
     QHttpSocketPrivate(QHttpSocket *httpSocket, QTcpSocket *tcpSocket);
 
+    QByteArray statusReason(int statusCode) const;
+
     QTcpSocket *socket;
     QByteArray readBuffer;
 
@@ -70,7 +72,6 @@ private Q_SLOTS:
     void onDisconnected();
 
 private:
-
     bool readHeaders();
     void readData();
 

@@ -42,6 +42,19 @@ QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket, QTcpSocket *tcpS
     onReadyRead();
 }
 
+QByteArray QHttpSocketPrivate::statusReason(int statusCode) const
+{
+    switch(statusCode) {
+    case QHttpSocket::OK: return "OK";
+    case QHttpSocket::MovedPermanently: return "MOVED PERMANENTLY";
+    case QHttpSocket::Found: return "FOUND";
+    case QHttpSocket::Forbidden: return "FORBIDDEN";
+    case QHttpSocket::NotFound: return "NOT FOUND";
+    case QHttpSocket::InternalServerError: return "INTERNAL SERVER ERROR";
+    default: return "UNKNOWN";
+    }
+}
+
 void QHttpSocketPrivate::onReadyRead()
 {
     // Append all of the new data to the read buffer
@@ -183,9 +196,10 @@ QHttpHeaderMap &QHttpSocket::headers() const
     return d->requestHeaders;
 }
 
-void QHttpSocket::setStatusCode(const QByteArray &statusCode)
+void QHttpSocket::setStatusCode(int statusCode, const QByteArray &statusReason)
 {
-    d->responseStatusCode = statusCode;
+    d->responseStatusCode = QByteArray::number(statusCode) + " " +
+            (statusReason.isNull() ? d->statusReason(statusCode) : statusReason);
 }
 
 void QHttpSocket::setHeader(const QByteArray &name, const QByteArray &value)

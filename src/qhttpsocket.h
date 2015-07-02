@@ -89,6 +89,24 @@ class QHTTPENGINE_EXPORT QHttpSocket : public QIODevice
 public:
 
     /**
+     * Predefined constants for HTTP status codes
+     */
+    enum {
+        /// Request was successful
+        OK = 200,
+        /// Resource has moved permanently
+        MovedPermanently = 301,
+        /// Resource is available at an alternate URI
+        Found = 302,
+        /// Access to the resource is forbidden
+        Forbidden = 403,
+        /// Resource was not found
+        NotFound = 404,
+        /// An internal server error occurred
+        InternalServerError = 500
+    };
+
+    /**
      * @brief Create a new QHttpSocket from a QTcpSocket
      *
      * This instance will assume ownership of the socket. That is, it will
@@ -149,10 +167,13 @@ public:
      * @brief Set the response code
      *
      * This method may only be called before the response headers are written.
+     * The statusReason parameter may be omitted if one of the predefined
+     * status code constants is used.
+     *
      * If no response status code is explicitly set, it will assume a default
      * value of "200 OK".
      */
-    void setStatusCode(const QByteArray &statusCode);
+    void setStatusCode(int statusCode, const QByteArray &statusReason = QByteArray());
 
     /**
      * @brief Set a response header to a specific value

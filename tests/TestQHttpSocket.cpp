@@ -81,7 +81,7 @@ void TestQHttpSocket::testProperties()
     QCOMPARE(server.path(), Path);
     QCOMPARE(server.headers(), headers);
 
-    server.setStatusCode(QByteArray::number(StatusCode) + " " + StatusReason);
+    server.setStatusCode(StatusCode, StatusReason);
     server.setHeaders(headers);
     server.writeHeaders();
 
