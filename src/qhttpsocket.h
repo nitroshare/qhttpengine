@@ -26,7 +26,7 @@
 #include <QList>
 #include <QTcpSocket>
 
-#include "config.h"
+#include "qhttpengine.h"
 #include "qhttpparser.h"
 
 class QHTTPENGINE_EXPORT QHttpSocketPrivate;

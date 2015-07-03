@@ -26,7 +26,7 @@
 #include <QIODevice>
 #include <QObject>
 
-#include "config.h"
+#include "qhttpengine.h"
 
 class QHTTPENGINE_EXPORT QIODeviceCopierPrivate;
 

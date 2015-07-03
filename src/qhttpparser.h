@@ -26,7 +26,7 @@
 #include <QList>
 #include <QMap>
 
-#include "config.h"
+#include "qhttpengine.h"
 #include "qibytearray.h"
 
 /**

@@ -25,7 +25,7 @@
 
 #include <QByteArray>
 
-#include "config.h"
+#include "qhttpengine.h"
 
 /**
  * @brief Case-insensitive subclass of QByteArray

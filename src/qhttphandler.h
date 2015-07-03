@@ -25,7 +25,7 @@
 
 #include <QObject>
 
-#include "config.h"
+#include "qhttpengine.h"
 #include "qhttpsocket.h"
 
 /**

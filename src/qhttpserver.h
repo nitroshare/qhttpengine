@@ -27,7 +27,7 @@
 #include <QObject>
 #include <QTcpServer>
 
-#include "config.h"
+#include "qhttpengine.h"
 #include "qhttphandler.h"
 
 class QHTTPENGINE_EXPORT QHttpServerPrivate;

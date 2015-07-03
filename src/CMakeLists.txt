@@ -1,8 +1,8 @@
-configure_file(config.h.in "${CMAKE_CURRENT_BINARY_DIR}/config.h")
+configure_file(qhttpengine.h.in "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.h")
 configure_file(qhttpengine.pc.in "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.pc" @ONLY)
 
 set(INCLUDE
-    "${CMAKE_CURRENT_BINARY_DIR}/config.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.h"
     QFilesystemHandler
     qfilesystemhandler.h
     QHttpHandler
