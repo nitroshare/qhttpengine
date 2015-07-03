@@ -34,12 +34,12 @@ class QFilesystemHandlerPrivate : public QObject
 
 public:
 
-    QFilesystemHandlerPrivate(QFilesystemHandler *handler, const QString &root);
+    QFilesystemHandlerPrivate(QFilesystemHandler *handler);
 
     bool absolutePath(const QString &path, QString &absolutePath);
     QByteArray mimeType(const QString &path);
 
-    QDir root;
+    QDir documentRoot;
 
 private:
 

@@ -27,20 +27,19 @@
 #include "qfilesystemhandler_p.h"
 #include "qiodevicecopier.h"
 
-QFilesystemHandlerPrivate::QFilesystemHandlerPrivate(QFilesystemHandler *handler, const QString &root)
+QFilesystemHandlerPrivate::QFilesystemHandlerPrivate(QFilesystemHandler *handler)
     : QObject(handler),
-      q(handler),
-      root(root)
+      q(handler)
 {
 }
 
 bool QFilesystemHandlerPrivate::absolutePath(const QString &path, QString &absolutePath)
 {
     // Clean the path and make it absolute
-    absolutePath = QDir(root.absoluteFilePath(path)).canonicalPath();
+    absolutePath = QDir(documentRoot.absoluteFilePath(path)).canonicalPath();
 
     // Ensure that the absolute path is within the root
-    return absolutePath.startsWith(root.canonicalPath());
+    return absolutePath.startsWith(documentRoot.canonicalPath());
 }
 
 QByteArray QFilesystemHandlerPrivate::mimeType(const QString &path)
@@ -58,14 +57,26 @@ QByteArray QFilesystemHandlerPrivate::mimeType(const QString &path)
     else { return "application/octet-stream"; }
 }
 
-QFilesystemHandler::QFilesystemHandler(const QString &root, QObject *parent)
+QFilesystemHandler::QFilesystemHandler(QObject *parent)
     : QHttpHandler(parent),
-      d(new QFilesystemHandlerPrivate(this, root))
+      d(new QFilesystemHandlerPrivate(this))
 {
+}
+
+QFilesystemHandler::QFilesystemHandler(const QString &documentRoot, QObject *parent)
+    : QHttpHandler(parent),
+      d(new QFilesystemHandlerPrivate(this))
+{
+    setDocumentRoot(documentRoot);
 }
 
 bool QFilesystemHandler::process(QHttpSocket *socket, const QString &path)
 {
+    // Nothing can be done until a document root is set
+    if(d->documentRoot.path().isNull()) {
+        return false;
+    }
+
     // Attempt to retrieve the absolute path
     QString absolutePath;
     if(!d->absolutePath(path, absolutePath)) {
@@ -93,4 +104,9 @@ bool QFilesystemHandler::process(QHttpSocket *socket, const QString &path)
     // Start the copy and indicate success
     copier->start();
     return true;
+}
+
+void QFilesystemHandler::setDocumentRoot(const QString &documentRoot)
+{
+    d->documentRoot.setPath(documentRoot);
 }

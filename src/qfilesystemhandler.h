@@ -41,7 +41,8 @@ class QHTTPENGINE_EXPORT QFilesystemHandlerPrivate;
  * QFilesystemHandler handler("/var/www");
  * @endcode
  *
- * Requests for resources outside the root will be ignored.
+ * Requests for resources outside the root will be ignored. It is also
+ * possible to modify the document root after initialization.
  */
 class QHTTPENGINE_EXPORT QFilesystemHandler : public QHttpHandler
 {
@@ -51,16 +52,26 @@ public:
 
     /**
      * @brief Create a new filesystem handler
-     *
-     * The root path provided is used to resolve each of the requests when
-     * they are received.
      */
-    QFilesystemHandler(const QString &root, QObject *parent = 0);
+    explicit QFilesystemHandler(QObject *parent = 0);
+
+    /**
+     * @brief Create a new filesystem handler from the specified directory
+     */
+    QFilesystemHandler(const QString &documentRoot, QObject *parent = 0);
 
     /**
      * @brief Reimplementation of QHttpHandler::process()
      */
     virtual bool process(QHttpSocket *socket, const QString &path);
+
+    /**
+     * @brief Set the document root
+     *
+     * The root path provided is used to resolve each of the requests when
+     * they are received.
+     */
+    void setDocumentRoot(const QString &documentRoot);
 
 private:
 
