@@ -30,7 +30,7 @@
 const QString ErrorTemplate =
         "<!DOCTYPE html><html><head><meta charset=\"utf-8\">"
         "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
-        "<title>%1</title></head><body><h1>%1 %2</h1><p>"
+        "<title>%1 %2</title></head><body><h1>%1 %2</h1><p>"
         "An error has occurred while trying to display the requested resource. "
         "Please contact the website owner if this error persists."
         "</p><hr><p><em>QHttpEngine %3</em></p></body></html>";
@@ -266,8 +266,8 @@ void QHttpSocket::writeError(int statusCode, const QByteArray &statusReason)
 
     // Build the template that will be sent to the client
     QByteArray data = ErrorTemplate
-            .arg(statusCode)
-            .arg(statusReason.constData())
+            .arg(d->responseStatusCode)
+            .arg(d->responseStatusReason.constData())
             .arg(QHTTPENGINE_VERSION)
             .toUtf8();
 
