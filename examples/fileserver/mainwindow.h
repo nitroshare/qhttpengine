@@ -20,16 +20,36 @@
  * IN THE SOFTWARE.
  */
 
-#include <QApplication>
+#ifndef FILESERVER_MAINWINDOW_H
+#define FILESERVER_MAINWINDOW_H
 
-#include "mainwindow.h"
+#include <QMainWindow>
 
-int main(int argc, char * argv[])
+#include <QFilesystemHandler>
+#include <QHttpServer>
+
+#include "ui_mainwindow.h"
+
+class MainWindow : public QMainWindow, public Ui::MainWindow
 {
-    QApplication a(argc, argv);
+    Q_OBJECT
 
-    MainWindow mainWindow;
-    mainWindow.show();
+public:
 
-    return a.exec();
-}
+    MainWindow();
+
+private Q_SLOTS:
+
+    void onBrowseClicked();
+    void onStartServerClicked();
+    void onStopServerClicked();
+
+private:
+
+    void toggleWidgets(bool running);
+
+    QFilesystemHandler mHandler;
+    QHttpServer mServer;
+};
+
+#endif // FILESERVER_MAINWINDOW_H

@@ -20,16 +20,52 @@
  * IN THE SOFTWARE.
  */
 
-#include <QApplication>
+#include <QDir>
+#include <QFileDialog>
+#include <QMessageBox>
 
 #include "mainwindow.h"
 
-int main(int argc, char * argv[])
+MainWindow::MainWindow()
+    : mServer(&mHandler)
 {
-    QApplication a(argc, argv);
+    setupUi(this);
 
-    MainWindow mainWindow;
-    mainWindow.show();
+    // Obtain the user's current home directory
+    documentRoot->setText(QDir::homePath());
+}
 
-    return a.exec();
+void MainWindow::onBrowseClicked()
+{
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Browse"), documentRoot->text());
+    if(!dir.isNull()) {
+        documentRoot->setText(dir);
+    }
+}
+
+void MainWindow::onStartServerClicked()
+{
+    mHandler.setDocumentRoot(documentRoot->text());
+
+    if(mServer.listen(QHostAddress::Any, port->value())) {
+        toggleWidgets(true);
+    } else {
+        QMessageBox::critical(this, tr("Error"), tr("Unable to listen on port."));
+    }
+}
+
+void MainWindow::onStopServerClicked()
+{
+    mServer.close();
+    toggleWidgets(false);
+}
+
+void MainWindow::toggleWidgets(bool running)
+{
+    documentRoot->setEnabled(!running);
+    browse->setEnabled(!running);
+    portLabel->setEnabled(!running);
+    port->setEnabled(!running);
+    startServer->setEnabled(!running);
+    stopServer->setEnabled(running);
 }

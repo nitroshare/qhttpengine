@@ -1,8 +1,17 @@
-set(SRC
-    main.cpp
+set(INCLUDE
+    mainwindow.h
 )
 
-add_executable(fileserver WIN32 ${SRC})
+set(SRC
+    main.cpp
+    mainwindow.cpp
+)
+
+qt5_wrap_ui(UI
+    mainwindow.ui
+)
+
+add_executable(fileserver WIN32 ${SRC} ${UI})
 qt5_use_modules(fileserver Widgets)
 target_link_libraries(fileserver qhttpengine)
 
@@ -14,6 +23,6 @@ install(TARGETS fileserver
     RUNTIME DESTINATION ${EXAMPLES_INSTALL_DIR}/fileserver
 )
 
-install(FILES ${SRC}
+install(FILES ${INCLUDE} ${SRC} ${UI}
     DESTINATION ${EXAMPLES_INSTALL_DIR}/fileserver
 )
