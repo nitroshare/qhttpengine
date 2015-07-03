@@ -40,15 +40,16 @@ void QSubHandler::addHandler(const QRegExp &pattern, QHttpHandler *handler)
     d->patterns.append(URL(pattern, handler));
 }
 
-bool QSubHandler::process(QHttpSocket *socket, const QString &path)
+void QSubHandler::process(QHttpSocket *socket, const QString &path)
 {
     // Check each of the patterns for a match
     foreach(URL url, d->patterns) {
         if(url.first.indexIn(path) != -1) {
-            return url.second->process(socket, path.mid(url.first.matchedLength()));
+            url.second->process(socket, path.mid(url.first.matchedLength()));
+            return;
         }
     }
 
-    // If no match was found, return false
-    return false;
+    // If no match was found, indicate an error
+    socket->writeError(QHttpSocket::NotFound);
 }

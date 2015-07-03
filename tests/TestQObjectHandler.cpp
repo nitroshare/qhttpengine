@@ -55,26 +55,26 @@ private Q_SLOTS:
 
 void TestQObjectHandler::testRequests_data()
 {
-    QTest::addColumn<bool>("success");
     QTest::addColumn<QByteArray>("path");
+    QTest::addColumn<int>("statusCode");
 
     QTest::newRow("nonexistent slot")
-            << false
-            << QByteArray("nonexistent");
+            << QByteArray("nonexistent")
+            << 404;
 
     QTest::newRow("invalid signature")
-            << false
-            << QByteArray("invalidSignature");
+            << QByteArray("invalidSignature")
+            << 500;
 
     QTest::newRow("valid slot")
-            << true
-            << QByteArray("validSlot");
+            << QByteArray("validSlot")
+            << 200;
 }
 
 void TestQObjectHandler::testRequests()
 {
-    QFETCH(bool, success);
     QFETCH(QByteArray, path);
+    QFETCH(int, statusCode);
 
     DummyHandler handler;
 
@@ -84,23 +84,25 @@ void TestQObjectHandler::testRequests()
     QSimpleHttpClient client(pair.client());
     QHttpSocket *socket = new QHttpSocket(pair.server(), &pair);
 
-    QCOMPARE(handler.process(socket, path), success);
+    handler.process(socket, path);
 
-    if(success) {
+    QVariantMap map;
+    map.insert("param1", 1);
+    map.insert("param2", 2);
 
-        QVariantMap map;
-        map.insert("param1", 1);
-        map.insert("param2", 2);
+    QByteArray data = QJsonDocument(QJsonObject::fromVariantMap(map)).toJson();
 
-        QByteArray data = QJsonDocument(QJsonObject::fromVariantMap(map)).toJson();
+    QHttpHeaderMap headers;
+    headers.insert("Content-Length", QByteArray::number(data.length()));
 
-        QHttpHeaderMap headers;
-        headers.insert("Content-Length", QByteArray::number(data.length()));
+    client.sendHeaders("POST", "/", headers);
+    client.sendData(data);
 
-        client.sendHeaders("POST", "/", headers);
-        client.sendData(data);
+    QTRY_COMPARE(client.statusCode(), statusCode);
 
-        QTRY_VERIFY(client.headers().contains("Content-Length"));
+    if(statusCode == 200) {
+
+        QVERIFY(client.headers().contains("Content-Length"));
         QTRY_COMPARE(client.data().length(), client.headers().value("Content-Length").toInt());
         QCOMPARE(QJsonDocument::fromJson(client.data()).object().toVariantMap(), map);
     }

@@ -63,26 +63,26 @@ void TestQFilesystemHandler::initTestCase()
 
 void TestQFilesystemHandler::testRequests_data()
 {
-    QTest::addColumn<bool>("success");
     QTest::addColumn<QString>("path");
+    QTest::addColumn<int>("statusCode");
 
     QTest::newRow("nonexistent resource")
-            << false
-            << "nonexistent";
+            << "nonexistent"
+            << 404;
 
     QTest::newRow("outside document root")
-            << false
-            << "../outside";
+            << "../outside"
+            << 404;
 
     QTest::newRow("inside document root")
-            << true
-            << "inside";
+            << "inside"
+            << 200;
 }
 
 void TestQFilesystemHandler::testRequests()
 {
-    QFETCH(bool, success);
     QFETCH(QString, path);
+    QFETCH(int, statusCode);
 
     QFilesystemHandler handler(QDir(dir.path()).absoluteFilePath("root"));
 
@@ -92,15 +92,9 @@ void TestQFilesystemHandler::testRequests()
     QSimpleHttpClient client(pair.client());
     QHttpSocket *socket = new QHttpSocket(pair.server(), &pair);
 
-    QCOMPARE(handler.process(socket, path), success);
+    handler.process(socket, path);
 
-    if(success) {
-        QSignalSpy destroyedSpy(socket, SIGNAL(destroyed()));
-
-        QTRY_COMPARE(client.statusCode(), 200);
-        QTRY_COMPARE(client.data(), Data);
-        QTRY_COMPARE(destroyedSpy.count(), 1);
-    }
+    QTRY_COMPARE(client.statusCode(), statusCode);
 }
 
 bool TestQFilesystemHandler::createFile(const QString &path)

@@ -70,40 +70,42 @@ QFilesystemHandler::QFilesystemHandler(const QString &documentRoot, QObject *par
     setDocumentRoot(documentRoot);
 }
 
-bool QFilesystemHandler::process(QHttpSocket *socket, const QString &path)
+void QFilesystemHandler::process(QHttpSocket *socket, const QString &path)
 {
-    // Nothing can be done until a document root is set
+    // If a document root is not set, an error has occurred
     if(d->documentRoot.path().isNull()) {
-        return false;
+        socket->writeError(QHttpSocket::InternalServerError);
+        return;
     }
 
     // Attempt to retrieve the absolute path
     QString absolutePath;
     if(!d->absolutePath(path, absolutePath)) {
-        return false;
+        socket->writeError(QHttpSocket::NotFound);
+        return;
     }
 
     // Attempt to open the file for reading
     QFile *file = new QFile(absolutePath);
     if(!file->open(QIODevice::ReadOnly)) {
         delete file;
-        return false;
+
+        socket->writeError(QHttpSocket::Forbidden);
+        return;
     }
 
     // Create a QIODeviceCopier to copy the file contents to the socket
     QIODeviceCopier *copier = new QIODeviceCopier(file, socket);
     connect(copier, SIGNAL(finished()), copier, SLOT(deleteLater()));
     connect(copier, SIGNAL(finished()), file, SLOT(deleteLater()));
-    connect(copier, SIGNAL(finished()), socket, SLOT(deleteLater()));
 
     // Set the mimetype and contentlength
     socket->setHeader("Content-Type", d->mimeType(absolutePath));
     socket->setHeader("Content-Length", QByteArray::number(file->size()));
     socket->writeHeaders();
 
-    // Start the copy and indicate success
+    // Start the copy
     copier->start();
-    return true;
 }
 
 void QFilesystemHandler::setDocumentRoot(const QString &documentRoot)

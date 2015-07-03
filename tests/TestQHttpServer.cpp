@@ -36,10 +36,9 @@ public:
 
     DummyHandler() : mSocket(0) {}
 
-    virtual bool process(QHttpSocket *socket, const QString &path) {
+    virtual void process(QHttpSocket *socket, const QString &path) {
         mSocket = socket;
         mPath = path;
-        return true;
     }
 
     QHttpSocket *mSocket;

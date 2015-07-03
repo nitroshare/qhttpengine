@@ -29,8 +29,8 @@
 #include "qhttpsocket.h"
 
 /**
- * @class QHttpHandler qhttphandler.h QHttpHandler
  * @brief Base class for URL handlers
+ * @headerfile qhttphandler.h QHttpHandler
  *
  * When a request is received by a QHttpServer, it is dispatched to a
  * QHttpHandler instance which will then determine what happens to the
@@ -62,13 +62,12 @@ public:
     /**
      * @brief Attempt to process a request
      *
-     * This method should attempt to process the request if the provided path
-     * matches a resource. If the request could not be processed, this method
-     * should return false and a 404 page will be served.
+     * This method should process the request either by fulfilling it or
+     * writing an error to the socket using QHttpSocket::writeError().
      *
      * Note that the leading "/" will be stripped from the path.
      */
-    virtual bool process(QHttpSocket *socket, const QString &path) = 0;
+    virtual void process(QHttpSocket *socket, const QString &path) = 0;
 };
 
 #endif // QHTTPENGINE_QHTTPHANDLER_H

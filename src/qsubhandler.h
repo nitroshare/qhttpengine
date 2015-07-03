@@ -55,7 +55,7 @@ public:
     /**
      * @brief Reimplementation of QHttpHandler::process()
      */
-    virtual bool process(QHttpSocket *socket, const QString &path);
+    virtual void process(QHttpSocket *socket, const QString &path);
 
     /**
      * @brief Add a handler for a specific pattern

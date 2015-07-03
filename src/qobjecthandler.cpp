@@ -63,10 +63,7 @@ void QObjectHandlerPrivate::onReadChannelFinished()
     socket->setHeader("Content-Length", QByteArray::number(data.length()));
     socket->setHeader("Content-Type", "application/json");
     socket->write(data);
-
-    // Close the socket and delete it
     socket->close();
-    socket->deleteLater();
 }
 
 QObjectHandler::QObjectHandler(QObject *parent)
@@ -75,7 +72,7 @@ QObjectHandler::QObjectHandler(QObject *parent)
 {
 }
 
-bool QObjectHandler::process(QHttpSocket *socket, const QString &path)
+void QObjectHandler::process(QHttpSocket *socket, const QString &path)
 {
     // Determine the index of the slot with the specified name - note that we
     // don't need to worry about retrieving the index for deleteLater() since
@@ -84,18 +81,18 @@ bool QObjectHandler::process(QHttpSocket *socket, const QString &path)
 
     // Ensure that the index is valid
     if(index == -1) {
-        return false;
+        socket->writeError(QHttpSocket::NotFound);
+        return;
     }
 
     // Ensure that the return type is correct
     QMetaMethod method = metaObject()->method(index);
     if(method.returnType() != QMetaType::QVariantMap) {
-        return false;
+        socket->writeError(QHttpSocket::InternalServerError);
+        return;
     }
 
     // Add the socket to the map
     d->map.insert(socket, index);
     connect(socket, SIGNAL(readChannelFinished()), d, SLOT(onReadChannelFinished()));
-
-    return true;
 }

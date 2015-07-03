@@ -25,18 +25,22 @@
 
 #include <QSubHandler>
 
+#include "common/qsimplehttpclient.h"
+#include "common/qsocketpair.h"
+
 class DummyHandler : public QHttpHandler
 {
     Q_OBJECT
 
 public:
 
-    virtual bool process(QHttpSocket *, const QString &path) {
-        pathRemainder = path;
-        return true;
+    virtual void process(QHttpSocket *socket, const QString &path) {
+        mPathRemainder = path;
+        socket->writeHeaders();
+        socket->close();
     }
 
-    QString pathRemainder;
+    QString mPathRemainder;
 };
 
 class TestQSubHandler : public QObject
@@ -51,44 +55,54 @@ private Q_SLOTS:
 
 void TestQSubHandler::testPatterns_data()
 {
-    QTest::addColumn<bool>("success");
     QTest::addColumn<QRegExp>("pattern");
     QTest::addColumn<QString>("path");
     QTest::addColumn<QString>("pathRemainder");
+    QTest::addColumn<int>("statusCode");
 
     QTest::newRow("match")
-            << true
             << QRegExp("\\w+")
             << QString("test")
-            << QString("");
+            << QString("")
+            << 200;
 
     QTest::newRow("no match")
-            << false
             << QRegExp("\\d+")
             << QString("test")
-            << QString("");
+            << QString("")
+            << 404;
 
     QTest::newRow("path")
-            << true
             << QRegExp("one/")
             << QString("one/two")
-            << QString("two");
+            << QString("two")
+            << 200;
 }
 
 void TestQSubHandler::testPatterns()
 {
-    QFETCH(bool, success);
     QFETCH(QRegExp, pattern);
     QFETCH(QString, path);
     QFETCH(QString, pathRemainder);
+    QFETCH(int, statusCode);
 
     DummyHandler handler;
 
     QSubHandler subHandler;
     subHandler.addHandler(pattern, &handler);
 
-    QCOMPARE(subHandler.process(0, path), success);
-    QCOMPARE(handler.pathRemainder, pathRemainder);
+    QSocketPair pair;
+    QTRY_VERIFY(pair.isConnected());
+
+    QSimpleHttpClient client(pair.client());
+    QHttpSocket *socket = new QHttpSocket(pair.server(), &pair);
+
+    subHandler.process(socket, path);
+
+    client.sendHeaders("GET", "/", QHttpHeaderMap());
+
+    QTRY_COMPARE(client.statusCode(), statusCode);
+    QCOMPARE(handler.mPathRemainder, pathRemainder);
 }
 
 QTEST_MAIN(TestQSubHandler)
