@@ -37,7 +37,6 @@ public:
 
     QHttpServerPrivate(QHttpServer *httpServer, QHttpHandler *httpHandler);
 
-    QTcpServer server;
     QHttpHandler *handler;
 
 private Q_SLOTS:

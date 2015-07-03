@@ -29,13 +29,13 @@ QHttpServerPrivate::QHttpServerPrivate(QHttpServer *httpServer, QHttpHandler *ht
       q(httpServer),
       handler(httpHandler)
 {
-    connect(&server, SIGNAL(newConnection()), this, SLOT(onIncomingConnection()));
+    connect(q, SIGNAL(newConnection()), this, SLOT(onIncomingConnection()));
 }
 
 void QHttpServerPrivate::onIncomingConnection()
 {
     // Obtain the next pending connection and create a QHttpSocket from it
-    QHttpSocket *socket = new QHttpSocket(server.nextPendingConnection(), this);
+    QHttpSocket *socket = new QHttpSocket(q->nextPendingConnection(), this);
 
     // Wait until the socket finishes reading the HTTP headers to continue
     connect(socket, SIGNAL(headersParsed()), this, SLOT(onHeadersParsed()));
@@ -51,22 +51,7 @@ void QHttpServerPrivate::onHeadersParsed()
 }
 
 QHttpServer::QHttpServer(QHttpHandler *handler, QObject *parent)
-    : QObject(parent),
+    : QTcpServer(parent),
       d(new QHttpServerPrivate(this, handler))
 {
-}
-
-bool QHttpServer::listen(const QHostAddress &address, quint16 port)
-{
-    return d->server.listen(address, port);
-}
-
-QHostAddress QHttpServer::address() const
-{
-    return d->server.serverAddress();
-}
-
-quint16 QHttpServer::port() const
-{
-    return d->server.serverPort();
 }

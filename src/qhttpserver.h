@@ -25,6 +25,7 @@
 
 #include <QHostAddress>
 #include <QObject>
+#include <QTcpServer>
 
 #include "config.h"
 #include "qhttphandler.h"
@@ -44,13 +45,16 @@ class QHTTPENGINE_EXPORT QHttpServerPrivate;
  * @code
  * QFileSystemHandler fshandler("/var/www");
  * QHttpServer server(&fshandler);
+ * server.listen();
+ *
+ * // Note: use server.serverAddress() and server.serverPort() to connect
  * @endcode
  *
  * The QSubHandler class allows multiple handlers to be used with a single
  * server while using the request path to route requests to the appropriate
  * handler.
  */
-class QHTTPENGINE_EXPORT QHttpServer : public QObject
+class QHTTPENGINE_EXPORT QHttpServer : public QTcpServer
 {
     Q_OBJECT
 
@@ -60,21 +64,6 @@ public:
      * @brief Create an HTTP server with the specified handler
      */
     QHttpServer(QHttpHandler *handler, QObject *parent = 0);
-
-    /**
-     * @brief Listen for incoming HTTP connections
-     */
-    bool listen(const QHostAddress &address = QHostAddress::Any, quint16 port = 0);
-
-    /**
-     * @brief Retrieve the address that the server is listening on
-     */
-    QHostAddress address() const;
-
-    /**
-     * @brief Retrieve the port that the server is listening on
-     */
-    quint16 port() const;
 
 private:
 
