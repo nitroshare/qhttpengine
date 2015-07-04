@@ -47,7 +47,6 @@ QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket, QTcpSocket *tcpS
 {
     connect(socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
     connect(socket, SIGNAL(bytesWritten(qint64)), this, SLOT(onBytesWritten(qint64)));
-    connect(socket, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
 
     // Process anything already received by the socket
     onReadyRead();
@@ -99,17 +98,6 @@ void QHttpSocketPrivate::onBytesWritten(qint64 bytes)
     if(writeState == WriteData) {
         Q_EMIT q->bytesWritten(bytes);
     }
-}
-
-void QHttpSocketPrivate::onDisconnected()
-{
-    // The socket should not be disconnected until both the reading and
-    // writing have completed - if so, an error has occurred
-    if(readState != ReadFinished || writeState != WriteFinished) {
-        Q_EMIT q->error();
-    }
-
-    q->close();
 }
 
 bool QHttpSocketPrivate::readHeaders()
@@ -202,9 +190,18 @@ QByteArray QHttpSocket::path() const
     return d->requestPath;
 }
 
-QHttpHeaderMap &QHttpSocket::headers() const
+QHttpHeaderMap QHttpSocket::headers() const
 {
     return d->requestHeaders;
+}
+
+qint64 QHttpSocket::contentLength() const
+{
+    if(d->readState == QHttpSocketPrivate::ReadData) {
+        return d->requestDataTotal;
+    } else {
+        return -1;
+    }
 }
 
 void QHttpSocket::setStatusCode(int statusCode, const QByteArray &statusReason)

@@ -23,7 +23,6 @@
 #ifndef QHTTPENGINE_QHTTPSOCKET_H
 #define QHTTPENGINE_QHTTPSOCKET_H
 
-#include <QList>
 #include <QTcpSocket>
 
 #include "qhttpengine.h"
@@ -78,9 +77,6 @@ class QHTTPENGINE_EXPORT QHttpSocketPrivate;
  * httpSock->setHeader("Content-Length", 13);
  * httpSock->write("Hello, world!");
  * @endcode
- *
- * If an error is encountered during parsing or a socket error occurs, the
- * error() signal is emitted.
  */
 class QHTTPENGINE_EXPORT QHttpSocket : public QIODevice
 {
@@ -110,8 +106,7 @@ public:
      * @brief Create a new QHttpSocket from a QTcpSocket
      *
      * This instance will assume ownership of the socket. That is, it will
-     * make itself the parent of the socket. It is assumed that the socket
-     * is already opened for reading and writing.
+     * make itself the parent of the socket.
      */
     QHttpSocket(QTcpSocket *socket, QObject *parent = 0);
 
@@ -134,7 +129,7 @@ public:
      * @brief Close the device and underlying socket
      *
      * Invoking this method signifies that no more data will be written to the
-     * device.
+     * device. It will also close the underlying QTcpSocket.
      */
     virtual void close();
 
@@ -161,17 +156,24 @@ public:
      * parsed. The original case of the headers is preserved but comparisons
      * are performed in a case-insensitive manner.
      */
-    QHttpHeaderMap &headers() const;
+    QHttpHeaderMap headers() const;
+
+    /**
+     * @brief Retrieve the length of the content
+     *
+     * This value is provided by the `Content-Length` HTTP header (if present)
+     * and returns -1 if the value is not available.
+     */
+    qint64 contentLength() const;
 
     /**
      * @brief Set the response code
      *
      * This method may only be called before the response headers are written.
-     * The statusReason parameter may be omitted if one of the predefined
-     * status code constants is used.
      *
-     * If no response status code is explicitly set, it will assume a default
-     * value of "200 OK".
+     * The statusReason parameter may be omitted if one of the predefined
+     * status code constants is used. If no response status code is explicitly
+     * set, it will assume a default value of "200 OK".
      */
     void setStatusCode(int statusCode, const QByteArray &statusReason = QByteArray());
 
@@ -179,6 +181,8 @@ public:
      * @brief Set a response header to a specific value
      *
      * This method may only be called before the response headers are written.
+     * If the specified header already has a value set, it will be
+     * overwritten.
      */
     void setHeader(const QByteArray &name, const QByteArray &value);
 
@@ -186,6 +190,7 @@ public:
      * @brief Set the response headers
      *
      * This method may only be called before the response headers are written.
+     * All existing headers will be overwritten.
      */
     void setHeaders(const QHttpHeaderMap &headers);
 
@@ -203,20 +208,11 @@ public:
     void writeRedirect(const QByteArray &path, bool permanent = false);
 
     /**
-     * @brief Write an HTTP error code to the socket
+     * @brief Write an HTTP error to the socket
      */
     void writeError(int statusCode, const QByteArray &statusReason = QByteArray());
 
 Q_SIGNALS:
-
-    /**
-     * @brief Indicate that an error has occurred
-     *
-     * This signal is emitted when an error occurs during parsing or when the
-     * underlying socket encounters an error. The connection will immediately
-     * be aborted.
-     */
-    void error();
 
     /**
      * @brief Indicate that request headers have been parsed

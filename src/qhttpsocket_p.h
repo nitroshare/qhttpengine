@@ -70,9 +70,9 @@ private Q_SLOTS:
 
     void onReadyRead();
     void onBytesWritten(qint64 bytes);
-    void onDisconnected();
 
 private:
+
     bool readHeaders();
     void readData();
 
