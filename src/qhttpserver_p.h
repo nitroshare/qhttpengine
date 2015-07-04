@@ -35,7 +35,7 @@ class QHttpServerPrivate : public QObject
 
 public:
 
-    QHttpServerPrivate(QHttpServer *httpServer, QHttpHandler *httpHandler);
+    QHttpServerPrivate(QHttpServer *httpServer);
 
     QHttpHandler *handler;
 

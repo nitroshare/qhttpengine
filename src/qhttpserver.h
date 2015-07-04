@@ -36,23 +36,26 @@ class QHTTPENGINE_EXPORT QHttpServerPrivate;
  * @brief HTTP server
  * @headerfile qhttpserver.h QHttpServer
  *
- * This class provides an HTTP server capable of receiving incoming requests
- * and routing them to the appropriate handler based on their request paths.
- * The handler is provided as an argument to the constructor. The following
- * example creates a server that will respond to requests for files in the
- * /var/www directory:
+ * This class provides a TCP server that listens for HTTP requests on the
+ * specified address and port. When a new request is received, a QHttpSocket
+ * is created for the QTcpSocket which abstracts a TCP server socket. Once the
+ * request headers are received, the registered handler is invoked and the
+ * request processed. The QHttpSocket assumes ownership of the QTcpSocket.
+ *
+ * Because QHttpServer derives from QTcpServer, instructing the server to
+ * listen on an available port is as simple as invoking listen() with no
+ * parameters:
  *
  * @code
- * QFileSystemHandler fshandler("/var/www");
- * QHttpServer server(&fshandler);
- * server.listen();
- *
- * // Note: use server.serverAddress() and server.serverPort() to connect
+ * QHttpServer server;
+ * if(!server.listen()) {
+ *     // error handling
+ * }
  * @endcode
  *
- * The QSubHandler class allows multiple handlers to be used with a single
- * server while using the request path to route requests to the appropriate
- * handler.
+ * Before passing the socket to the handler, the QTcpSocket's disconnected()
+ * signal is connected to the QHttpSocket's deleteLater() slot to ensure that
+ * the socket is deleted when the client disconnects.
  */
 class QHTTPENGINE_EXPORT QHttpServer : public QTcpServer
 {
@@ -61,14 +64,23 @@ class QHTTPENGINE_EXPORT QHttpServer : public QTcpServer
 public:
 
     /**
+     * @brief Create an HTTP server
+     */
+    explicit QHttpServer(QObject *parent = 0);
+
+    /**
      * @brief Create an HTTP server with the specified handler
      */
     QHttpServer(QHttpHandler *handler, QObject *parent = 0);
 
+    /**
+     * @brief Set the handler for all new requests
+     */
+    void setHandler(QHttpHandler *handler);
+
 private:
 
     QHttpServerPrivate *const d;
-    friend class QHttpServerPrivate;
 };
 
 #endif // QHTTPENGINE_QHTTPSERVER_H

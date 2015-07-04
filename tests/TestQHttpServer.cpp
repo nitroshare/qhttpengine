@@ -20,6 +20,7 @@
  * IN THE SOFTWARE.
  */
 
+#include <QSignalSpy>
 #include <QTcpSocket>
 #include <QTest>
 
@@ -28,17 +29,18 @@
 
 #include "common/qsimplehttpclient.h"
 
-class DummyHandler : public QHttpHandler
+class TestHandler : public QHttpHandler
 {
     Q_OBJECT
 
 public:
 
-    DummyHandler() : mSocket(0) {}
+    TestHandler() : mSocket(0) {}
 
     virtual void process(QHttpSocket *socket, const QString &path) {
         mSocket = socket;
         mPath = path;
+        socket->writeHeaders();
     }
 
     QHttpSocket *mSocket;
@@ -56,7 +58,7 @@ private Q_SLOTS:
 
 void TestQHttpServer::testServer()
 {
-    DummyHandler handler;
+    TestHandler handler;
     QHttpServer server(&handler);
 
     QVERIFY(server.listen(QHostAddress::LocalHost));
@@ -70,6 +72,10 @@ void TestQHttpServer::testServer()
 
     QTRY_VERIFY(handler.mSocket != 0);
     QCOMPARE(handler.mPath, QString("test"));
+
+    QSignalSpy destroyedSpy(handler.mSocket, SIGNAL(destroyed()));
+    socket.disconnectFromHost();
+    QTRY_COMPARE(destroyedSpy.count(), 1);
 }
 
 QTEST_MAIN(TestQHttpServer)

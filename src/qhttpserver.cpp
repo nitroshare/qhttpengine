@@ -20,14 +20,16 @@
  * IN THE SOFTWARE.
  */
 
+#include <QTcpSocket>
+
 #include "qhttpserver.h"
 #include "qhttpserver_p.h"
 #include "qhttpsocket.h"
 
-QHttpServerPrivate::QHttpServerPrivate(QHttpServer *httpServer, QHttpHandler *httpHandler)
+QHttpServerPrivate::QHttpServerPrivate(QHttpServer *httpServer)
     : QObject(httpServer),
       q(httpServer),
-      handler(httpHandler)
+      handler(0)
 {
     connect(q, SIGNAL(newConnection()), this, SLOT(onIncomingConnection()));
 }
@@ -35,10 +37,14 @@ QHttpServerPrivate::QHttpServerPrivate(QHttpServer *httpServer, QHttpHandler *ht
 void QHttpServerPrivate::onIncomingConnection()
 {
     // Obtain the next pending connection and create a QHttpSocket from it
-    QHttpSocket *socket = new QHttpSocket(q->nextPendingConnection(), this);
+    QTcpSocket *tcpSocket = q->nextPendingConnection();
+    QHttpSocket *httpSocket = new QHttpSocket(tcpSocket, this);
 
-    // Wait until the socket finishes reading the HTTP headers to continue
-    connect(socket, SIGNAL(headersParsed()), this, SLOT(onHeadersParsed()));
+    // Wait until the socket finishes reading the HTTP headers before routing
+    connect(httpSocket, SIGNAL(headersParsed()), this, SLOT(onHeadersParsed()));
+
+    // Destroy the socket once the client is disconnected
+    connect(tcpSocket, SIGNAL(disconnected()), httpSocket, SLOT(deleteLater()));
 }
 
 void QHttpServerPrivate::onHeadersParsed()
@@ -46,12 +52,33 @@ void QHttpServerPrivate::onHeadersParsed()
     // Obtain the socket that corresponds with the sender of the signal
     QHttpSocket *socket = qobject_cast<QHttpSocket*>(sender());
 
-    // Obtain the path and pass it along to the handler
-    handler->process(socket, QString(socket->path().mid(1)));
+    // Ensure that a handler has been set
+    if(handler) {
+
+        // Obtain the path, strip the initial "/", and pass it along to the handler
+        handler->process(socket, QString(socket->path().mid(1)));
+
+    } else {
+
+        // Return an HTTP 500 error to the client
+        socket->writeError(QHttpSocket::InternalServerError);
+    }
+}
+
+QHttpServer::QHttpServer(QObject *parent)
+    : QTcpServer(parent),
+      d(new QHttpServerPrivate(this))
+{
 }
 
 QHttpServer::QHttpServer(QHttpHandler *handler, QObject *parent)
     : QTcpServer(parent),
-      d(new QHttpServerPrivate(this, handler))
+      d(new QHttpServerPrivate(this))
 {
+    setHandler(handler);
+}
+
+void QHttpServer::setHandler(QHttpHandler *handler)
+{
+    d->handler = handler;
 }
