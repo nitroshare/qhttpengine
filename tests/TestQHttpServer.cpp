@@ -40,7 +40,6 @@ public:
     virtual void process(QHttpSocket *socket, const QString &path) {
         mSocket = socket;
         mPath = path;
-        socket->writeHeaders();
     }
 
     QHttpSocket *mSocket;
@@ -74,7 +73,7 @@ void TestQHttpServer::testServer()
     QCOMPARE(handler.mPath, QString("test"));
 
     QSignalSpy destroyedSpy(handler.mSocket, SIGNAL(destroyed()));
-    socket.disconnectFromHost();
+    handler.mSocket->close();
     QTRY_COMPARE(destroyedSpy.count(), 1);
 }
 
