@@ -115,7 +115,6 @@ void TestQHttpSocket::testRedirect()
     server.writeRedirect(Path, true);
 
     QTRY_COMPARE(client.statusCode(), static_cast<int>(QHttpSocket::MovedPermanently));
-    QVERIFY(client.headers().contains("Location"));
     QCOMPARE(client.headers().value("Location"), Path);
 }
 
@@ -152,6 +151,7 @@ void TestQHttpSocket::testSignals()
     }
     QCOMPARE(bytesWritten, Data.length());
 
+    QTRY_COMPARE(aboutToCloseSpy.count(), 0);
     server.close();
     QTRY_COMPARE(aboutToCloseSpy.count(), 1);
 }
