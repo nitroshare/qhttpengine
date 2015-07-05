@@ -41,6 +41,7 @@ QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket, QTcpSocket *tcpS
       socket(tcpSocket),
       readState(ReadHeaders),
       requestDataRead(0),
+      requestDataTotal(-1),
       writeState(WriteNone),
       responseStatusCode(200),
       responseStatusReason(statusReason(200))
@@ -197,11 +198,7 @@ QHttpHeaderMap QHttpSocket::headers() const
 
 qint64 QHttpSocket::contentLength() const
 {
-    if(d->readState == QHttpSocketPrivate::ReadData) {
-        return d->requestDataTotal;
-    } else {
-        return -1;
-    }
+    return d->requestDataTotal;
 }
 
 void QHttpSocket::setStatusCode(int statusCode, const QByteArray &statusReason)

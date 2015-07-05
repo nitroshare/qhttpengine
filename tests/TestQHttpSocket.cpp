@@ -98,6 +98,7 @@ void TestQHttpSocket::testData()
     client.sendHeaders(Method, Path, headers);
     client.sendData(Data);
 
+    QTRY_COMPARE(server.contentLength(), Data.length());
     QTRY_COMPARE(server.bytesAvailable(), Data.length());
     QCOMPARE(server.readAll(), Data);
 
