@@ -81,7 +81,7 @@ void TestQIODeviceCopier::testQTcpSocket()
     copier.start();
 
     pair.client()->write(SampleData);
-    pair.client()->disconnectFromHost();
+    pair.client()->close();
 
     QTRY_COMPARE(finishedSpy.count(), 1);
     QCOMPARE(errorSpy.count(), 0);

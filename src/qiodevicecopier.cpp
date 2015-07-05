@@ -92,11 +92,6 @@ QIODeviceCopier::QIODeviceCopier(QIODevice *src, QIODevice *dest, QObject *paren
 {
 }
 
-qint64 QIODeviceCopier::bufferSize() const
-{
-    return d->bufferSize;
-}
-
 void QIODeviceCopier::setBufferSize(qint64 size)
 {
     d->bufferSize = size;

@@ -31,13 +31,13 @@ typedef QList<QByteArray> QByteArrayList;
 
 Q_DECLARE_METATYPE(QHttpHeaderMap)
 
-const QByteArray Line1 = "a: b";
 const QIByteArray Key1 = "a";
 const QByteArray Value1 = "b";
+const QByteArray Line1 = Key1 + ": " + Value1;
 
-const QByteArray Line2 = "c: d";
 const QIByteArray Key2 = "c";
 const QByteArray Value2 = "d";
+const QByteArray Line2 = Key2 + ": " + Value2;
 
 class TestQHttpParser : public QObject
 {

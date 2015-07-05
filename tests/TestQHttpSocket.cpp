@@ -20,7 +20,6 @@
  * IN THE SOFTWARE.
  */
 
-#include <QBuffer>
 #include <QObject>
 #include <QSignalSpy>
 #include <QTest>
@@ -112,10 +111,13 @@ void TestQHttpSocket::testRedirect()
 {
     CREATE_SOCKET_PAIR();
 
+    QSignalSpy disconnectedSpy(pair.client(), SIGNAL(disconnected()));
+
     server.writeRedirect(Path, true);
 
     QTRY_COMPARE(client.statusCode(), static_cast<int>(QHttpSocket::MovedPermanently));
     QCOMPARE(client.headers().value("Location"), Path);
+    QTRY_COMPARE(disconnectedSpy.count(), 1);
 }
 
 void TestQHttpSocket::testSignals()

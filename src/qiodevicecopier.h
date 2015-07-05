@@ -36,12 +36,33 @@ class QHTTPENGINE_EXPORT QIODeviceCopierPrivate;
  *
  * QIODeviceCopier provides a set of methods for reading data from a QIODevice
  * and writing it to another. The class operates asynchronously and therefore
- * can be used from the main thread.
+ * can be used from the main thread. The copier is initialized with pointers
+ * to two QIODevices:
+ *
+ * @code
+ * QFile srcFile("src.txt");
+ * QFile destFile("dest.txt");
+ *
+ * QIODeviceCopier copier(&srcFile, &destFile);
+ * copier.start()
+ * @endcode
+ *
+ * Notice in the example above that it is not necessary to open the devices
+ * prior to starting the copy operation. The copier will attempt to open both
+ * devices with the appropriate mode if they are not already open.
+ *
+ * If the source device is sequential, data will be read as it becomes
+ * available and immediately written to the destination device. If the source
+ * device is not sequential, data will be read and written in blocks. The size
+ * of the blocks can be modified with the setBufferSize() method.
+ *
+ * If an error occurs, the error() signal will be emitted. When the copy
+ * completes, either by reading all of the data from the source device or
+ * encountering an error, the finished() signal is emitted.
  */
 class QHTTPENGINE_EXPORT QIODeviceCopier : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(qint64 bufferSize READ bufferSize WRITE setBufferSize)
 
 public:
 
@@ -49,11 +70,6 @@ public:
      * @brief Create a new device copier from the specified source and destination devices
      */
     QIODeviceCopier(QIODevice *src, QIODevice *dest, QObject *parent = 0);
-
-    /**
-     * @brief Retrieve the current buffer size
-     */
-    qint64 bufferSize() const;
 
     /**
      * @brief Set the size of the buffer

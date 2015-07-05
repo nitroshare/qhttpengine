@@ -94,6 +94,8 @@ public:
         MovedPermanently = 301,
         /// Resource is available at an alternate URI
         Found = 302,
+        /// Bad client request
+        BadRequest = 400,
         /// Access to the resource is forbidden
         Forbidden = 403,
         /// Resource was not found

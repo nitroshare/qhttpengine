@@ -59,6 +59,7 @@ QByteArray QHttpSocketPrivate::statusReason(int statusCode) const
     case QHttpSocket::OK: return "OK";
     case QHttpSocket::MovedPermanently: return "MOVED PERMANENTLY";
     case QHttpSocket::Found: return "FOUND";
+    case QHttpSocket::BadRequest: return "BAD REQUEST";
     case QHttpSocket::Forbidden: return "FORBIDDEN";
     case QHttpSocket::NotFound: return "NOT FOUND";
     case QHttpSocket::InternalServerError: return "INTERNAL SERVER ERROR";
@@ -71,6 +72,7 @@ void QHttpSocketPrivate::onReadyRead()
     // Append all of the new data to the read buffer
     readBuffer.append(socket->readAll());
 
+    // If reading headers, return if they could not be read (yet)
     if(readState == ReadHeaders) {
         if(!readHeaders()) {
             return;
@@ -80,6 +82,8 @@ void QHttpSocketPrivate::onReadyRead()
     if(readState == ReadData) {
         readData();
     } else if(readState == ReadFinished) {
+
+        // Any data received here is unexpected and should be ignored
         readBuffer.clear();
     }
 }
@@ -113,9 +117,12 @@ bool QHttpSocketPrivate::readHeaders()
     // Attempt to parse the headers and if a problem is encountered, abort
     // the connection (so that no more data is read or written) and return
     if(!QHttpParser::parseRequestHeaders(readBuffer.left(index), requestMethod, requestPath, requestHeaders)) {
-        socket->abort();
+        q->writeError(QHttpSocket::BadRequest);
         return false;
     }
+
+    // Indicate that the headers have been parsed
+    Q_EMIT q->headersParsed();
 
     // Remove the headers from the buffer
     readBuffer.remove(0, index + 4);
@@ -130,9 +137,6 @@ bool QHttpSocketPrivate::readHeaders()
         readState = ReadFinished;
         Q_EMIT q->readChannelFinished();
     }
-
-    // Indicate that the headers have been parsed
-    Q_EMIT q->headersParsed();
 
     return true;
 }
