@@ -22,10 +22,20 @@
 
 #include <QFile>
 #include <QFileInfo>
+#include <QFileInfoList>
 
 #include "qfilesystemhandler.h"
 #include "qfilesystemhandler_p.h"
 #include "qiodevicecopier.h"
+
+// Header for directory listings
+const QString ListTemplateHeader =
+        "<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>%1</title>"
+        "</head><body><h1>%1</h1><p>Directory listing:</p><ul>";
+
+// Footer for directory listings
+const QString ListTemplateFooter =
+        "</ul><hr><em>QHttpEngine %1</em></body></html>";
 
 QFilesystemHandlerPrivate::QFilesystemHandlerPrivate(QFilesystemHandler *handler)
     : QObject(handler),
@@ -57,6 +67,54 @@ QByteArray QFilesystemHandlerPrivate::mimeType(const QString &path)
     else { return "application/octet-stream"; }
 }
 
+void QFilesystemHandlerPrivate::processFile(QHttpSocket *socket, const QString &absolutePath)
+{
+    // Attempt to open the file for reading
+    QFile *file = new QFile(absolutePath);
+    if(!file->open(QIODevice::ReadOnly)) {
+        delete file;
+
+        socket->writeError(QHttpSocket::Forbidden);
+        return;
+    }
+
+    // Create a QIODeviceCopier to copy the file contents to the socket
+    QIODeviceCopier *copier = new QIODeviceCopier(file, socket);
+    connect(copier, SIGNAL(finished()), copier, SLOT(deleteLater()));
+    connect(copier, SIGNAL(finished()), file, SLOT(deleteLater()));
+
+    // Set the mimetype and content length
+    socket->setHeader("Content-Type", mimeType(absolutePath));
+    socket->setHeader("Content-Length", QByteArray::number(file->size()));
+    socket->writeHeaders();
+
+    // Start the copy
+    copier->start();
+}
+
+void QFilesystemHandlerPrivate::processDirectory(QHttpSocket *socket, const QString &path, const QString &absolutePath)
+{
+    QString listing = ListTemplateHeader.arg(path);
+
+    // Add entries for each of the files
+    foreach(QFileInfo info, QDir(absolutePath).entryInfoList()) {
+        listing.append(QString("<li><a href=\"%1%2\">%1%2</a></li>")
+                .arg(info.fileName())
+                .arg(info.isDir() ? "/" : ""));
+    }
+
+    listing.append(ListTemplateFooter.arg(QHTTPENGINE_VERSION));
+
+    // Convert the string to UTF-8
+    QByteArray data = listing.toUtf8();
+
+    // Set the headers and write the content
+    socket->setHeader("Content-Type", "text/html");
+    socket->setHeader("Content-Length", QByteArray::number(data.length()));
+    socket->write(data);
+    socket->close();
+}
+
 QFilesystemHandler::QFilesystemHandler(QObject *parent)
     : QHttpHandler(parent),
       d(new QFilesystemHandlerPrivate(this))
@@ -85,27 +143,11 @@ void QFilesystemHandler::process(QHttpSocket *socket, const QString &path)
         return;
     }
 
-    // Attempt to open the file for reading
-    QFile *file = new QFile(absolutePath);
-    if(!file->open(QIODevice::ReadOnly)) {
-        delete file;
-
-        socket->writeError(QHttpSocket::Forbidden);
-        return;
+    if(QFileInfo(absolutePath).isDir()) {
+        d->processDirectory(socket, path, absolutePath);
+    } else {
+        d->processFile(socket, absolutePath);
     }
-
-    // Create a QIODeviceCopier to copy the file contents to the socket
-    QIODeviceCopier *copier = new QIODeviceCopier(file, socket);
-    connect(copier, SIGNAL(finished()), copier, SLOT(deleteLater()));
-    connect(copier, SIGNAL(finished()), file, SLOT(deleteLater()));
-
-    // Set the mimetype and contentlength
-    socket->setHeader("Content-Type", d->mimeType(absolutePath));
-    socket->setHeader("Content-Length", QByteArray::number(file->size()));
-    socket->writeHeaders();
-
-    // Start the copy
-    copier->start();
 }
 
 void QFilesystemHandler::setDocumentRoot(const QString &documentRoot)

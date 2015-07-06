@@ -27,6 +27,7 @@
 #include <QObject>
 
 #include "qfilesystemhandler.h"
+#include "qhttpsocket.h"
 
 class QFilesystemHandlerPrivate : public QObject
 {
@@ -38,6 +39,9 @@ public:
 
     bool absolutePath(const QString &path, QString &absolutePath);
     QByteArray mimeType(const QString &path);
+
+    void processFile(QHttpSocket *socket, const QString &absolutePath);
+    void processDirectory(QHttpSocket *socket, const QString &path, const QString &absolutePath);
 
     QDir documentRoot;
 
