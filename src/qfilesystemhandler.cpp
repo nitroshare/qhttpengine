@@ -23,6 +23,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QFileInfoList>
+#include <QUrl>
 
 #include "qfilesystemhandler.h"
 #include "qfilesystemhandler_p.h"
@@ -60,7 +61,8 @@ QByteArray QFilesystemHandlerPrivate::mimeType(const QString &path)
     QFileInfo info(path);
     QString extension = info.completeSuffix();
 
-    if(extension == "css") { return "text/css"; }
+    if(extension == "htm" || extension == "html") { return "text/html"; }
+    else if(extension == "css") { return "text/css"; }
     else if(extension == "js") { return "application/javascript"; }
     else if(extension == "jpg") { return "image/jpeg"; }
     else if(extension == "png") { return "image/png"; }
@@ -94,12 +96,12 @@ void QFilesystemHandlerPrivate::processFile(QHttpSocket *socket, const QString &
 
 void QFilesystemHandlerPrivate::processDirectory(QHttpSocket *socket, const QString &path, const QString &absolutePath)
 {
-    QString listing = ListTemplateHeader.arg(path);
+    QString listing = ListTemplateHeader.arg(path.toHtmlEscaped());
 
     // Add entries for each of the files
     foreach(QFileInfo info, QDir(absolutePath).entryInfoList()) {
         listing.append(QString("<li><a href=\"%1%2\">%1%2</a></li>")
-                .arg(info.fileName())
+                .arg(info.fileName().toHtmlEscaped())
                 .arg(info.isDir() ? "/" : ""));
     }
 
@@ -136,15 +138,18 @@ void QFilesystemHandler::process(QHttpSocket *socket, const QString &path)
         return;
     }
 
+    // URL-decode the path
+    QString decodedPath = QUrl::fromPercentEncoding(path.toUtf8());
+
     // Attempt to retrieve the absolute path
     QString absolutePath;
-    if(!d->absolutePath(path, absolutePath)) {
+    if(!d->absolutePath(decodedPath, absolutePath)) {
         socket->writeError(QHttpSocket::NotFound);
         return;
     }
 
     if(QFileInfo(absolutePath).isDir()) {
-        d->processDirectory(socket, path, absolutePath);
+        d->processDirectory(socket, decodedPath, absolutePath);
     } else {
         d->processFile(socket, absolutePath);
     }
