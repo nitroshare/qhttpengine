@@ -24,6 +24,7 @@
 #define QHTTPENGINE_QFILESYSTEMHANDLERPRIVATE_H
 
 #include <QDir>
+#include <QMimeDatabase>
 #include <QObject>
 
 #include "qfilesystemhandler.h"
@@ -44,6 +45,7 @@ public:
     void processDirectory(QHttpSocket *socket, const QString &path, const QString &absolutePath);
 
     QDir documentRoot;
+    QMimeDatabase database;
 
 private:
 

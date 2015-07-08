@@ -53,20 +53,10 @@ bool QFilesystemHandlerPrivate::absolutePath(const QString &path, QString &absol
     return absolutePath.startsWith(documentRoot.canonicalPath());
 }
 
-QByteArray QFilesystemHandlerPrivate::mimeType(const QString &path)
+QByteArray QFilesystemHandlerPrivate::mimeType(const QString &absolutePath)
 {
-    // TODO: use libmagic or the Windows registry when possible
-    // TODO: determine what the equivalent is on OS X (libmagic?)
-
-    QFileInfo info(path);
-    QString extension = info.completeSuffix();
-
-    if(extension == "htm" || extension == "html") { return "text/html"; }
-    else if(extension == "css") { return "text/css"; }
-    else if(extension == "js") { return "application/javascript"; }
-    else if(extension == "jpg") { return "image/jpeg"; }
-    else if(extension == "png") { return "image/png"; }
-    else { return "application/octet-stream"; }
+    // Query the MIME database based on the filename and contents
+    return database.mimeTypeForFile(absolutePath).name().toUtf8();
 }
 
 void QFilesystemHandlerPrivate::processFile(QHttpSocket *socket, const QString &absolutePath)
