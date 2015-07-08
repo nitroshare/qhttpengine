@@ -26,6 +26,7 @@
 #include <QTest>
 #include <QVariantMap>
 
+#include <QHttpSocket>
 #include <QObjectHandler>
 
 #include "common/qsimplehttpclient.h"
@@ -55,24 +56,34 @@ private Q_SLOTS:
 
 void TestQObjectHandler::testRequests_data()
 {
+    QTest::addColumn<QByteArray>("method");
     QTest::addColumn<QByteArray>("path");
     QTest::addColumn<int>("statusCode");
 
     QTest::newRow("nonexistent slot")
+            << QByteArray("POST")
             << QByteArray("nonexistent")
-            << 404;
+            << static_cast<int>(QHttpSocket::NotFound);
 
     QTest::newRow("invalid signature")
+            << QByteArray("POST")
             << QByteArray("invalidSignature")
-            << 500;
+            << static_cast<int>(QHttpSocket::InternalServerError);
+
+    QTest::newRow("bad method")
+            << QByteArray("GET")
+            << QByteArray("validSlot")
+            << static_cast<int>(QHttpSocket::MethodNotAllowed);
 
     QTest::newRow("valid slot")
+            << QByteArray("POST")
             << QByteArray("validSlot")
-            << 200;
+            << static_cast<int>(QHttpSocket::OK);
 }
 
 void TestQObjectHandler::testRequests()
 {
+    QFETCH(QByteArray, method);
     QFETCH(QByteArray, path);
     QFETCH(int, statusCode);
 
@@ -84,8 +95,6 @@ void TestQObjectHandler::testRequests()
     QSimpleHttpClient client(pair.client());
     QHttpSocket *socket = new QHttpSocket(pair.server(), &pair);
 
-    handler.process(socket, path);
-
     QVariantMap map;
     map.insert("param1", 1);
     map.insert("param2", 2);
@@ -95,8 +104,12 @@ void TestQObjectHandler::testRequests()
     QHttpHeaderMap headers;
     headers.insert("Content-Length", QByteArray::number(data.length()));
 
-    client.sendHeaders("POST", "/", headers);
+    client.sendHeaders(method, path, headers);
     client.sendData(data);
+
+    QTRY_VERIFY(socket->isHeadersParsed());
+
+    handler.process(socket, socket->path());
 
     QTRY_COMPARE(client.statusCode(), statusCode);
 
