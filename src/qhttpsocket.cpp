@@ -195,6 +195,11 @@ QByteArray QHttpSocket::path() const
     return d->requestPath;
 }
 
+bool QHttpSocket::isHeadersParsed() const
+{
+    return d->readState > QHttpSocketPrivate::ReadHeaders;
+}
+
 QHttpHeaderMap QHttpSocket::headers() const
 {
     return d->requestHeaders;

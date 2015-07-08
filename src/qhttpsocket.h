@@ -152,6 +152,11 @@ public:
     QByteArray path() const;
 
     /**
+     * @brief Determine if the request headers have been parsed yet
+     */
+    bool isHeadersParsed() const;
+
+    /**
      * @brief Retrieve a map of request headers
      *
      * This method may only be called after the request headers have been
