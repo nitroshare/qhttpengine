@@ -62,6 +62,7 @@ QByteArray QHttpSocketPrivate::statusReason(int statusCode) const
     case QHttpSocket::BadRequest: return "BAD REQUEST";
     case QHttpSocket::Forbidden: return "FORBIDDEN";
     case QHttpSocket::NotFound: return "NOT FOUND";
+    case QHttpSocket::MethodNotAllowed: return "METHOD NOT ALLOWED";
     case QHttpSocket::InternalServerError: return "INTERNAL SERVER ERROR";
     default: return "UNKNOWN";
     }

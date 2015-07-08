@@ -26,6 +26,7 @@
 #include <QMap>
 #include <QObject>
 
+#include "qhttpsocket.h"
 #include "qobjecthandler.h"
 
 class QObjectHandlerPrivate : public QObject
@@ -35,6 +36,8 @@ class QObjectHandlerPrivate : public QObject
 public:
 
     explicit QObjectHandlerPrivate(QObjectHandler *handler);
+
+    void invokeSlot(QHttpSocket *socket, int index);
 
     QMap<QObject*, int> map;
 

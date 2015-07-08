@@ -100,6 +100,8 @@ public:
         Forbidden = 403,
         /// Resource was not found
         NotFound = 404,
+        /// Method is not valid for the resource
+        MethodNotAllowed = 405,
         /// An internal server error occurred
         InternalServerError = 500
     };

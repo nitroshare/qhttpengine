@@ -37,14 +37,8 @@ QObjectHandlerPrivate::QObjectHandlerPrivate(QObjectHandler *handler)
 {
 }
 
-void QObjectHandlerPrivate::onReadChannelFinished()
+void QObjectHandlerPrivate::invokeSlot(QHttpSocket *socket, int index)
 {
-    // Obtain the pointer to the socket emitting the signal
-    QHttpSocket *socket = qobject_cast<QHttpSocket*>(sender());
-
-    // Obtain the index and remove it from the map
-    int index = map.take(socket);
-
     // Attempt to decode the JSON from the socket
     QJsonParseError error;
     QJsonDocument document = QJsonDocument::fromJson(socket->readAll(), &error);
@@ -66,6 +60,18 @@ void QObjectHandlerPrivate::onReadChannelFinished()
     socket->close();
 }
 
+void QObjectHandlerPrivate::onReadChannelFinished()
+{
+    // Obtain the pointer to the socket emitting the signal
+    QHttpSocket *socket = qobject_cast<QHttpSocket*>(sender());
+
+    // Obtain the index and remove it from the map
+    int index = map.take(socket);
+
+    // Actually invoke the slot
+    invokeSlot(socket, index);
+}
+
 QObjectHandler::QObjectHandler(QObject *parent)
     : QHttpHandler(parent),
       d(new QObjectHandlerPrivate(this))
@@ -74,25 +80,42 @@ QObjectHandler::QObjectHandler(QObject *parent)
 
 void QObjectHandler::process(QHttpSocket *socket, const QString &path)
 {
+    // Only POST requests are accepted - reject any other methods but ensure
+    // that the Allow header is set in order to comply with RFC 2616
+    if(socket->method() != "POST") {
+        socket->setHeader("Allow", "POST");
+        socket->writeError(QHttpSocket::MethodNotAllowed);
+        return;
+    }
+
     // Determine the index of the slot with the specified name - note that we
     // don't need to worry about retrieving the index for deleteLater() since
     // we specify the "QVariantMap" parameter type, which no parent slots use
     int index = metaObject()->indexOfSlot(QString("%1(QVariantMap)").arg(path).toUtf8().data());
 
-    // Ensure that the index is valid
+    // If the index is invalid, the "resource" was not found
     if(index == -1) {
         socket->writeError(QHttpSocket::NotFound);
         return;
     }
 
-    // Ensure that the return type is correct
+    // Ensure that the return type of the slot is QVariantMap
     QMetaMethod method = metaObject()->method(index);
     if(method.returnType() != QMetaType::QVariantMap) {
         socket->writeError(QHttpSocket::InternalServerError);
         return;
     }
 
-    // Add the socket to the map
-    d->map.insert(socket, index);
-    connect(socket, SIGNAL(readChannelFinished()), d, SLOT(onReadChannelFinished()));
+    // Check to see if the socket has finished receiving all of the data yet
+    // or not - if so, jump to invokeSlot(), otherwise wait for the
+    // readChannelFinished() signal
+    if(socket->bytesAvailable() >= socket->contentLength()) {
+        d->invokeSlot(socket, index);
+    } else {
+
+        // Add the socket and index to the map so that the latter can be
+        // retrieved when the readChannelFinished() signal is emitted
+        d->map.insert(socket, index);
+        connect(socket, SIGNAL(readChannelFinished()), d, SLOT(onReadChannelFinished()));
+    }
 }
