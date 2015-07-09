@@ -20,8 +20,11 @@
  * IN THE SOFTWARE.
  */
 
+#include <QCommandLineOption>
+#include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QRegExp>
+#include <QStringList>
 
 #include <QFilesystemHandler>
 #include <QHttpHandler>
@@ -33,6 +36,15 @@ int main(int argc, char * argv[])
 {
     QCoreApplication a(argc, argv);
 
+    // Build the command-line options
+    QCommandLineParser parser;
+    QCommandLineOption portOption(QStringList() << "p" << "port", "port to listen on", "<port>", "8000");
+    parser.addOption(portOption);
+
+    // Parse the options that were provided and obtain the values
+    parser.process(a);
+    quint16 port = parser.value(portOption).toInt();
+
     // Build the hierarchy of handlers
     QFilesystemHandler handler(":/static");
 
@@ -41,8 +53,8 @@ int main(int argc, char * argv[])
 
     QHttpServer server(&handler);
 
-    // Listen on the specified port
-    if(!server.listen(QHostAddress::Any, 8000)) {
+    // Attempt to listen on the specified port
+    if(!server.listen(QHostAddress::LocalHost, port)) {
         qCritical("Unable to listen on the specified port.");
         return 1;
     }
