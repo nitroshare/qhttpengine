@@ -34,21 +34,32 @@ class QHTTPENGINE_EXPORT QHttpHandlerPrivate;
  * @brief Base class for URL handlers
  * @headerfile qhttphandler.h QHttpHandler
  *
- * When a request is received by a QHttpServer, it is dispatched to a
- * QHttpHandler instance which will then determine what happens to the
- * request. This is done by reimplementing the process() method.
+ * When a request is received by a QHttpServer, it invokes the route() method
+ * of its handler which is used to determine what happens to the request. All
+ * HTTP handlers derive from this class and should override the protected
+ * process() method in order to process the request.
  *
- * This method is invoked either by a QHttpServer or a QSubHandler and is
- * passed two arguments:
+ * It is possible to attach sub-handlers to specific paths or patterns. When
+ * this is done, incoming requests are first compared to the list of patterns
+ * and if a match is found, that handler is invoked instead. The following
+ * example creates a handler that will invoke a sub-handler when the request
+ * path begins with `/test/`:
  *
- * \li the socket (request headers already parsed)
- * \li the relative request path (leading slash removed)
+ * @code
+ * QHttpHandler handler, subHandler;
+ * handler.addSubHandler("/test/", &subHandler);
+ * @endcode
  *
- * For example, if a QHttpServer is initialized with a QFilesystemHandler, the
- * process() method will be invoked each time a request comes in and the path
- * will be set to QHttpSocket::path() (with the leading slash removed).
+ * When a request is to be processed by the handler, the process() method is
+ * invoked with the following parameters:
  *
- * [...]
+ *  - a pointer to the HTTP socket
+ *  - the request path with the parts matching the pattern removed
+ *
+ * Using the previous example, an incoming request for `/test/123` would cause
+ * the subHandler's process() method to be invoked with the path set to `123`.
+ *
+ * The default implementation of process() simply returns an HTTP 404 error.
  */
 class QHTTPENGINE_EXPORT QHttpHandler : public QObject
 {
@@ -58,8 +69,6 @@ public:
 
     /**
      * @brief Base constructor for a handler
-     *
-     * Because this class is abstract, it cannot be instantiated.
      */
     explicit QHttpHandler(QObject *parent = 0);
 
@@ -67,23 +76,27 @@ public:
      * @brief Add a handler for a specific pattern
      *
      * The pattern and handler will be added to an internal list that will be
-     * used when the process() method is invoked to determine whether the
-     * request matches any patterns. Order is preserved.
+     * used when the route() method is invoked to determine whether the
+     * request matches any patterns. The order of the list is preserved.
      */
     void addSubHandler(const QRegExp &pattern, QHttpHandler *handler);
 
     /**
-     * @brief [...]
+     * @brief Route an incoming request
+     *
+     * If the request path matches a sub-handler, it will be routed to that
+     * handler. Otherwise the process() method will be invoked.
      */
     void route(QHttpSocket *socket, const QString &path);
 
 protected:
 
     /**
-     * @brief Attempt to process a request
+     * @brief Process a request
      *
-     * This method should process the request either by fulfilling it or
-     * writing an error to the socket using QHttpSocket::writeError().
+     * This method should process the request either by fulfilling it, sending
+     * a redirect with QHttpSocket::writeRedirect(), or writing an error to
+     * the socket using QHttpSocket::writeError().
      *
      * Note that the leading "/" will be stripped from the path.
      */
