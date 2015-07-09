@@ -28,6 +28,8 @@
 #include "qhttpengine.h"
 #include "qhttpsocket.h"
 
+class QHTTPENGINE_EXPORT QHttpHandlerPrivate;
+
 /**
  * @brief Base class for URL handlers
  * @headerfile qhttphandler.h QHttpHandler
@@ -45,6 +47,8 @@
  * For example, if a QHttpServer is initialized with a QFilesystemHandler, the
  * process() method will be invoked each time a request comes in and the path
  * will be set to QHttpSocket::path() (with the leading slash removed).
+ *
+ * [...]
  */
 class QHTTPENGINE_EXPORT QHttpHandler : public QObject
 {
@@ -60,6 +64,22 @@ public:
     explicit QHttpHandler(QObject *parent = 0);
 
     /**
+     * @brief Add a handler for a specific pattern
+     *
+     * The pattern and handler will be added to an internal list that will be
+     * used when the process() method is invoked to determine whether the
+     * request matches any patterns. Order is preserved.
+     */
+    void addSubHandler(const QRegExp &pattern, QHttpHandler *handler);
+
+    /**
+     * @brief [...]
+     */
+    void route(QHttpSocket *socket, const QString &path);
+
+protected:
+
+    /**
      * @brief Attempt to process a request
      *
      * This method should process the request either by fulfilling it or
@@ -67,7 +87,11 @@ public:
      *
      * Note that the leading "/" will be stripped from the path.
      */
-    virtual void process(QHttpSocket *socket, const QString &path) = 0;
+    virtual void process(QHttpSocket *socket, const QString &path);
+
+private:
+
+    QHttpHandlerPrivate *const d;
 };
 
 #endif // QHTTPENGINE_QHTTPHANDLER_H

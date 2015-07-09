@@ -21,8 +21,41 @@
  */
 
 #include "qhttphandler.h"
+#include "qhttphandler_p.h"
+
+QHttpHandlerPrivate::QHttpHandlerPrivate(QHttpHandler *handler)
+    : QObject(handler),
+      q(handler)
+{
+}
 
 QHttpHandler::QHttpHandler(QObject *parent)
-    : QObject(parent)
+    : QObject(parent),
+      d(new QHttpHandlerPrivate(this))
 {
+}
+
+void QHttpHandler::addSubHandler(const QRegExp &pattern, QHttpHandler *handler)
+{
+    d->patterns.append(URL(pattern, handler));
+}
+
+void QHttpHandler::route(QHttpSocket *socket, const QString &path)
+{
+    // Check each of the patterns for a match
+    foreach(URL url, d->patterns) {
+        if(url.first.indexIn(path) != -1) {
+            url.second->route(socket, path.mid(url.first.matchedLength()));
+            return;
+        }
+    }
+
+    // If no match, invoke the process() method
+    process(socket, path);
+}
+
+void QHttpHandler::process(QHttpSocket *socket, const QString &)
+{
+    // The default response is simply a 404 error
+    socket->writeError(QHttpSocket::NotFound);
 }

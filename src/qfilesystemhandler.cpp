@@ -118,6 +118,11 @@ QFilesystemHandler::QFilesystemHandler(const QString &documentRoot, QObject *par
     setDocumentRoot(documentRoot);
 }
 
+void QFilesystemHandler::setDocumentRoot(const QString &documentRoot)
+{
+    d->documentRoot.setPath(documentRoot);
+}
+
 void QFilesystemHandler::process(QHttpSocket *socket, const QString &path)
 {
     // If a document root is not set, an error has occurred
@@ -141,9 +146,4 @@ void QFilesystemHandler::process(QHttpSocket *socket, const QString &path)
     } else {
         d->processFile(socket, absolutePath);
     }
-}
-
-void QFilesystemHandler::setDocumentRoot(const QString &documentRoot)
-{
-    d->documentRoot.setPath(documentRoot);
 }

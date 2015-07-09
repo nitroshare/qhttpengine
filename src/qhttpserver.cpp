@@ -56,7 +56,7 @@ void QHttpServerPrivate::onHeadersParsed()
     if(handler) {
 
         // Obtain the path, strip the initial "/", and pass it along to the handler
-        handler->process(socket, QString(socket->path().mid(1)));
+        handler->route(socket, QString(socket->path().mid(1)));
 
     } else {
 

@@ -68,6 +68,8 @@ public:
      */
     explicit QObjectHandler(QObject *parent = 0);
 
+protected:
+
     /**
      * @brief Reimplementation of QHttpHandler::process()
      */

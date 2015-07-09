@@ -4,13 +4,13 @@ add_subdirectory(common)
 
 set(TESTS
     TestQFilesystemHandler.cpp
+    TestQHttpHandler.cpp
     TestQHttpParser.cpp
     TestQHttpServer.cpp
     TestQHttpSocket.cpp
     TestQIByteArray.cpp
     TestQIODeviceCopier.cpp
     TestQObjectHandler.cpp
-    TestQSubHandler.cpp
 )
 
 foreach(TEST ${TESTS})

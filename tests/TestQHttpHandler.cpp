@@ -24,7 +24,7 @@
 #include <QTest>
 
 #include <QHttpSocket>
-#include <QSubHandler>
+#include <QHttpHandler>
 
 #include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"
@@ -44,7 +44,7 @@ public:
     QString mPathRemainder;
 };
 
-class TestQSubHandler : public QObject
+class TestQHttpHandler : public QObject
 {
     Q_OBJECT
 
@@ -54,7 +54,7 @@ private Q_SLOTS:
     void testPatterns();
 };
 
-void TestQSubHandler::testPatterns_data()
+void TestQHttpHandler::testPatterns_data()
 {
     QTest::addColumn<QRegExp>("pattern");
     QTest::addColumn<QByteArray>("path");
@@ -80,17 +80,17 @@ void TestQSubHandler::testPatterns_data()
             << static_cast<int>(QHttpSocket::OK);
 }
 
-void TestQSubHandler::testPatterns()
+void TestQHttpHandler::testPatterns()
 {
     QFETCH(QRegExp, pattern);
     QFETCH(QByteArray, path);
     QFETCH(QString, pathRemainder);
     QFETCH(int, statusCode);
 
-    DummyHandler handler;
+    DummyHandler subHandler;
 
-    QSubHandler subHandler;
-    subHandler.addHandler(pattern, &handler);
+    QHttpHandler handler;
+    handler.addSubHandler(pattern, &subHandler);
 
     QSocketPair pair;
     QTRY_VERIFY(pair.isConnected());
@@ -101,11 +101,11 @@ void TestQSubHandler::testPatterns()
     client.sendHeaders("GET", path, QHttpHeaderMap());
     QTRY_VERIFY(socket.isHeadersParsed());
 
-    subHandler.process(&socket, socket.path());
+    handler.route(&socket, socket.path());
 
     QTRY_COMPARE(client.statusCode(), statusCode);
-    QCOMPARE(handler.mPathRemainder, pathRemainder);
+    QCOMPARE(subHandler.mPathRemainder, pathRemainder);
 }
 
-QTEST_MAIN(TestQSubHandler)
-#include "TestQSubHandler.moc"
+QTEST_MAIN(TestQHttpHandler)
+#include "TestQHttpHandler.moc"

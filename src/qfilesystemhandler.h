@@ -62,17 +62,19 @@ public:
     QFilesystemHandler(const QString &documentRoot, QObject *parent = 0);
 
     /**
-     * @brief Reimplementation of QHttpHandler::process()
-     */
-    virtual void process(QHttpSocket *socket, const QString &path);
-
-    /**
      * @brief Set the document root
      *
      * The root path provided is used to resolve each of the requests when
      * they are received.
      */
     void setDocumentRoot(const QString &documentRoot);
+
+protected:
+
+    /**
+     * @brief Reimplementation of QHttpHandler::process()
+     */
+    virtual void process(QHttpSocket *socket, const QString &path);
 
 private:
 

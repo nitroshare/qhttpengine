@@ -20,8 +20,8 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QSUBHANDLERPRIVATE_H
-#define QHTTPENGINE_QSUBHANDLERPRIVATE_H
+#ifndef QHTTPENGINE_QHTTPHANDLERPRIVATE_H
+#define QHTTPENGINE_QHTTPHANDLERPRIVATE_H
 
 #include <QList>
 #include <QObject>
@@ -29,23 +29,22 @@
 #include <QRegExp>
 
 #include "qhttphandler.h"
-#include "qsubhandler.h"
 
 typedef QPair<QRegExp, QHttpHandler*> URL;
 
-class QSubHandlerPrivate : public QObject
+class QHttpHandlerPrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    explicit QSubHandlerPrivate(QSubHandler *handler);
+    explicit QHttpHandlerPrivate(QHttpHandler *handler);
 
     QList<URL> patterns;
 
 private:
 
-    QSubHandler *const q;
+    QHttpHandler *const q;
 };
 
-#endif // QHTTPENGINE_QSUBHANDLERPRIVATE_H
+#endif // QHTTPENGINE_QHTTPHANDLERPRIVATE_H

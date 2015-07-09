@@ -96,7 +96,7 @@ void TestQFilesystemHandler::testRequests()
     QSimpleHttpClient client(pair.client());
     QHttpSocket socket(pair.server(), &pair);
 
-    handler.process(&socket, path);
+    handler.route(&socket, path);
 
     QTRY_COMPARE(client.statusCode(), statusCode);
 }

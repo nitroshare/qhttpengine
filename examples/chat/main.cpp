@@ -23,9 +23,9 @@
 #include <QCoreApplication>
 
 #include <QFilesystemHandler>
+#include <QHttpHandler>
 #include <QHttpServer>
 #include <QObjectHandler>
-#include <QSubHandler>
 
 int main(int argc, char * argv[])
 {

@@ -121,7 +121,7 @@ void TestQObjectHandler::testRequests()
 
     QTRY_VERIFY(socket.isHeadersParsed());
 
-    handler.process(&socket, socket.path());
+    handler.route(&socket, socket.path());
 
     QTRY_COMPARE(client.statusCode(), statusCode);
 

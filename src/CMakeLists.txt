@@ -19,8 +19,6 @@ set(INCLUDE
     qiodevicecopier.h
     QObjectHandler
     qobjecthandler.h
-    QSubHandler
-    qsubhandler.h
 )
 
 set(SRC
@@ -32,7 +30,6 @@ set(SRC
     qibytearray.cpp
     qiodevicecopier.cpp
     qobjecthandler.cpp
-    qsubhandler.cpp
 )
 
 add_library(qhttpengine SHARED ${SRC})
