@@ -93,7 +93,7 @@ void QFilesystemHandlerPrivate::processDirectory(QHttpSocket *socket, const QStr
 
     // Build the response and convert the string to UTF-8
     QByteArray data = ListTemplate
-            .arg(path.toHtmlEscaped())
+            .arg("/" + path.toHtmlEscaped())
             .arg(listing)
             .arg(QHTTPENGINE_VERSION)
             .toUtf8();
