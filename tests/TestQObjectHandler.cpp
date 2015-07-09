@@ -111,7 +111,7 @@ void TestQObjectHandler::testRequests()
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    QHttpSocket *socket = new QHttpSocket(pair.server(), &pair);
+    QHttpSocket socket(pair.server(), &pair);
 
     QHttpHeaderMap headers;
     headers.insert("Content-Length", QByteArray::number(data.length()));
@@ -119,9 +119,9 @@ void TestQObjectHandler::testRequests()
     client.sendHeaders(method, path, headers);
     client.sendData(data);
 
-    QTRY_VERIFY(socket->isHeadersParsed());
+    QTRY_VERIFY(socket.isHeadersParsed());
 
-    handler.process(socket, socket->path());
+    handler.process(&socket, socket.path());
 
     QTRY_COMPARE(client.statusCode(), statusCode);
 

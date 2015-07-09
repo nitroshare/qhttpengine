@@ -96,12 +96,12 @@ void TestQSubHandler::testPatterns()
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    QHttpSocket *socket = new QHttpSocket(pair.server(), &pair);
+    QHttpSocket socket(pair.server(), &pair);
 
     client.sendHeaders("GET", path, QHttpHeaderMap());
-    QTRY_VERIFY(socket->isHeadersParsed());
+    QTRY_VERIFY(socket.isHeadersParsed());
 
-    subHandler.process(socket, socket->path());
+    subHandler.process(&socket, socket.path());
 
     QTRY_COMPARE(client.statusCode(), statusCode);
     QCOMPARE(handler.mPathRemainder, pathRemainder);

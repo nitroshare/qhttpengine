@@ -90,9 +90,9 @@ void TestQFilesystemHandler::testRequests()
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    QHttpSocket *socket = new QHttpSocket(pair.server(), &pair);
+    QHttpSocket socket(pair.server(), &pair);
 
-    handler.process(socket, path);
+    handler.process(&socket, path);
 
     QTRY_COMPARE(client.statusCode(), statusCode);
 }
