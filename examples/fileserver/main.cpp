@@ -20,16 +20,43 @@
  * IN THE SOFTWARE.
  */
 
-#include <QApplication>
+#include <QCommandLineOption>
+#include <QCommandLineParser>
+#include <QCoreApplication>
+#include <QDir>
+#include <QHostAddress>
+#include <QStringList>
 
-#include "mainwindow.h"
+#include <QFilesystemHandler>
+#include <QHttpServer>
 
 int main(int argc, char * argv[])
 {
-    QApplication a(argc, argv);
+    QCoreApplication a(argc, argv);
 
-    MainWindow mainWindow;
-    mainWindow.show();
+    // Build the command-line options
+    QCommandLineParser parser;
+    QCommandLineOption portOption(QStringList() << "p" << "port", "port to listen on", "<port>", "8000");
+    parser.addOption(portOption);
+    QCommandLineOption dirOption(QStringList() << "d" << "directory", "directory to serve", "<directory>", QDir::homePath());
+    parser.addOption(dirOption);
+
+    // Parse the options that were provided
+    parser.process(a);
+
+    // Obtain the values
+    quint16 port = parser.value(portOption).toInt();
+    QString dir = parser.value(dirOption);
+
+    // Create the filesystem handler and server
+    QFilesystemHandler handler(dir);
+    QHttpServer server(&handler);
+
+    // Attempt to listen on the specified port
+    if(!server.listen(QHostAddress::LocalHost, port)) {
+        qCritical("Unable to listen on the specified port.");
+        return 1;
+    }
 
     return a.exec();
 }
