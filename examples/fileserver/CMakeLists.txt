@@ -7,6 +7,11 @@ set(SRC
     mainwindow.cpp
 )
 
+set(OTHER
+    CMakeLists.txt
+    mainwindow.ui
+)
+
 qt5_wrap_ui(UI
     mainwindow.ui
 )
@@ -23,6 +28,6 @@ install(TARGETS fileserver
     RUNTIME DESTINATION ${EXAMPLES_INSTALL_DIR}/fileserver
 )
 
-install(FILES ${INCLUDE} ${SRC} ${UI}
+install(FILES ${INCLUDE} ${SRC} ${OTHER}
     DESTINATION ${EXAMPLES_INSTALL_DIR}/fileserver
 )
