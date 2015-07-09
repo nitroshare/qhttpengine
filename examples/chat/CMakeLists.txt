@@ -2,7 +2,9 @@ set(SRC
     main.cpp
 )
 
-add_executable(chat ${SRC})
+qt5_add_resources(QRC resources.qrc)
+
+add_executable(chat ${SRC} ${QRC})
 target_link_libraries(chat qhttpengine)
 
 set_target_properties(chat PROPERTIES

@@ -25,13 +25,19 @@
 #include <QFilesystemHandler>
 #include <QHttpHandler>
 #include <QHttpServer>
-#include <QObjectHandler>
 
 int main(int argc, char * argv[])
 {
     QCoreApplication a(argc, argv);
 
-    //...
+    QFilesystemHandler handler(":/static");
+    QHttpServer server(&handler);
+
+    // Listen on the specified port
+    if(!server.listen(QHostAddress::Any, 8000)) {
+        qCritical("Unable to listen on the specified port.");
+        return 1;
+    }
 
     return a.exec();
 }
