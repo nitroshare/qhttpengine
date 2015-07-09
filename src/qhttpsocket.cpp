@@ -122,9 +122,6 @@ bool QHttpSocketPrivate::readHeaders()
         return false;
     }
 
-    // Indicate that the headers have been parsed
-    Q_EMIT q->headersParsed();
-
     // Remove the headers from the buffer
     readBuffer.remove(0, index + 4);
 
@@ -136,6 +133,13 @@ bool QHttpSocketPrivate::readHeaders()
         requestDataTotal = requestHeaders.value("Content-Length").toLongLong();
     } else {
         readState = ReadFinished;
+    }
+
+    // Indicate that the headers have been parsed
+    Q_EMIT q->headersParsed();
+
+    // If the new readState is ReadFinished, then indicate so
+    if(readState == ReadFinished) {
         Q_EMIT q->readChannelFinished();
     }
 
