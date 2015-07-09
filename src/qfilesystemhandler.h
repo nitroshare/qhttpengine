@@ -41,8 +41,9 @@ class QHTTPENGINE_EXPORT QFilesystemHandlerPrivate;
  * QFilesystemHandler handler("/var/www");
  * @endcode
  *
- * Requests for resources outside the root will be ignored. It is also
- * possible to modify the document root after initialization.
+ * Requests for resources outside the root will be ignored. It is possible to
+ * modify the document root after initialization. It is also possible to use a
+ * resource directory for the document root.
  */
 class QHTTPENGINE_EXPORT QFilesystemHandler : public QHttpHandler
 {

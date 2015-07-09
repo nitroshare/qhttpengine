@@ -29,14 +29,11 @@
 #include "qfilesystemhandler_p.h"
 #include "qiodevicecopier.h"
 
-// Header for directory listings
-const QString ListTemplateHeader =
+// Template for listing directory contents
+const QString ListTemplate =
         "<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>%1</title>"
-        "</head><body><h1>%1</h1><p>Directory listing:</p><ul>";
-
-// Footer for directory listings
-const QString ListTemplateFooter =
-        "</ul><hr><em>QHttpEngine %1</em></body></html>";
+        "</head><body><h1>%1</h1><p>Directory listing:</p><ul>%2</ul><hr>"
+        "<em>QHttpEngine %3</em></body></html>";
 
 QFilesystemHandlerPrivate::QFilesystemHandlerPrivate(QFilesystemHandler *handler)
     : QObject(handler),
@@ -86,19 +83,20 @@ void QFilesystemHandlerPrivate::processFile(QHttpSocket *socket, const QString &
 
 void QFilesystemHandlerPrivate::processDirectory(QHttpSocket *socket, const QString &path, const QString &absolutePath)
 {
-    QString listing = ListTemplateHeader.arg(path.toHtmlEscaped());
-
     // Add entries for each of the files
+    QString listing;
     foreach(QFileInfo info, QDir(absolutePath).entryInfoList()) {
         listing.append(QString("<li><a href=\"%1%2\">%1%2</a></li>")
                 .arg(info.fileName().toHtmlEscaped())
                 .arg(info.isDir() ? "/" : ""));
     }
 
-    listing.append(ListTemplateFooter.arg(QHTTPENGINE_VERSION));
-
-    // Convert the string to UTF-8
-    QByteArray data = listing.toUtf8();
+    // Build the response and convert the string to UTF-8
+    QByteArray data = ListTemplate
+            .arg(path.toHtmlEscaped())
+            .arg(listing)
+            .arg(QHTTPENGINE_VERSION)
+            .toUtf8();
 
     // Set the headers and write the content
     socket->setHeader("Content-Type", "text/html");

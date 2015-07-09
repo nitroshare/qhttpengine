@@ -77,6 +77,10 @@ void TestQFilesystemHandler::testRequests_data()
     QTest::newRow("inside document root")
             << "inside"
             << static_cast<int>(QHttpSocket::OK);
+
+    QTest::newRow("directory listing")
+            << ""
+            << static_cast<int>(QHttpSocket::OK);
 }
 
 void TestQFilesystemHandler::testRequests()
