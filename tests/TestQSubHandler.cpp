@@ -23,6 +23,7 @@
 #include <QRegExp>
 #include <QTest>
 
+#include <QHttpSocket>
 #include <QSubHandler>
 
 #include "common/qsimplehttpclient.h"
@@ -64,19 +65,19 @@ void TestQSubHandler::testPatterns_data()
             << QRegExp("\\w+")
             << QByteArray("test")
             << QString("")
-            << 200;
+            << static_cast<int>(QHttpSocket::OK);
 
     QTest::newRow("no match")
             << QRegExp("\\d+")
             << QByteArray("test")
             << QString("")
-            << 404;
+            << static_cast<int>(QHttpSocket::NotFound);
 
     QTest::newRow("path")
             << QRegExp("one/")
             << QByteArray("one/two")
             << QString("two")
-            << 200;
+            << static_cast<int>(QHttpSocket::OK);
 }
 
 void TestQSubHandler::testPatterns()

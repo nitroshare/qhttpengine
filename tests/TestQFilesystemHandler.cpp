@@ -68,15 +68,15 @@ void TestQFilesystemHandler::testRequests_data()
 
     QTest::newRow("nonexistent resource")
             << "nonexistent"
-            << 404;
+            << static_cast<int>(QHttpSocket::NotFound);
 
     QTest::newRow("outside document root")
             << "../outside"
-            << 404;
+            << static_cast<int>(QHttpSocket::NotFound);
 
     QTest::newRow("inside document root")
             << "inside"
-            << 200;
+            << static_cast<int>(QHttpSocket::OK);
 }
 
 void TestQFilesystemHandler::testRequests()
