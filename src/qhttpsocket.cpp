@@ -171,7 +171,11 @@ QHttpSocket::QHttpSocket(QTcpSocket *socket, QObject *parent)
 
 qint64 QHttpSocket::bytesAvailable() const
 {
-    return d->readBuffer.size() + QIODevice::bytesAvailable();
+    if(d->readState > QHttpSocketPrivate::ReadHeaders) {
+        return d->readBuffer.size() + QIODevice::bytesAvailable();
+    } else {
+        return 0;
+    }
 }
 
 bool QHttpSocket::isSequential() const
