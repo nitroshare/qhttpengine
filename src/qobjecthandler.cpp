@@ -43,14 +43,20 @@ void QObjectHandlerPrivate::invokeSlot(QHttpSocket *socket, int index)
     QJsonParseError error;
     QJsonDocument document = QJsonDocument::fromJson(socket->readAll(), &error);
 
-    // TODO: check document.isObject()
-    // TODO: check "error" variable for a problem
+    // Ensure that the document is valid
+    if(error.error != QJsonParseError::NoError) {
+        socket->writeError(QHttpSocket::BadRequest);
+        return;
+    }
 
-    // Invoke the slot
+    // Attempt to invoke the slot
     QVariantMap retVal;
-    q->metaObject()->method(index).invoke(q,
-        Q_RETURN_ARG(QVariantMap, retVal),
-        Q_ARG(QVariantMap, document.object().toVariantMap()));
+    if(!q->metaObject()->method(index).invoke(q,
+            Q_RETURN_ARG(QVariantMap, retVal),
+            Q_ARG(QVariantMap, document.object().toVariantMap()))) {
+        socket->writeError(QHttpSocket::InternalServerError);
+        return;
+    }
 
     // Convert the return value to JSON and write it to the socket
     QByteArray data = QJsonDocument(QJsonObject::fromVariantMap(retVal)).toJson();

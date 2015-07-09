@@ -58,26 +58,43 @@ void TestQObjectHandler::testRequests_data()
 {
     QTest::addColumn<QByteArray>("method");
     QTest::addColumn<QByteArray>("path");
+    QTest::addColumn<QByteArray>("data");
     QTest::addColumn<int>("statusCode");
+
+    QVariantMap map;
+    map.insert("param1", 1);
+    map.insert("param2", 2);
+
+    QByteArray data = QJsonDocument(QJsonObject::fromVariantMap(map)).toJson();
 
     QTest::newRow("nonexistent slot")
             << QByteArray("POST")
             << QByteArray("nonexistent")
+            << data
             << static_cast<int>(QHttpSocket::NotFound);
 
     QTest::newRow("invalid signature")
             << QByteArray("POST")
             << QByteArray("invalidSignature")
+            << data
             << static_cast<int>(QHttpSocket::InternalServerError);
 
     QTest::newRow("bad method")
             << QByteArray("GET")
             << QByteArray("validSlot")
+            << data
             << static_cast<int>(QHttpSocket::MethodNotAllowed);
+
+    QTest::newRow("malformed JSON")
+            << QByteArray("POST")
+            << QByteArray("validSlot")
+            << QByteArray("")
+            << static_cast<int>(QHttpSocket::BadRequest);
 
     QTest::newRow("valid slot")
             << QByteArray("POST")
             << QByteArray("validSlot")
+            << data
             << static_cast<int>(QHttpSocket::OK);
 }
 
@@ -85,6 +102,7 @@ void TestQObjectHandler::testRequests()
 {
     QFETCH(QByteArray, method);
     QFETCH(QByteArray, path);
+    QFETCH(QByteArray, data);
     QFETCH(int, statusCode);
 
     DummyHandler handler;
@@ -94,12 +112,6 @@ void TestQObjectHandler::testRequests()
 
     QSimpleHttpClient client(pair.client());
     QHttpSocket *socket = new QHttpSocket(pair.server(), &pair);
-
-    QVariantMap map;
-    map.insert("param1", 1);
-    map.insert("param2", 2);
-
-    QByteArray data = QJsonDocument(QJsonObject::fromVariantMap(map)).toJson();
 
     QHttpHeaderMap headers;
     headers.insert("Content-Length", QByteArray::number(data.length()));
@@ -113,11 +125,10 @@ void TestQObjectHandler::testRequests()
 
     QTRY_COMPARE(client.statusCode(), statusCode);
 
-    if(statusCode == 200) {
-
+    if(statusCode == QHttpSocket::OK) {
         QVERIFY(client.headers().contains("Content-Length"));
         QTRY_COMPARE(client.data().length(), client.headers().value("Content-Length").toInt());
-        QCOMPARE(QJsonDocument::fromJson(client.data()).object().toVariantMap(), map);
+        QCOMPARE(QJsonDocument::fromJson(client.data()), QJsonDocument::fromJson(data));
     }
 }
 
