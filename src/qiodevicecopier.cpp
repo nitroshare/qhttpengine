@@ -127,3 +127,11 @@ void QIODeviceCopier::start()
     // The first read from the device needs to be triggered
     QTimer::singleShot(0, d, d->src->isSequential() ? SLOT(onReadyRead()) : SLOT(nextBlock()));
 }
+
+void QIODeviceCopier::stop()
+{
+    disconnect(d->src, SIGNAL(readyRead()), d, SLOT(onReadyRead()));
+    disconnect(d->src, SIGNAL(readChannelFinished()), d, SLOT(onReadChannelFinished()));
+
+    Q_EMIT finished();
+}

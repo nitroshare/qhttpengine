@@ -90,7 +90,8 @@ Q_SIGNALS:
      * emitted. For other files, this signal relies on QIODevice::atEnd() and
      * QIODevice::aboutToClose().
      *
-     * This signal will also be emitted immediately after the error() signal.
+     * This signal will also be emitted immediately after the error() signal
+     * or if the stop() method is invoked.
      */
     void finished();
 
@@ -106,6 +107,14 @@ public Q_SLOTS:
      * This method should never be invoked more than once.
      */
     void start();
+
+    /**
+     * @brief Stop the copy operation
+     *
+     * The start() method should not be invoked after stopping the copy.
+     * Instead, a new instance should be created.
+     */
+    void stop();
 
 private:
 

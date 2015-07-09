@@ -41,6 +41,7 @@ private Q_SLOTS:
 
     void testQBuffer();
     void testQTcpSocket();
+    void testStop();
 };
 
 void TestQIODeviceCopier::testQBuffer()
@@ -86,6 +87,27 @@ void TestQIODeviceCopier::testQTcpSocket()
     QTRY_COMPARE(finishedSpy.count(), 1);
     QCOMPARE(errorSpy.count(), 0);
     QCOMPARE(destData, SampleData);
+}
+
+void TestQIODeviceCopier::testStop()
+{
+    QSocketPair pair;
+    QTRY_VERIFY(pair.isConnected());
+
+    QByteArray destData;
+    QBuffer dest(&destData);
+
+    QIODeviceCopier copier(pair.server(), &dest);
+
+    copier.start();
+
+    pair.client()->write(SampleData);
+    QTRY_COMPARE(destData, SampleData);
+
+    copier.stop();
+
+    pair.client()->write(SampleData);
+    QTRY_COMPARE(destData, SampleData);
 }
 
 QTEST_MAIN(TestQIODeviceCopier)
