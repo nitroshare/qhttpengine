@@ -20,32 +20,25 @@
  * IN THE SOFTWARE.
  */
 
-#include <QCoreApplication>
-#include <QRegExp>
+#ifndef CHAT_APIHANDLER_H
+#define CHAT_APIHANDLER_H
 
-#include <QFilesystemHandler>
-#include <QHttpHandler>
-#include <QHttpServer>
+#include <QStringList>
 
-#include "apihandler.h"
+#include <QObjectHandler>
 
-int main(int argc, char * argv[])
+class ApiHandler : public QObjectHandler
 {
-    QCoreApplication a(argc, argv);
+    Q_OBJECT
 
-    // Build the hierarchy of handlers
-    QFilesystemHandler handler(":/static");
+public Q_SLOTS:
 
-    ApiHandler apiHandler;
-    handler.addSubHandler(QRegExp("api/"), &apiHandler);
+    QVariantMap postMessage(const QVariantMap &params);
+    QVariantMap getMessages(const QVariantMap &params);
 
-    QHttpServer server(&handler);
+private:
 
-    // Listen on the specified port
-    if(!server.listen(QHostAddress::Any, 8000)) {
-        qCritical("Unable to listen on the specified port.");
-        return 1;
-    }
+    QStringList mMessages;
+};
 
-    return a.exec();
-}
+#endif // CHAT_APIHANDLER_H

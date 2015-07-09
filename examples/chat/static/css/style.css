@@ -12,6 +12,7 @@ body {
 }
 
 #input {
+    height: 60px;
     width: 100%;
 }
 
@@ -45,4 +46,8 @@ body {
 
 .message.system {
     color: #777;
+}
+
+.spacer {
+    height: 80px;
 }

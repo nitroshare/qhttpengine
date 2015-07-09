@@ -20,32 +20,44 @@
  * IN THE SOFTWARE.
  */
 
-#include <QCoreApplication>
-#include <QRegExp>
-
-#include <QFilesystemHandler>
-#include <QHttpHandler>
-#include <QHttpServer>
-
 #include "apihandler.h"
 
-int main(int argc, char * argv[])
+QVariantMap ApiHandler::postMessage(const QVariantMap &params)
 {
-    QCoreApplication a(argc, argv);
-
-    // Build the hierarchy of handlers
-    QFilesystemHandler handler(":/static");
-
-    ApiHandler apiHandler;
-    handler.addSubHandler(QRegExp("api/"), &apiHandler);
-
-    QHttpServer server(&handler);
-
-    // Listen on the specified port
-    if(!server.listen(QHostAddress::Any, 8000)) {
-        qCritical("Unable to listen on the specified port.");
-        return 1;
+    // Ensure that a valid message was supplied
+    if(!params.contains("message")) {
+        return QVariantMap();
     }
 
-    return a.exec();
+    // Add the new message to the list
+    mMessages.append(params.value("message").toString());
+    return QVariantMap();
+}
+
+QVariantMap ApiHandler::getMessages(const QVariantMap &params)
+{
+    // Ensure an index was supplied
+    if(!params.contains("index")) {
+        return QVariantMap();
+    }
+
+    int index = params.value("index").toInt();
+    QVariantList messages;
+
+    // Construct a list of all messages with an index higher than the one
+    // that was provided as a parameter
+    if(index >= -1 && index < mMessages.count()) {
+        for(QStringList::const_iterator i = mMessages.constBegin() + index + 1;
+                i != mMessages.constEnd(); ++i) {
+            QVariantMap data;
+            data.insert("index", i - mMessages.constBegin());
+            data.insert("message", *i);
+            messages.append(data);
+        }
+    }
+
+    // Return the list of messages
+    QVariantMap data;
+    data.insert("messages", messages);
+    return data;
 }
