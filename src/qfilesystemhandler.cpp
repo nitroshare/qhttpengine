@@ -69,6 +69,7 @@ void QFilesystemHandlerPrivate::processFile(QHttpSocket *socket, const QString &
 
     // Create a QIODeviceCopier to copy the file contents to the socket
     QIODeviceCopier *copier = new QIODeviceCopier(file, socket);
+    connect(socket, SIGNAL(destroyed()), copier, SLOT(stop()));
     connect(copier, SIGNAL(finished()), copier, SLOT(deleteLater()));
     connect(copier, SIGNAL(finished()), file, SLOT(deleteLater()));
 
