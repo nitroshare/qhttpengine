@@ -49,6 +49,7 @@ int main(int argc, char * argv[])
         "port",
         "8000"
     );
+    parser.addOption(portOption);
     QCommandLineOption dirOption(
         QStringList() << "d" << "directory",
         "directory to serve",
