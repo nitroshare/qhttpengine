@@ -21,7 +21,7 @@ QHttpEngine is designed in a portable way, so it may run on other compilers and 
 
 ## Building
 
-QHttpEngine uses CMake for building the library. The library recognizes three options during configuration, all of which are disabled by default:
+QHttpEngine uses CMake for building the library. The library recognizes three options during configuration, all of which are disabled by default (only the library itself is built):
 
 - `BUILD_DOC` - (requires Doxygen) generates documentation from the comments in the source code
 - `BUILD_EXAMPLES` - builds the sample applications that demonstrate how to use QHttpEngine
@@ -29,7 +29,7 @@ QHttpEngine uses CMake for building the library. The library recognizes three op
 
 ## Usage
 
-Serving static files from a directory is as simple as creating a QHttpServer instance:
+Serving static files from a directory is as simple as creating an instance of QHttpServer and QFilesystemHandler:
 
 @code
 QFilesystemHandler handler("/var/www");
