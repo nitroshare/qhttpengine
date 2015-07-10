@@ -65,28 +65,34 @@ void TestQFilesystemHandler::testRequests_data()
 {
     QTest::addColumn<QString>("path");
     QTest::addColumn<int>("statusCode");
+    QTest::addColumn<QByteArray>("data");
 
     QTest::newRow("nonexistent resource")
             << "nonexistent"
-            << static_cast<int>(QHttpSocket::NotFound);
+            << static_cast<int>(QHttpSocket::NotFound)
+            << QByteArray();
 
     QTest::newRow("outside document root")
             << "../outside"
-            << static_cast<int>(QHttpSocket::NotFound);
+            << static_cast<int>(QHttpSocket::NotFound)
+            << QByteArray();
 
     QTest::newRow("inside document root")
             << "inside"
-            << static_cast<int>(QHttpSocket::OK);
+            << static_cast<int>(QHttpSocket::OK)
+            << Data;
 
     QTest::newRow("directory listing")
             << ""
-            << static_cast<int>(QHttpSocket::OK);
+            << static_cast<int>(QHttpSocket::OK)
+            << QByteArray();
 }
 
 void TestQFilesystemHandler::testRequests()
 {
     QFETCH(QString, path);
     QFETCH(int, statusCode);
+    QFETCH(QByteArray, data);
 
     QFilesystemHandler handler(QDir(dir.path()).absoluteFilePath("root"));
 
@@ -99,6 +105,10 @@ void TestQFilesystemHandler::testRequests()
     handler.route(&socket, path);
 
     QTRY_COMPARE(client.statusCode(), statusCode);
+
+    if(!data.isNull()) {
+        QTRY_COMPARE(client.data(), data);
+    }
 }
 
 bool TestQFilesystemHandler::createFile(const QString &path)
