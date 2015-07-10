@@ -36,15 +36,33 @@ int main(int argc, char * argv[])
 
     // Build the command-line options
     QCommandLineParser parser;
-    QCommandLineOption portOption(QStringList() << "p" << "port", "port to listen on", "<port>", "8000");
-    parser.addOption(portOption);
-    QCommandLineOption dirOption(QStringList() << "d" << "directory", "directory to serve", "<directory>", QDir::homePath());
+    QCommandLineOption addressOption(
+        QStringList() << "a" << "address",
+        "address to bind to",
+        "address",
+        "127.0.0.1"
+    );
+    parser.addOption(addressOption);
+    QCommandLineOption portOption(
+        QStringList() << "p" << "port",
+        "port to listen on",
+        "port",
+        "8000"
+    );
+    QCommandLineOption dirOption(
+        QStringList() << "d" << "directory",
+        "directory to serve",
+        "directory",
+        QDir::homePath()
+    );
     parser.addOption(dirOption);
+    parser.addHelpOption();
 
     // Parse the options that were provided
     parser.process(a);
 
     // Obtain the values
+    QHostAddress address = QHostAddress(parser.value(addressOption));
     quint16 port = parser.value(portOption).toInt();
     QString dir = parser.value(dirOption);
 
@@ -53,7 +71,7 @@ int main(int argc, char * argv[])
     QHttpServer server(&handler);
 
     // Attempt to listen on the specified port
-    if(!server.listen(QHostAddress::LocalHost, port)) {
+    if(!server.listen(address, port)) {
         qCritical("Unable to listen on the specified port.");
         return 1;
     }

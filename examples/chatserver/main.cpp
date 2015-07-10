@@ -23,6 +23,7 @@
 #include <QCommandLineOption>
 #include <QCommandLineParser>
 #include <QCoreApplication>
+#include <QHostAddress>
 #include <QRegExp>
 #include <QStringList>
 
@@ -38,11 +39,27 @@ int main(int argc, char * argv[])
 
     // Build the command-line options
     QCommandLineParser parser;
-    QCommandLineOption portOption(QStringList() << "p" << "port", "port to listen on", "<port>", "8000");
+    QCommandLineOption addressOption(
+        QStringList() << "a" << "address",
+        "address to bind to",
+        "address",
+        "127.0.0.1"
+    );
+    parser.addOption(addressOption);
+    QCommandLineOption portOption(
+        QStringList() << "p" << "port",
+        "port to listen on",
+        "port",
+        "8000"
+    );
     parser.addOption(portOption);
+    parser.addHelpOption();
 
-    // Parse the options that were provided and obtain the values
+    // Parse the options that were provided
     parser.process(a);
+
+    // Obtain the values
+    QHostAddress address = QHostAddress(parser.value(addressOption));
     quint16 port = parser.value(portOption).toInt();
 
     // Build the hierarchy of handlers
@@ -54,7 +71,7 @@ int main(int argc, char * argv[])
     QHttpServer server(&handler);
 
     // Attempt to listen on the specified port
-    if(!server.listen(QHostAddress::LocalHost, port)) {
+    if(!server.listen(address, port)) {
         qCritical("Unable to listen on the specified port.");
         return 1;
     }
