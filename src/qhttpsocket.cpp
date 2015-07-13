@@ -46,6 +46,8 @@ QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket, QTcpSocket *tcpS
       responseStatusCode(200),
       responseStatusReason(statusReason(200))
 {
+    socket->setParent(this);
+
     connect(socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
     connect(socket, SIGNAL(bytesWritten(qint64)), this, SLOT(onBytesWritten(qint64)));
 
