@@ -64,6 +64,7 @@ int main(int argc, char * argv[])
 
     // Build the hierarchy of handlers
     QFilesystemHandler handler(":/static");
+    handler.addRedirect(QRegExp("^$"), "/index.html");
 
     ApiHandler apiHandler;
     handler.addSubHandler(QRegExp("api/"), &apiHandler);
