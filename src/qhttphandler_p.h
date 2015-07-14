@@ -30,7 +30,8 @@
 
 #include "qhttphandler.h"
 
-typedef QPair<QRegExp, QHttpHandler*> URL;
+typedef QPair<QRegExp, QString> Redirect;
+typedef QPair<QRegExp, QHttpHandler*> SubHandler;
 
 class QHttpHandlerPrivate : public QObject
 {
@@ -40,7 +41,8 @@ public:
 
     explicit QHttpHandlerPrivate(QHttpHandler *handler);
 
-    QList<URL> patterns;
+    QList<Redirect> redirects;
+    QList<SubHandler> subHandlers;
 
 private:
 

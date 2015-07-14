@@ -35,17 +35,34 @@ QHttpHandler::QHttpHandler(QObject *parent)
 {
 }
 
+void QHttpHandler::addRedirect(const QRegExp &pattern, const QString &destination)
+{
+    d->redirects.append(Redirect(pattern, destination));
+}
+
 void QHttpHandler::addSubHandler(const QRegExp &pattern, QHttpHandler *handler)
 {
-    d->patterns.append(URL(pattern, handler));
+    d->subHandlers.append(SubHandler(pattern, handler));
 }
 
 void QHttpHandler::route(QHttpSocket *socket, const QString &path)
 {
-    // Check each of the patterns for a match
-    foreach(URL url, d->patterns) {
-        if(url.first.indexIn(path) != -1) {
-            url.second->route(socket, path.mid(url.first.matchedLength()));
+    // Check each of the redirects for a match
+    foreach(Redirect redirect, d->redirects) {
+        if(redirect.first.indexIn(path) != -1) {
+            QString newPath = redirect.second;
+            foreach(QString replacement, redirect.first.capturedTexts().mid(1)) {
+                newPath = newPath.arg(replacement);
+            }
+            socket->writeRedirect(newPath.toUtf8());
+            return;
+        }
+    }
+
+    // Check each of the sub-handlers for a match
+    foreach(SubHandler subHandler, d->subHandlers) {
+        if(subHandler.first.indexIn(path) != -1) {
+            subHandler.second->route(socket, path.mid(subHandler.first.matchedLength()));
             return;
         }
     }

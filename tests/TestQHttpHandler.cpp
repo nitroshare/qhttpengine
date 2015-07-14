@@ -50,11 +50,14 @@ class TestQHttpHandler : public QObject
 
 private Q_SLOTS:
 
-    void testPatterns_data();
-    void testPatterns();
+    void testSubHandler_data();
+    void testSubHandler();
+
+    void testRedirect_data();
+    void testRedirect();
 };
 
-void TestQHttpHandler::testPatterns_data()
+void TestQHttpHandler::testSubHandler_data()
 {
     QTest::addColumn<QRegExp>("pattern");
     QTest::addColumn<QByteArray>("path");
@@ -80,17 +83,12 @@ void TestQHttpHandler::testPatterns_data()
             << static_cast<int>(QHttpSocket::OK);
 }
 
-void TestQHttpHandler::testPatterns()
+void TestQHttpHandler::testSubHandler()
 {
     QFETCH(QRegExp, pattern);
     QFETCH(QByteArray, path);
     QFETCH(QString, pathRemainder);
     QFETCH(int, statusCode);
-
-    DummyHandler subHandler;
-
-    QHttpHandler handler;
-    handler.addSubHandler(pattern, &subHandler);
 
     QSocketPair pair;
     QTRY_VERIFY(pair.isConnected());
@@ -101,10 +99,72 @@ void TestQHttpHandler::testPatterns()
     client.sendHeaders("GET", path, QHttpHeaderMap());
     QTRY_VERIFY(socket.isHeadersParsed());
 
+    DummyHandler subHandler;
+
+    QHttpHandler handler;
+    handler.addSubHandler(pattern, &subHandler);
+
     handler.route(&socket, socket.path());
 
     QTRY_COMPARE(client.statusCode(), statusCode);
     QCOMPARE(subHandler.mPathRemainder, pathRemainder);
+}
+
+void TestQHttpHandler::testRedirect_data()
+{
+    QTest::addColumn<QRegExp>("pattern");
+    QTest::addColumn<QString>("destination");
+    QTest::addColumn<QByteArray>("path");
+    QTest::addColumn<int>("statusCode");
+    QTest::addColumn<QByteArray>("location");
+
+    QTest::newRow("match")
+            << QRegExp("\\w+")
+            << QString("/two")
+            << QByteArray("one")
+            << static_cast<int>(QHttpSocket::Found)
+            << QByteArray("/two");
+
+    QTest::newRow("no match")
+            << QRegExp("\\d+")
+            << QString("")
+            << QByteArray("test")
+            << static_cast<int>(QHttpSocket::NotFound);
+
+    QTest::newRow("captured texts")
+            << QRegExp("(\\d+)")
+            << QString("/path/%1")
+            << QByteArray("123")
+            << static_cast<int>(QHttpSocket::Found)
+            << QByteArray("/path/123");
+}
+
+void TestQHttpHandler::testRedirect()
+{
+    QFETCH(QRegExp, pattern);
+    QFETCH(QString, destination);
+    QFETCH(QByteArray, path);
+    QFETCH(int, statusCode);
+
+    QSocketPair pair;
+    QTRY_VERIFY(pair.isConnected());
+
+    QSimpleHttpClient client(pair.client());
+    QHttpSocket socket(pair.server(), &pair);
+
+    client.sendHeaders("GET", path, QHttpHeaderMap());
+    QTRY_VERIFY(socket.isHeadersParsed());
+
+    QHttpHandler handler;
+    handler.addRedirect(pattern, destination);
+    handler.route(&socket, socket.path());
+
+    QTRY_COMPARE(client.statusCode(), statusCode);
+
+    if(statusCode == QHttpSocket::Found) {
+        QFETCH(QByteArray, location);
+        QCOMPARE(client.headers().value("Location"), location);
+    }
 }
 
 QTEST_MAIN(TestQHttpHandler)

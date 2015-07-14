@@ -39,15 +39,19 @@ class QHTTPENGINE_EXPORT QHttpHandlerPrivate;
  * HTTP handlers derive from this class and should override the protected
  * process() method in order to process the request.
  *
- * It is possible to attach sub-handlers to specific paths or patterns. When
- * this is done, incoming requests are first compared to the list of patterns
- * and if a match is found, that handler is invoked instead. The following
- * example creates a handler that will invoke a sub-handler when the request
- * path begins with `/test/`:
+ * It is possible to add redirects for specific paths or patterns by using the
+ * addRedirect() method. Whenever an incoming request matches one of the
+ * patterns, an HTTP 302 redirect is returned to the client.
+ *
+ * It is also possible to attach sub-handlers to specific paths or patterns.
+ * When this is done, incoming requests are first compared to the list of
+ * patterns and if a match is found, that handler is invoked instead. The
+ * following example creates a handler that will invoke a sub-handler when the
+ * request path begins with `test/`:
  *
  * @code
  * QHttpHandler handler, subHandler;
- * handler.addSubHandler("/test/", &subHandler);
+ * handler.addSubHandler("test/", &subHandler);
  * @endcode
  *
  * When a request is to be processed by the handler, the process() method is
@@ -73,11 +77,27 @@ public:
     explicit QHttpHandler(QObject *parent = 0);
 
     /**
+     * @brief Add a redirect for a specific pattern
+     *
+     * The pattern and destination will be added to an internal list that will
+     * be used when the route() method is invoked to determine whether the
+     * request matches any patterns. The order of the list is preserved.
+     *
+     * The destination path may use "%1", "%2", etc. to refer to captured
+     * parts of the pattern. The client will receive an HTTP 302 redirect.
+     *
+     * Note that redirects are processed before sub-handlers.
+     */
+    void addRedirect(const QRegExp &pattern, const QString &destination);
+
+    /**
      * @brief Add a handler for a specific pattern
      *
      * The pattern and handler will be added to an internal list that will be
      * used when the route() method is invoked to determine whether the
      * request matches any patterns. The order of the list is preserved.
+     *
+     * Note that redirects are processed before sub-handlers.
      */
     void addSubHandler(const QRegExp &pattern, QHttpHandler *handler);
 
