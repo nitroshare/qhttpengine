@@ -10,6 +10,7 @@ set(TESTS
     TestQHttpSocket.cpp
     TestQIByteArray.cpp
     TestQIODeviceCopier.cpp
+    TestQLocalFile.cpp
     TestQObjectHandler.cpp
 )
 

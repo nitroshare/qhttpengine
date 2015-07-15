@@ -22,51 +22,34 @@
 
 #include <QCoreApplication>
 #include <QDir>
+#include <QObject>
+#include <QTest>
 
-#if defined(Q_OS_UNIX)
-#  include <sys/stat.h>
-#endif
+#include <QLocalFile>
 
-#include "qlocalfile.h"
-#include "qlocalfile_p.h"
+const QString ApplicationName = "QHttpEngine";
 
-QLocalFilePrivate::QLocalFilePrivate(QLocalFile *localFile)
-    : QObject(localFile),
-      q(localFile)
+class TestQLocalFile : public QObject
 {
-    // Store the file in the user's home directory and set the filename to the
-    // name of the application with a "." prepended
-    q->setFileName(QDir::home().absoluteFilePath("." + QCoreApplication::applicationName()));
+    Q_OBJECT
+
+private Q_SLOTS:
+
+    void initTestCase();
+    void testOpen();
+};
+
+void TestQLocalFile::initTestCase()
+{
+    QCoreApplication::setApplicationName(ApplicationName);
 }
 
-bool QLocalFilePrivate::setPermission()
+void TestQLocalFile::testOpen()
 {
-#if defined(Q_OS_UNIX)
-    return chmod(q->fileName().toUtf8().constData(), S_IRUSR | S_IWUSR) == 0;
-#else
-    // Unsupported platform, so setPermission() must fail
-    return false;
-#endif
+    QLocalFile file;
+    QVERIFY(file.open());
+    QVERIFY(file.remove());
 }
 
-bool QLocalFilePrivate::setHidden()
-{
-#if defined(Q_OS_UNIX)
-    // On Unix, anything beginning with a "." is hidden
-    return true;
-#else
-    // Unsupported platform, so setHidden() must fail
-    return false;
-#endif
-}
-
-QLocalFile::QLocalFile(QObject *parent)
-    : QFile(parent),
-      d(new QLocalFilePrivate(this))
-{
-}
-
-bool QLocalFile::open()
-{
-    return QFile::open(QIODevice::WriteOnly) && d->setPermission() && d->setHidden();
-}
+QTEST_MAIN(TestQLocalFile)
+#include "TestQLocalFile.moc"
