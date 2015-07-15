@@ -35,6 +35,11 @@ set(SRC
     qobjecthandler.cpp
 )
 
+if(WIN32)
+    configure_file(resource.rc.in "${CMAKE_CURRENT_BINARY_DIR}/resource.rc")
+    set(SRC ${SRC} "${CMAKE_CURRENT_BINARY_DIR}/resource.rc")
+endif()
+
 add_library(qhttpengine SHARED ${SRC})
 qt5_use_modules(qhttpengine Network)
 
