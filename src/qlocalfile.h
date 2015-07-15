@@ -30,12 +30,26 @@
 class QHTTPENGINE_EXPORT QLocalFilePrivate;
 
 /**
- * @brief Local file accessible
- * @headerfile qlocalauth.h QLocalAuth
+ * @brief Locally accessible file
+ * @headerfile qlocalfile.h QLocalFile
  *
  * QLocalFile uses platform-specific functions to create a file containing
- * information that will be accessible only to the local user. This is
- * typically used for storing authentication tokens.
+ * information that will be accessible only to the local user. The file is
+ * opened exclusively for writing. This is typically used for storing
+ * authentication tokens:
+ *
+ * @code
+ * QLocalFile file;
+ * if(file.open()) {
+ *     file.write("private data");
+ *     file.close();
+ * }
+ * @endcode
+ *
+ * By default, the file is stored in the user's home directory and the name of
+ * the file is derived from the value of QCoreApplication::applicationName().
+ * For example, if the application name was "test" and the user's home
+ * directory was `/home/bob`, the absolute path would be `/home/bob/.test`.
  */
 class QHTTPENGINE_EXPORT QLocalFile : public QFile
 {
@@ -51,7 +65,9 @@ public:
     /**
      * @brief Attempt to open the file
      *
-     * The file must be opened before data can be written.
+     * The file must be opened before data can be written. This method will
+     * return false if the underlying file could not be opened or if this
+     * class was unable to set the appropriate file permissions.
      */
     bool open();
 
