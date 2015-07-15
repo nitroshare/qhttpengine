@@ -6,7 +6,6 @@ option(BUILD_EXAMPLES "Build the example applications" OFF)
 option(BUILD_TESTS "Build the test suite" OFF)
 
 set(PROJECT_NAME "QHttpEngine")
-set(PROJECT_TITLE "QHttpEngine")
 set(PROJECT_DESCRIPTION "Simple and secure HTTP server for Qt applications")
 set(PROJECT_AUTHOR "Nathan Osman")
 set(PROJECT_URL "https://github.com/nitroshare/qhttpengine")
