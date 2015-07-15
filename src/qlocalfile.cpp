@@ -51,59 +51,52 @@ bool QLocalFilePrivate::setPermission()
     // which consists of one or more ACEs (access control entries) - so the
     // ACL for the file must contain only a single ACE, granting access to the
     // file owner (the current user)
-    bool success = false;
-    PSID pSID = NULL;
-    PSECURITY_DESCRIPTOR pSD = NULL;
-    PACL pACL = NULL;
 
-    do {
-        // Retrieve the owner SID for the file
-        if(GetNamedSecurityInfoW((LPCWSTR)q->fileName().utf16(),
-                                 SE_FILE_OBJECT,
-                                 OWNER_SECURITY_INFORMATION,
-                                 &pSID,
-                                 NULL,
-                                 NULL,
-                                 NULL,
-                                 &pSD) != ERROR_SUCCESS) {
-            break;
-        }
+    // Retrieve the owner SID for the file
+    PSID pSID;
+    PSECURITY_DESCRIPTOR pSD;
+    if(GetNamedSecurityInfoW((LPCWSTR)q->fileName().utf16(),
+                             SE_FILE_OBJECT,
+                             OWNER_SECURITY_INFORMATION,
+                             &pSID,
+                             NULL,
+                             NULL,
+                             NULL,
+                             &pSD) != ERROR_SUCCESS) {
+        return false;
+    }
 
-        // Information required for the access control entry
-        EXPLICIT_ACCESS_W ea;
-        ZeroMemory(&ea, sizeof(EXPLICIT_ACCESS));
-        ea.grfAccessPermissions = STANDARD_RIGHTS_REQUIRED;
-        ea.grfAccessMode = GRANT_ACCESS;
-        ea.grfInheritance = NO_INHERITANCE;
-        ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
-        ea.Trustee.ptstrName = (LPWSTR)pSID;
+    EXPLICIT_ACCESS_W ea;
+    ZeroMemory(&ea, sizeof(EXPLICIT_ACCESS));
+    ea.grfAccessPermissions = STANDARD_RIGHTS_REQUIRED;
+    ea.grfAccessMode = GRANT_ACCESS;
+    ea.grfInheritance = NO_INHERITANCE;
+    ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+    ea.Trustee.ptstrName = (LPWSTR)pSID;
 
-        // Create a new ACL with a single access control entry
-        if(SetEntriesInAclW(1, &ea, NULL, &pACL) != ERROR_SUCCESS) {
-            break;
-        }
+    // Create a new ACL with a single access control entry
+    PACL pACL;
+    if(SetEntriesInAclW(1, &ea, NULL, &pACL) != ERROR_SUCCESS) {
+        LocalFree(pSD);
+        return false;
+    }
 
-        // Apply the ACL to the file
-        if(SetNamedSecurityInfoW((LPWSTR)q->fileName().utf16(),
-                                 SE_FILE_OBJECT,
-                                 DACL_SECURITY_INFORMATION,
-                                 NULL,
-                                 NULL,
-                                 pACL,
-                                 NULL) != ERROR_SUCCESS) {
-            break;
-        }
+    LocalFree(pSD);
 
-        // Indicate success
-        success = true;
+    // Apply the ACL to the file
+    if(SetNamedSecurityInfoW((LPWSTR)q->fileName().utf16(),
+                             SE_FILE_OBJECT,
+                             DACL_SECURITY_INFORMATION,
+                             NULL,
+                             NULL,
+                             pACL,
+                             NULL) != ERROR_SUCCESS) {
+        LocalFree(pACL);
+        return false;
+    }
 
-    } while(false);
-
-    // Clean up the resources
-    if(pSD) LocalFree(pSD);
-    if(pACL) LocalFree(pACL);
-
-    return success;
+    LocalFree(pACL);
+    return true;
 #else
     // Unsupported platform, so setPermission() must fail
     return false;
