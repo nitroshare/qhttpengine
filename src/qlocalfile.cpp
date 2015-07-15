@@ -26,7 +26,8 @@
 #if defined(Q_OS_UNIX)
 #  include <sys/stat.h>
 #elif defined(Q_OS_WIN)
-#  include <windows.h>
+#  include <aclapi.h>
+#  include <fileapi.h>
 #endif
 
 #include "qlocalfile.h"
@@ -45,6 +46,65 @@ bool QLocalFilePrivate::setPermission()
 {
 #if defined(Q_OS_UNIX)
     return chmod(q->fileName().toUtf8().constData(), S_IRUSR | S_IWUSR) == 0;
+#elif defined(Q_OS_WIN)
+    // Windows uses ACLs to control file access - each file contains an ACL
+    // which consists of one or more ACEs (access control entries) - so the
+    // ACL for the file must contain only a single ACE, granting access to the
+    // file owner (the current user)
+    bool success = false;
+    PSID pSID = NULL;
+    PSECURITY_DESCRIPTOR pSD = NULL;
+    PACL pACL = NULL;
+
+    do {
+        // Retrieve the owner SID for the file
+        if(GetNamedSecurityInfoW((LPCWSTR)q->fileName().utf16(),
+                                 SE_FILE_OBJECT,
+                                 OWNER_SECURITY_INFORMATION,
+                                 &pSID,
+                                 NULL,
+                                 NULL,
+                                 NULL,
+                                 &pSD) != ERROR_SUCCESS) {
+            break;
+        }
+
+        // Information required for the access control entry
+        EXPLICIT_ACCESS_W ea;
+        ZeroMemory(&ea, sizeof(EXPLICIT_ACCESS));
+        ea.grfAccessPermissions = STANDARD_RIGHTS_REQUIRED;
+        ea.grfAccessMode = GRANT_ACCESS;
+        ea.grfInheritance = NO_INHERITANCE;
+        ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+        ea.Trustee.ptstrName = (LPWSTR)pSID;
+
+        // Create a new ACL with a single access control entry
+        if(SetEntriesInAclW(1, &ea, NULL, &pACL) != ERROR_SUCCESS) {
+            break;
+        }
+
+        // Apply the ACL to the file
+        if(SetNamedSecurityInfoW((LPWSTR)q->fileName().utf16(),
+                                 SE_FILE_OBJECT,
+                                 DACL_SECURITY_INFORMATION,
+                                 NULL,
+                                 NULL,
+                                 pACL,
+                                 NULL) != ERROR_SUCCESS) {
+            break;
+        }
+
+        // Indicate success
+        success = true;
+
+    } while(false);
+
+    // Clean up the resources
+    if(pSID) FreeSid(pSID);
+    if(pSD) LocalFree(pSD);
+    if(pACL) LocalFree(pACL);
+
+    return success;
 #else
     // Unsupported platform, so setPermission() must fail
     return false;
