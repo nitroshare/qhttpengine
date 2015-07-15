@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 2.8.11)
 project(qhttpengine)
 
+if(NOT (CMAKE_MAJOR_VERSION VERSION_LESS 3))
+    cmake_policy(SET CMP0043 OLD)
+endif()
+
 option(BUILD_DOC "Build Doxygen documentation" OFF)
 option(BUILD_EXAMPLES "Build the example applications" OFF)
 option(BUILD_TESTS "Build the test suite" OFF)
