@@ -20,30 +20,27 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QLOCALAUTH_H
-#define QHTTPENGINE_QLOCALAUTH_H
+#ifndef QHTTPENGINE_QLOCALFILEPRIVATE_H
+#define QHTTPENGINE_QLOCALFILEPRIVATE_H
 
 #include <QObject>
 
-#include "qhttpengine.h"
+#include "qlocalfile.h"
 
-class QHTTPENGINE_EXPORT QLocalAuthPrivate;
-
-/**
- * @brief Facilitator for local file-based authentication
- * @headerfile qlocalauth.h QLocalAuth
- */
-class QHTTPENGINE_EXPORT QLocalAuth : public QObject
+class QLocalFilePrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    QLocalAuth(QObject *parent = 0);
+    explicit QLocalFilePrivate(QLocalFile *localFile);
+
+    bool setPermission();
+    bool setHidden();
 
 private:
 
-    QLocalAuthPrivate *const d;
+    QLocalFile *const q;
 };
 
-#endif // QHTTPENGINE_QLOCALAUTH_H
+#endif // QHTTPENGINE_QLOCALFILEPRIVATE_H

@@ -20,18 +20,53 @@
  * IN THE SOFTWARE.
  */
 
-#include "qlocalauth.h"
-#include "qlocalauth_p.h"
+#include <QCoreApplication>
+#include <QDir>
 
-QLocalAuthPrivate::QLocalAuthPrivate(QLocalAuth *localAuth)
-    : QObject(localAuth),
-      q(localAuth)
+#if defined(Q_OS_UNIX)
+#  include <sys/stat.h>
+#endif
+
+#include "qlocalfile.h"
+#include "qlocalfile_p.h"
+
+QLocalFilePrivate::QLocalFilePrivate(QLocalFile *localFile)
+    : QObject(localFile),
+      q(localFile)
+{
+    // Store the file in the user's home directory and set the filename to the
+    // name of the application with a "." prepended
+    q->setFileName(QDir::home().absoluteFilePath("." + QCoreApplication::applicationName()));
+}
+
+bool QLocalFilePrivate::setPermission()
+{
+#if defined(Q_OS_UNIX)
+    return chmod(q->fileName().toUtf8().constData(), S_IRUSR | S_IWUSR) == 0;
+#else
+    // Unsupported platform, so setPermission() must fail
+    return false;
+#endif
+}
+
+bool QLocalFilePrivate::setHidden()
+{
+#if defined(Q_OS_UNIX)
+    // On Unix, anything beginning with a "." is hidden
+    return true;
+#else
+    // Unsupported platform, so setHidden() must fail
+    return false;
+#endif
+}
+
+QLocalFile::QLocalFile(QObject *parent)
+    : QFile(parent),
+      d(new QLocalFilePrivate(this))
 {
 }
 
-QLocalAuth::QLocalAuth(QObject *parent)
-    : QObject(parent),
-      d(new QLocalAuthPrivate(this))
+bool QLocalFile::open()
 {
-    //...
+    return false;
 }

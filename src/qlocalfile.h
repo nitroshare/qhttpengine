@@ -20,24 +20,44 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QLOCALAUTHPRIVATE_H
-#define QHTTPENGINE_QLOCALAUTHPRIVATE_H
+#ifndef QHTTPENGINE_QLOCALFILE_H
+#define QHTTPENGINE_QLOCALFILE_H
 
-#include <QObject>
+#include <QFile>
 
-#include "qlocalauth.h"
+#include "qhttpengine.h"
 
-class QLocalAuthPrivate : public QObject
+class QHTTPENGINE_EXPORT QLocalFilePrivate;
+
+/**
+ * @brief Local file accessible
+ * @headerfile qlocalauth.h QLocalAuth
+ *
+ * QLocalFile uses platform-specific functions to create a file containing
+ * information that will be accessible only to the local user. This is
+ * typically used for storing authentication tokens.
+ */
+class QHTTPENGINE_EXPORT QLocalFile : public QFile
 {
     Q_OBJECT
 
 public:
 
-    explicit QLocalAuthPrivate(QLocalAuth *localAuth);
+    /**
+     * @brief Create a new local file
+     */
+    explicit QLocalFile(QObject *parent = 0);
+
+    /**
+     * @brief Attempt to open the file
+     *
+     * The file must be opened before data can be written.
+     */
+    bool open();
 
 private:
 
-    QLocalAuth *const q;
+    QLocalFilePrivate *const d;
 };
 
-#endif // QHTTPENGINE_QLOCALAUTHPRIVATE_H
+#endif // QHTTPENGINE_QLOCALFILE_H

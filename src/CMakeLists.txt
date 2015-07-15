@@ -17,6 +17,8 @@ set(INCLUDE
     qibytearray.h
     QIODeviceCopier
     qiodevicecopier.h
+    QLocalFile
+    qlocalfile.h
     QObjectHandler
     qobjecthandler.h
 )
@@ -29,6 +31,7 @@ set(SRC
     qhttpsocket.cpp
     qibytearray.cpp
     qiodevicecopier.cpp
+    qlocalfile.cpp
     qobjecthandler.cpp
 )
 
