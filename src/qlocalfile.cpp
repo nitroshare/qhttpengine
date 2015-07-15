@@ -100,7 +100,6 @@ bool QLocalFilePrivate::setPermission()
     } while(false);
 
     // Clean up the resources
-    if(pSID) FreeSid(pSID);
     if(pSD) LocalFree(pSD);
     if(pACL) LocalFree(pACL);
 
@@ -117,7 +116,7 @@ bool QLocalFilePrivate::setHidden()
     // On Unix, anything beginning with a "." is hidden
     return true;
 #elif defined(Q_OS_WIN)
-    return SetFileAttributesW((LPCWSTR)q->fileName().utf16(), FILE_ATTRIBUTE_HIDDEN) == 0;
+    return SetFileAttributesW((LPCWSTR)q->fileName().utf16(), FILE_ATTRIBUTE_HIDDEN) != 0;
 #else
     // Unsupported platform, so setHidden() must fail
     return false;
