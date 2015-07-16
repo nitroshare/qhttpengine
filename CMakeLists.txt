@@ -9,6 +9,8 @@ option(BUILD_DOC "Build Doxygen documentation" OFF)
 option(BUILD_EXAMPLES "Build the example applications" OFF)
 option(BUILD_TESTS "Build the test suite" OFF)
 
+set(LIB_INSTALL_DIR lib CACHE STRING "Library installation directory")
+
 set(PROJECT_NAME "QHttpEngine")
 set(PROJECT_DESCRIPTION "Simple and secure HTTP server for Qt applications")
 set(PROJECT_AUTHOR "Nathan Osman")
