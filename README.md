@@ -13,7 +13,7 @@ QHttpEngine requires a modern C++ compiler supported by the Qt framework. Some e
 - GCC (including MinGW-w64)
 - Clang
 
-CMake 2.8.9+ and Qt 5.x are required to build the library.
+CMake 2.8.11+ and Qt 5.1+ are required to build the library.
 
 ### Build Instructions
 
