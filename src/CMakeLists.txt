@@ -46,8 +46,9 @@ add_library(qhttpengine SHARED ${SRC})
 qt5_use_modules(qhttpengine Network)
 
 target_include_directories(qhttpengine PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}"
-    "${CMAKE_CURRENT_BINARY_DIR}"
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+    $<INSTALL_INTERFACE:include/qhttpengine>
 )
 
 set_target_properties(qhttpengine PROPERTIES
