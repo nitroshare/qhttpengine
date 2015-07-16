@@ -62,9 +62,11 @@ set_target_properties(qhttpengine PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}"
 )
 
-install(TARGETS qhttpengine
+install(TARGETS qhttpengine EXPORT qhttpengine-export
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
     ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
     PUBLIC_HEADER DESTINATION include/qhttpengine
 )
+
+install(EXPORT qhttpengine-export DESTINATION "${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME}")
