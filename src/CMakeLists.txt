@@ -1,5 +1,4 @@
 configure_file(qhttpengine.h.in "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.h")
-configure_file(qhttpengine.pc.in "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.pc" @ONLY)
 
 set(HEADERS
     "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.h"
@@ -58,8 +57,8 @@ set_target_properties(qhttpengine PROPERTIES
     OUTPUT_NAME ${OUTPUT_NAME}
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
-    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}"
     RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}"
+    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}"
 )
 
 install(TARGETS qhttpengine
@@ -67,8 +66,4 @@ install(TARGETS qhttpengine
     LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
     ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
     PUBLIC_HEADER DESTINATION include/qhttpengine
-)
-
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.pc"
-    DESTINATION lib/pkgconfig
 )
