@@ -36,8 +36,11 @@ set(SRC
 )
 
 if(WIN32)
+    set(OUTPUT_NAME ${PROJECT_NAME}${PROJECT_VERSION_MAJOR})
     configure_file(resource.rc.in "${CMAKE_CURRENT_BINARY_DIR}/resource.rc")
     set(SRC ${SRC} "${CMAKE_CURRENT_BINARY_DIR}/resource.rc")
+else()
+    set(OUTPUT_NAME ${PROJECT_NAME})
 endif()
 
 add_library(qhttpengine SHARED ${SRC})
@@ -52,6 +55,7 @@ set_target_properties(qhttpengine PROPERTIES
     DEFINE_SYMBOL QT_NO_SIGNALS_SLOTS_KEYWORDS
     DEFINE_SYMBOL QHTTPENGINE_LIBRARY
     PUBLIC_HEADER "${HEADERS}"
+    OUTPUT_NAME ${OUTPUT_NAME}
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}"
