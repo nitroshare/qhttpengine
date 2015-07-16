@@ -59,7 +59,7 @@ set_target_properties(qhttpengine PROPERTIES
 )
 
 install(TARGETS qhttpengine
-    RUNTIME DESTINATION lib
+    RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     PUBLIC_HEADER DESTINATION include/qhttpengine
