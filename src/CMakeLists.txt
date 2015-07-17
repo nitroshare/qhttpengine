@@ -46,9 +46,9 @@ add_library(qhttpengine SHARED ${SRC})
 qt5_use_modules(qhttpengine Network)
 
 target_include_directories(qhttpengine PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-    $<INSTALL_INTERFACE:include/qhttpengine>
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
+    "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}/${PROJECT_NAME}>"
 )
 
 set_target_properties(qhttpengine PROPERTIES
@@ -66,9 +66,18 @@ install(TARGETS qhttpengine EXPORT qhttpengine-export
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
     ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
-    PUBLIC_HEADER DESTINATION include/qhttpengine
+    PUBLIC_HEADER DESTINATION "${INCLUDE_INSTALL_DIR}/${PROJECT_NAME}"
 )
 
-install(EXPORT qhttpengine-export DESTINATION "${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME}"
-    FILE QHttpEngineConfig.cmake
+install(EXPORT qhttpengine-export DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
+    FILE ${PROJECT_NAME}Config.cmake
+)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Version.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Version.cmake"
+    DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
 )
