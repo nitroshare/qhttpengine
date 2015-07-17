@@ -32,6 +32,7 @@ class QHTTPENGINE_EXPORT QHttpSocketPrivate;
 
 /**
  * @brief Implementation of the HTTP protocol
+ * @headerfile qhttpsocket.h QHttpEngine/QHttpSocket
  *
  * QHttpSocket provides a class derived from QIODevice that can be used to
  * read data from and write data to an HTTP client through a QTcpSocket

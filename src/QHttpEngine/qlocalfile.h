@@ -31,6 +31,7 @@ class QHTTPENGINE_EXPORT QLocalFilePrivate;
 
 /**
  * @brief Locally accessible file
+ * @headerfile qlocalfile.h QHttpEngine/QLocalFile
  *
  * QLocalFile uses platform-specific functions to create a file containing
  * information that will be accessible only to the local user. This is
