@@ -81,3 +81,10 @@ write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Ver
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Version.cmake"
     DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
 )
+
+if(NOT WIN32)
+    configure_file(${PROJECT_NAME}.pc.in "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc" @ONLY)
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
+        DESTINATION "${LIB_INSTALL_DIR}/pkgconfig"
+    )
+endif()
