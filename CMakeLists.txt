@@ -1,17 +1,9 @@
 cmake_minimum_required(VERSION 2.8.11)
-project(qhttpengine)
+project(QHttpEngine)
 
 if(NOT (CMAKE_MAJOR_VERSION VERSION_LESS 3))
     cmake_policy(SET CMP0043 OLD)
 endif()
-
-option(BUILD_DOC "Build Doxygen documentation" OFF)
-option(BUILD_EXAMPLES "Build the example applications" OFF)
-option(BUILD_TESTS "Build the test suite" OFF)
-
-set(LIB_INSTALL_DIR lib CACHE STRING "Library installation directory")
-set(INCLUDE_INSTALL_DIR include CACHE STRING "Header installation directory")
-set(CMAKECONFIG_INSTALL_DIR "${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME}" CACHE STRING "CMake configuration installation directory")
 
 set(PROJECT_NAME "QHttpEngine")
 set(PROJECT_DESCRIPTION "Simple and secure HTTP server for Qt applications")
@@ -22,6 +14,17 @@ set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 1)
 set(PROJECT_VERSION_PATCH 0)
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+
+option(BUILD_DOC "Build Doxygen documentation" OFF)
+option(BUILD_EXAMPLES "Build the example applications" OFF)
+option(BUILD_TESTS "Build the test suite" OFF)
+
+set(BIN_INSTALL_DIR bin CACHE STRING "Binary runtime installation directory relative to the install prefix")
+set(LIB_INSTALL_DIR lib CACHE STRING "Library installation directory relative to the install prefix")
+set(INCLUDE_INSTALL_DIR include CACHE STRING "Header installation directory relative to the install prefix")
+set(CMAKECONFIG_INSTALL_DIR "${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME}" CACHE STRING "CMake configuration installation directory")
+set(DOC_INSTALL_DIR share/doc/${PROJECT_NAME} CACHE STRING "Documentation installation directory relative to the install prefix")
+set(EXAMPLES_INSTALL_DIR "${LIB_INSTALL_DIR}/${PROJECT_NAME}/examples")
 
 find_package(Qt5Network 5.1 REQUIRED)
 

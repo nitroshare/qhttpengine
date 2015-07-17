@@ -1,5 +1,3 @@
-set(EXAMPLES_INSTALL_DIR "${LIB_INSTALL_DIR}/${PROJECT_NAME}/examples")
-
 set(EXAMPLES
     chatserver
     fileserver

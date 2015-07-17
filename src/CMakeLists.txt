@@ -16,41 +16,37 @@ set(SRC
 )
 
 if(WIN32)
-    set(OUTPUT_NAME ${PROJECT_NAME}${PROJECT_VERSION_MAJOR})
     configure_file(resource.rc.in "${CMAKE_CURRENT_BINARY_DIR}/resource.rc")
     set(SRC ${SRC} "${CMAKE_CURRENT_BINARY_DIR}/resource.rc")
-else()
-    set(OUTPUT_NAME ${PROJECT_NAME})
 endif()
 
-add_library(qhttpengine SHARED ${HEADERS} ${SRC})
-qt5_use_modules(qhttpengine Network)
+add_library(QHttpEngine SHARED ${HEADERS} ${SRC})
+qt5_use_modules(QHttpEngine Network)
 
-target_include_directories(qhttpengine PUBLIC
+target_include_directories(QHttpEngine PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
     "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>"
 )
 
-set_target_properties(qhttpengine PROPERTIES
+set_target_properties(QHttpEngine PROPERTIES
     DEFINE_SYMBOL QT_NO_SIGNALS_SLOTS_KEYWORDS
     DEFINE_SYMBOL QHTTPENGINE_LIBRARY
     PUBLIC_HEADER "${HEADERS}"
-    OUTPUT_NAME ${OUTPUT_NAME}
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
     RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}"
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}"
 )
 
-install(TARGETS qhttpengine EXPORT qhttpengine-export
-    RUNTIME DESTINATION bin
+install(TARGETS QHttpEngine EXPORT QHttpEngine-export
+    RUNTIME DESTINATION "${BIN_INSTALL_DIR}"
     LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
     ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
     PUBLIC_HEADER DESTINATION "${INCLUDE_INSTALL_DIR}/${PROJECT_NAME}"
 )
 
-install(EXPORT qhttpengine-export DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
+install(EXPORT QHttpEngine-export DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
     FILE ${PROJECT_NAME}Config.cmake
 )
 

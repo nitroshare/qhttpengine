@@ -19,7 +19,7 @@ foreach(TEST ${TESTS})
 
     add_executable(${NAME} "${TEST}")
     qt5_use_modules(${NAME} Test)
-    target_link_libraries(${NAME} qhttpengine common)
+    target_link_libraries(${NAME} QHttpEngine common)
     set_target_properties(${NAME} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}"
     )

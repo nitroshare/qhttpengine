@@ -3,7 +3,7 @@ set(SRC
 )
 
 add_executable(fileserver ${SRC})
-target_link_libraries(fileserver qhttpengine)
+target_link_libraries(fileserver QHttpEngine)
 set_target_properties(fileserver PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}"
 )
