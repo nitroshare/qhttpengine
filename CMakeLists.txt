@@ -10,6 +10,8 @@ option(BUILD_EXAMPLES "Build the example applications" OFF)
 option(BUILD_TESTS "Build the test suite" OFF)
 
 set(LIB_INSTALL_DIR lib CACHE STRING "Library installation directory")
+set(INCLUDE_INSTALL_DIR include CACHE STRING "Header installation directory")
+set(CMAKECONFIG_INSTALL_DIR "${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME}" CACHE STRING "CMake configuration installation directory")
 
 set(PROJECT_NAME "QHttpEngine")
 set(PROJECT_DESCRIPTION "Simple and secure HTTP server for Qt applications")
