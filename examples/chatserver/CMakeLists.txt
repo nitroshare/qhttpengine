@@ -12,5 +12,5 @@ set_target_properties(chatserver PROPERTIES
 )
 
 install(TARGETS chatserver
-    RUNTIME DESTINATION ${EXAMPLES_BIN_DIR}
+    RUNTIME DESTINATION "${EXAMPLE_DIR}"
 )

@@ -9,5 +9,5 @@ set_target_properties(fileserver PROPERTIES
 )
 
 install(TARGETS fileserver
-    RUNTIME DESTINATION ${EXAMPLES_BIN_DIR}
+    RUNTIME DESTINATION "${EXAMPLE_DIR}"
 )
