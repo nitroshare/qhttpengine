@@ -69,4 +69,6 @@ install(TARGETS qhttpengine EXPORT qhttpengine-export
     PUBLIC_HEADER DESTINATION include/qhttpengine
 )
 
-install(EXPORT qhttpengine-export DESTINATION "${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME}")
+install(EXPORT qhttpengine-export DESTINATION "${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME}"
+    FILE QHttpEngineConfig.cmake
+)
