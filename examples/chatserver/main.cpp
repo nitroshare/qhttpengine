@@ -27,9 +27,9 @@
 #include <QRegExp>
 #include <QStringList>
 
-#include <QFilesystemHandler>
-#include <QHttpHandler>
-#include <QHttpServer>
+#include <QHttpEngine/QFilesystemHandler>
+#include <QHttpEngine/QHttpHandler>
+#include <QHttpEngine/QHttpServer>
 
 #include "apihandler.h"
 

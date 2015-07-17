@@ -25,7 +25,7 @@
 #include <QObject>
 #include <QTest>
 
-#include <QLocalFile>
+#include <QHttpEngine/QLocalFile>
 
 const QString ApplicationName = "QHttpEngine";
 

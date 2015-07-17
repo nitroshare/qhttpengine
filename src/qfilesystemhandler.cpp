@@ -25,9 +25,9 @@
 #include <QFileInfoList>
 #include <QUrl>
 
-#include "qfilesystemhandler.h"
+#include "QHttpEngine/qfilesystemhandler.h"
+#include "QHttpEngine/qiodevicecopier.h"
 #include "qfilesystemhandler_p.h"
-#include "qiodevicecopier.h"
 
 // Template for listing directory contents
 const QString ListTemplate =

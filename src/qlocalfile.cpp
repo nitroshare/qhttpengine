@@ -30,7 +30,7 @@
 #  include <fileapi.h>
 #endif
 
-#include "qlocalfile.h"
+#include "QHttpEngine/qlocalfile.h"
 #include "qlocalfile_p.h"
 
 QLocalFilePrivate::QLocalFilePrivate(QLocalFile *localFile)

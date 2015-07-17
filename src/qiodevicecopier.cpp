@@ -22,7 +22,7 @@
 
 #include <QTimer>
 
-#include "qiodevicecopier.h"
+#include "QHttpEngine/qiodevicecopier.h"
 #include "qiodevicecopier_p.h"
 
 // Default value for the bufferSize property

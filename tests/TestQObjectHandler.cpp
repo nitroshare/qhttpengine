@@ -26,8 +26,8 @@
 #include <QTest>
 #include <QVariantMap>
 
-#include <QHttpSocket>
-#include <QObjectHandler>
+#include <QHttpEngine/QHttpSocket>
+#include <QHttpEngine/QObjectHandler>
 
 #include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"

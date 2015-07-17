@@ -29,7 +29,6 @@
 class QHTTPENGINE_EXPORT QFilesystemHandlerPrivate;
 
 /**
- * @class QFilesystemHandler qfilesystemhandler.h QFilesystemHandler
  * @brief Handler for filesystem requests
  *
  * This handler responds to requests for resources on a local filesystem. The

@@ -1,26 +1,7 @@
 configure_file(qhttpengine.h.in "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.h")
 
-set(HEADERS
-    "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.h"
-    QFilesystemHandler
-    qfilesystemhandler.h
-    QHttpHandler
-    qhttphandler.h
-    QHttpParser
-    qhttpparser.h
-    QHttpServer
-    qhttpserver.h
-    QHttpSocket
-    qhttpsocket.h
-    QIByteArray
-    qibytearray.h
-    QIODeviceCopier
-    qiodevicecopier.h
-    QLocalFile
-    qlocalfile.h
-    QObjectHandler
-    qobjecthandler.h
-)
+file(GLOB HEADERS "${PROJECT_NAME}/*")
+set(HEADERS "${HEADERS}" "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.h")
 
 set(SRC
     qfilesystemhandler.cpp
@@ -42,13 +23,13 @@ else()
     set(OUTPUT_NAME ${PROJECT_NAME})
 endif()
 
-add_library(qhttpengine SHARED ${SRC})
+add_library(qhttpengine SHARED ${HEADERS} ${SRC})
 qt5_use_modules(qhttpengine Network)
 
 target_include_directories(qhttpengine PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
-    "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}/${PROJECT_NAME}>"
+    "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>"
 )
 
 set_target_properties(qhttpengine PROPERTIES

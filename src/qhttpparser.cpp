@@ -22,7 +22,7 @@
 
 #include <QByteArray>
 
-#include "qhttpparser.h"
+#include "QHttpEngine/qhttpparser.h"
 
 void QHttpParser::split(const QByteArray &data, const QByteArray &delim, int maxSplit, QList<QByteArray> &parts)
 {

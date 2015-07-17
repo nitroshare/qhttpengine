@@ -32,7 +32,6 @@ class QHTTPENGINE_EXPORT QIODeviceCopierPrivate;
 
 /**
  * @brief Device copier
- * @headerfile qiodevicecopier.h QIODeviceCopier
  *
  * QIODeviceCopier provides a set of methods for reading data from a QIODevice
  * and writing it to another. The class operates asynchronously and therefore

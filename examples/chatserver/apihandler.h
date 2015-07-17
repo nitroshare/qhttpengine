@@ -25,7 +25,7 @@
 
 #include <QStringList>
 
-#include <QObjectHandler>
+#include <QHttpEngine/QObjectHandler>
 
 class ApiHandler : public QObjectHandler
 {

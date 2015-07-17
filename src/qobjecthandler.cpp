@@ -28,7 +28,7 @@
 #include <QMetaType>
 #include <QVariantMap>
 
-#include "qobjecthandler.h"
+#include "QHttpEngine/qobjecthandler.h"
 #include "qobjecthandler_p.h"
 
 QObjectHandlerPrivate::QObjectHandlerPrivate(QObjectHandler *handler)

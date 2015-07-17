@@ -22,7 +22,7 @@
 
 #include <QString>
 
-#include "qibytearray.h"
+#include "QHttpEngine/qibytearray.h"
 
 QIByteArray::QIByteArray()
 {}

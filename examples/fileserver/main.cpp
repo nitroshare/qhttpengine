@@ -27,8 +27,8 @@
 #include <QHostAddress>
 #include <QStringList>
 
-#include <QFilesystemHandler>
-#include <QHttpServer>
+#include <QHttpEngine/QFilesystemHandler>
+#include <QHttpEngine/QHttpServer>
 
 int main(int argc, char * argv[])
 {

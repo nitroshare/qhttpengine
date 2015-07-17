@@ -22,9 +22,9 @@
 
 #include <QTcpSocket>
 
-#include "qhttpserver.h"
+#include "QHttpEngine/qhttpserver.h"
+#include "QHttpEngine/qhttpsocket.h"
 #include "qhttpserver_p.h"
-#include "qhttpsocket.h"
 
 QHttpServerPrivate::QHttpServerPrivate(QHttpServer *httpServer)
     : QObject(httpServer),

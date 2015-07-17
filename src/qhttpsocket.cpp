@@ -22,7 +22,7 @@
 
 #include <cstring>
 
-#include "qhttpsocket.h"
+#include "QHttpEngine/qhttpsocket.h"
 #include "qhttpsocket_p.h"
 
 // Predefined error response requires a simple HTML template to be returned to

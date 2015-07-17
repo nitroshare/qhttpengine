@@ -27,7 +27,7 @@
 #include <QTcpSocket>
 #include <QTest>
 
-#include <QIODeviceCopier>
+#include <QHttpEngine/QIODeviceCopier>
 
 #include "common/qsocketpair.h"
 

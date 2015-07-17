@@ -24,8 +24,8 @@
 #include <QSignalSpy>
 #include <QTest>
 
-#include <QHttpSocket>
-#include <QHttpParser>
+#include <QHttpEngine/QHttpSocket>
+#include <QHttpEngine/QHttpParser>
 
 #include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"

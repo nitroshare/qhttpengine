@@ -39,7 +39,6 @@ typedef QMap<QIByteArray, QByteArray> QHttpHeaderMap;
 
 /**
  * @brief Utility methods for parsing HTTP requests and responses
- * @headerfile qhttpparser.h QHttpParser
  *
  * This class provides a set of static methods for parsing HTTP request and
  * response headers. Functionality is broken up into smaller methods in order

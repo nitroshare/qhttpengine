@@ -26,8 +26,8 @@
 #include <QMap>
 #include <QObject>
 
-#include "qhttpsocket.h"
-#include "qobjecthandler.h"
+#include "QHttpEngine/qhttpsocket.h"
+#include "QHttpEngine/qobjecthandler.h"
 
 class QObjectHandlerPrivate : public QObject
 {

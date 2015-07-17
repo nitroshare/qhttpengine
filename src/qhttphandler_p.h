@@ -28,7 +28,7 @@
 #include <QPair>
 #include <QRegExp>
 
-#include "qhttphandler.h"
+#include "QHttpEngine/qhttphandler.h"
 
 typedef QPair<QRegExp, QString> Redirect;
 typedef QPair<QRegExp, QHttpHandler*> SubHandler;

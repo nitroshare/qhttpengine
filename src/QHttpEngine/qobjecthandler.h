@@ -30,7 +30,6 @@ class QHTTPENGINE_EXPORT QObjectHandlerPrivate;
 
 /**
  * @brief Handler for invoking slots
- * @headerfile qobjecthandler.h QObjectHandler
  *
  * This handler enables incoming requests to invoke a matching slot in a
  * QObject-derived class. The request body is expected to contain parameters

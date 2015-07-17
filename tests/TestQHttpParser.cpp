@@ -24,8 +24,8 @@
 #include <QObject>
 #include <QTest>
 
-#include <QHttpParser>
-#include <QIByteArray>
+#include <QHttpEngine/QHttpParser>
+#include <QHttpEngine/QIByteArray>
 
 typedef QList<QByteArray> QByteArrayList;
 

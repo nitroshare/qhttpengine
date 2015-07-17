@@ -26,8 +26,8 @@
 #include <QObject>
 #include <QTcpServer>
 
-#include "qhttphandler.h"
-#include "qhttpserver.h"
+#include "QHttpEngine/qhttphandler.h"
+#include "QHttpEngine/qhttpserver.h"
 
 class QHttpServerPrivate : public QObject
 {

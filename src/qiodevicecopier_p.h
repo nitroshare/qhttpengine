@@ -26,7 +26,7 @@
 #include <QIODevice>
 #include <QObject>
 
-#include "qiodevicecopier.h"
+#include "QHttpEngine/qiodevicecopier.h"
 
 class QIODeviceCopierPrivate : public QObject
 {

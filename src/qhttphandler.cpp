@@ -20,7 +20,8 @@
  * IN THE SOFTWARE.
  */
 
-#include "qhttphandler.h"
+#include <QHttpEngine/QHttpHandler>
+
 #include "qhttphandler_p.h"
 
 QHttpHandlerPrivate::QHttpHandlerPrivate(QHttpHandler *handler)

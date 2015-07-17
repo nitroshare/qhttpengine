@@ -24,8 +24,8 @@
 #include <QTcpSocket>
 #include <QTest>
 
-#include <QHttpServer>
-#include <QHttpHandler>
+#include <QHttpEngine/QHttpServer>
+#include <QHttpEngine/QHttpHandler>
 
 #include "common/qsimplehttpclient.h"
 
