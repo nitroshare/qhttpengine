@@ -38,7 +38,7 @@ class QHTTPENGINE_EXPORT QHttpSocketPrivate;
  * read data from and write data to an HTTP client through a QTcpSocket
  * provided in the constructor. The QHttpSocket will assume ownership of the
  * socket and ensure it is properly deleted. Consequently, the QTcpSocket must
- * have been allocated on the heap.
+ * have been allocated on the heap:
  *
  * @code
  * QTcpSocket *tcpSock = new QTcpSocket;
@@ -49,16 +49,17 @@ class QHTTPENGINE_EXPORT QHttpSocketPrivate;
  * @endcode
  *
  * Once the headersParsed() signal is emitted, information about the request
- * can be retrieved using the appropriate methods. This includes the method,
- * path, and headers. As data is received, the readyRead() signal is emitted
- * and any available data can be read using QIODevice's read*() methods.
+ * can be retrieved using the appropriate methods. As data is received, the
+ * readyRead() signal is emitted and any available data can be read using
+ * QIODevice::read():
  *
  * @code
+ * QByteArray data;
  * connect(httpSock, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
  *
  * void MyClass::onReadyRead()
  * {
- *     data += httpSock->readAll();
+ *     data.append(httpSock->readAll());
  * }
  * @endcode
  *
@@ -70,13 +71,19 @@ class QHTTPENGINE_EXPORT QHttpSocketPrivate;
  * The status code and headers may be set as long as no data has been written
  * to the device and the writeHeaders() method has not been called. The
  * headers are written either when the writeHeaders() method is called or when
- * data is first written to the device.
+ * data is first written to the device:
  *
  * @code
  * httpSock->setStatusCode(QHttpSocket::OK);
  * httpSock->setHeader("Content-Length", 13);
  * httpSock->write("Hello, world!");
  * @endcode
+ *
+ * This class also provides methods that simplify writing a redirect or an
+ * HTTP error to the socket. To write a redirect, simply pass a path to the
+ * writeRedirect() method. To write an error, simply pass the desired HTTP
+ * status code to the writeError() method. Both methods will close the socket
+ * once the response is written.
  */
 class QHTTPENGINE_EXPORT QHttpSocket : public QIODevice
 {

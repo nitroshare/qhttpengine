@@ -33,14 +33,14 @@
 class QHTTPENGINE_EXPORT QHttpServerPrivate;
 
 /**
- * @brief HTTP server
+ * @brief TCP server for HTTP requests
  * @headerfile qhttpserver.h QHttpEngine/QHttpServer
  *
  * This class provides a TCP server that listens for HTTP requests on the
  * specified address and port. When a new request is received, a QHttpSocket
  * is created for the QTcpSocket which abstracts a TCP server socket. Once the
- * request headers are received, the registered handler is invoked and the
- * request processed. The QHttpSocket assumes ownership of the QTcpSocket.
+ * request headers are received, the root handler is invoked and the request
+ * processed. The QHttpSocket assumes ownership of the QTcpSocket.
  *
  * Because QHttpServer derives from QTcpServer, instructing the server to
  * listen on an available port is as simple as invoking listen() with no
@@ -74,7 +74,7 @@ public:
     QHttpServer(QHttpHandler *handler, QObject *parent = 0);
 
     /**
-     * @brief Set the handler for all new requests
+     * @brief Set the root handler for all new requests
      */
     void setHandler(QHttpHandler *handler);
 
