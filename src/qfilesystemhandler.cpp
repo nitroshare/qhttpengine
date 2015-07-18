@@ -43,11 +43,13 @@ QFilesystemHandlerPrivate::QFilesystemHandlerPrivate(QFilesystemHandler *handler
 
 bool QFilesystemHandlerPrivate::absolutePath(const QString &path, QString &absolutePath)
 {
-    // Clean the path and make it absolute
-    absolutePath = QDir(documentRoot.absoluteFilePath(path)).canonicalPath();
+    // Resolve the path according to the document root
+    absolutePath = documentRoot.absoluteFilePath(path);
 
-    // Ensure that the absolute path is within the root
-    return absolutePath.startsWith(documentRoot.canonicalPath());
+    // Perhaps not the most efficient way of doing things, but one way to
+    // determine if path is within the document root is to convert it to a
+    // relative path and check to see if it begins with "../" (it shouldn't)
+    return documentRoot.exists(absolutePath) && !documentRoot.relativeFilePath(path).startsWith("../");
 }
 
 QByteArray QFilesystemHandlerPrivate::mimeType(const QString &absolutePath)
