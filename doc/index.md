@@ -21,11 +21,14 @@ QHttpEngine is designed in a portable way, so it may run on other compilers and 
 
 ## Building
 
-QHttpEngine uses CMake for building the library. The library recognizes three options during configuration, all of which are disabled by default (only the library itself is built):
+QHttpEngine uses CMake for building the library. The library recognizes four options during configuration, all of which are disabled by default (the library is built as a shared library):
 
+- `BUILD_STATIC` - build and link a static library instead of a shared library
 - `BUILD_DOC` - (requires Doxygen) generates documentation from the comments in the source code
 - `BUILD_EXAMPLES` - builds the sample applications that demonstrate how to use QHttpEngine
 - `BUILD_TESTS` - build the test suite
+
+It is also possible to override installation directories by customizing the `BIN_INSTALL_DIR`, `LIB_INSTALL_DIR`, `INCLUDE_INSTALL_DIR`, `CMAKECONFIG_INSTALL_DIR`, `DOC_INSTALL_DIR`, and `EXAMPLES_INSTALL_DIR` variables.
 
 ## Usage
 
