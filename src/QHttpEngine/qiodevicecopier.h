@@ -31,7 +31,7 @@
 class QHTTPENGINE_EXPORT QIODeviceCopierPrivate;
 
 /**
- * @brief Device copier
+ * @brief Data copier for classes deriving from QIODevice
  * @headerfile qiodevicecopier.h QHttpEngine/QIODeviceCopier
  *
  * QIODeviceCopier provides a set of methods for reading data from a QIODevice
@@ -87,8 +87,8 @@ Q_SIGNALS:
      * @brief Indicate that the copy operation finished
      *
      * For sequential devices, this will occur when readChannelFinished() is
-     * emitted. For other files, this signal relies on QIODevice::atEnd() and
-     * QIODevice::aboutToClose().
+     * emitted. For other devices, this signal relies on QIODevice::atEnd()
+     * and QIODevice::aboutToClose().
      *
      * This signal will also be emitted immediately after the error() signal
      * or if the stop() method is invoked.
@@ -98,7 +98,7 @@ Q_SIGNALS:
 public Q_SLOTS:
 
     /**
-     * @brief Begin the copy operation
+     * @brief Start the copy operation
      *
      * The source device will be opened for reading and the destination device
      * opened for writing if applicable. If opening either file fails for some
@@ -111,8 +111,8 @@ public Q_SLOTS:
     /**
      * @brief Stop the copy operation
      *
-     * The start() method should not be invoked after stopping the copy.
-     * Instead, a new instance should be created.
+     * The start() method should not be invoked after stopping the operation.
+     * Instead, a new QIODeviceCopier instance should be created.
      */
     void stop();
 

@@ -119,6 +119,7 @@ protected:
 private:
 
     QHttpHandlerPrivate *const d;
+    friend class QHttpHandlerPrivate;
 };
 
 #endif // QHTTPENGINE_QHTTPHANDLER_H

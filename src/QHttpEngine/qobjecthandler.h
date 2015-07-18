@@ -78,6 +78,7 @@ protected:
 private:
 
     QObjectHandlerPrivate *const d;
+    friend class QObjectHandlerPrivate;
 };
 
 #endif // QHTTPENGINE_QOBJECTHANDLER_H

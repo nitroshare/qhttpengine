@@ -73,6 +73,7 @@ public:
 private:
 
     QLocalFilePrivate *const d;
+    friend class QLocalFilePrivate;
 };
 
 #endif // QHTTPENGINE_QLOCALFILE_H

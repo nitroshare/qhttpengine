@@ -79,6 +79,7 @@ protected:
 private:
 
     QFilesystemHandlerPrivate *const d;
+    friend class QFilesystemHandlerPrivate;
 };
 
 #endif // QHTTPENGINE_QFILESYSTEMHANDLER_H

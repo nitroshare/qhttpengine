@@ -38,9 +38,20 @@ class QHTTPENGINE_EXPORT QIByteArray : public QByteArray
 {
 public:
 
+    /**
+     * @brief Create an empty QIByteArray
+     */
     QIByteArray();
+
+    /**
+     * @brief QIByteArray copy constructor
+     */
     QIByteArray(const QByteArray &other);
-    QIByteArray(const char * data, int size = -1);
+
+    /**
+     * @brief Create a QIByteArray from a const char *
+     */
+    QIByteArray(const char *data, int size = -1);
 };
 
 QHTTPENGINE_EXPORT bool operator==(const QIByteArray &a1, const QIByteArray &a2);

@@ -81,6 +81,7 @@ public:
 private:
 
     QHttpServerPrivate *const d;
+    friend class QHttpServerPrivate;
 };
 
 #endif // QHTTPENGINE_QHTTPSERVER_H
