@@ -20,7 +20,12 @@ if(WIN32)
     set(SRC ${SRC} "${CMAKE_CURRENT_BINARY_DIR}/resource.rc")
 endif()
 
-add_library(QHttpEngine SHARED ${HEADERS} ${SRC})
+if(BUILD_STATIC)
+    add_library(QHttpEngine STATIC ${HEADERS} ${SRC})
+else()
+    add_library(QHttpEngine SHARED ${HEADERS} ${SRC})
+endif()
+
 qt5_use_modules(QHttpEngine Network)
 
 target_include_directories(QHttpEngine PUBLIC

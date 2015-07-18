@@ -15,6 +15,8 @@ set(PROJECT_VERSION_MINOR 1)
 set(PROJECT_VERSION_PATCH 0)
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
+option(BUILD_STATIC "Build a static library" OFF)
+
 option(BUILD_DOC "Build Doxygen documentation" OFF)
 option(BUILD_EXAMPLES "Build the example applications" OFF)
 option(BUILD_TESTS "Build the test suite" OFF)
