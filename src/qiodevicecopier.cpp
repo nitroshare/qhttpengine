@@ -90,6 +90,8 @@ QIODeviceCopier::QIODeviceCopier(QIODevice *src, QIODevice *dest, QObject *paren
     : QObject(parent),
       d(new QIODeviceCopierPrivate(this, src, dest))
 {
+    connect(src, SIGNAL(destroyed()), this, SLOT(stop()));
+    connect(dest, SIGNAL(destroyed()), this, SLOT(stop()));
 }
 
 void QIODeviceCopier::setBufferSize(qint64 size)
