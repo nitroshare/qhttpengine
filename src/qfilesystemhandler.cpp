@@ -31,13 +31,23 @@
 
 // Template for listing directory contents
 const QString ListTemplate =
-        "<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>%1</title>"
-        "</head><body><h1>%1</h1><p>Directory listing:</p><ul>%2</ul><hr>"
-        "<em>QHttpEngine %3</em></body></html>";
+        "<!DOCTYPE html>"
+        "<html>"
+          "<head>"
+            "<meta charset=\"utf-8\">"
+            "<title>%1</title>"
+          "</head>"
+          "<body>"
+            "<h1>%1</h1>"
+            "<p>Directory listing:</p>"
+            "<ul>%2</ul>"
+            "<hr>"
+            "<p><em>QHttpEngine %3</em></p>"
+          "</body>"
+        "</html>";
 
 QFilesystemHandlerPrivate::QFilesystemHandlerPrivate(QFilesystemHandler *handler)
-    : QObject(handler),
-      q(handler)
+    : QObject(handler)
 {
 }
 
@@ -54,7 +64,7 @@ bool QFilesystemHandlerPrivate::absolutePath(const QString &path, QString &absol
 
 QByteArray QFilesystemHandlerPrivate::mimeType(const QString &absolutePath)
 {
-    // Query the MIME database based on the filename and contents
+    // Query the MIME database based on the filename and its contents
     return database.mimeTypeForFile(absolutePath).name().toUtf8();
 }
 

@@ -46,10 +46,6 @@ public:
 
     QDir documentRoot;
     QMimeDatabase database;
-
-private:
-
-    QFilesystemHandler *const q;
 };
 
 #endif // QHTTPENGINE_QFILESYSTEMHANDLERPRIVATE_H
