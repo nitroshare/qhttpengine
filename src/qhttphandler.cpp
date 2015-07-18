@@ -36,9 +36,9 @@ QHttpHandler::QHttpHandler(QObject *parent)
 {
 }
 
-void QHttpHandler::addRedirect(const QRegExp &pattern, const QString &destination)
+void QHttpHandler::addRedirect(const QRegExp &pattern, const QString &path)
 {
-    d->redirects.append(Redirect(pattern, destination));
+    d->redirects.append(Redirect(pattern, path));
 }
 
 void QHttpHandler::addSubHandler(const QRegExp &pattern, QHttpHandler *handler)

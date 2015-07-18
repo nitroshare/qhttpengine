@@ -82,14 +82,14 @@ public:
     /**
      * @brief Add a redirect for a specific pattern
      *
-     * The pattern and location will be added to an internal list that will
-     * be used when the route() method is invoked to determine whether the
+     * The pattern and path will be added to an internal list that will be
+     * used when the route() method is invoked to determine whether the
      * request matches any patterns. The order of the list is preserved.
      *
      * The destination path may use "%1", "%2", etc. to refer to captured
      * parts of the pattern. The client will receive an HTTP 302 redirect.
      */
-    void addRedirect(const QRegExp &pattern, const QString &location);
+    void addRedirect(const QRegExp &pattern, const QString &path);
 
     /**
      * @brief Add a handler for a specific pattern
