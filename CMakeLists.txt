@@ -26,7 +26,7 @@ set(LIB_INSTALL_DIR lib CACHE STRING "Library installation directory relative to
 set(INCLUDE_INSTALL_DIR include CACHE STRING "Header installation directory relative to the install prefix")
 set(CMAKECONFIG_INSTALL_DIR "${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME}" CACHE STRING "CMake configuration installation directory")
 set(DOC_INSTALL_DIR share/doc/${PROJECT_NAME} CACHE STRING "Documentation installation directory relative to the install prefix")
-set(EXAMPLES_INSTALL_DIR "${LIB_INSTALL_DIR}/${PROJECT_NAME}/examples")
+set(EXAMPLES_INSTALL_DIR "${LIB_INSTALL_DIR}/${PROJECT_NAME}/examples" CACHE STRING "Examples installation directory relative to the install prefix")
 
 find_package(Qt5Network 5.1 REQUIRED)
 
