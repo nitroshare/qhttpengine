@@ -118,8 +118,7 @@ bool TestQFilesystemHandler::createFile(const QString &path)
         return false;
     }
 
-    file.write(Data);
-    return true;
+    return file.write(Data) == Data.length();
 }
 
 bool TestQFilesystemHandler::createDirectory(const QString &path)

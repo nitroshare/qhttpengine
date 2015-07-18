@@ -50,65 +50,12 @@ class TestQHttpHandler : public QObject
 
 private Q_SLOTS:
 
-    void testSubHandler_data();
-    void testSubHandler();
-
     void testRedirect_data();
     void testRedirect();
+
+    void testSubHandler_data();
+    void testSubHandler();
 };
-
-void TestQHttpHandler::testSubHandler_data()
-{
-    QTest::addColumn<QRegExp>("pattern");
-    QTest::addColumn<QByteArray>("path");
-    QTest::addColumn<QString>("pathRemainder");
-    QTest::addColumn<int>("statusCode");
-
-    QTest::newRow("match")
-            << QRegExp("\\w+")
-            << QByteArray("test")
-            << QString("")
-            << static_cast<int>(QHttpSocket::OK);
-
-    QTest::newRow("no match")
-            << QRegExp("\\d+")
-            << QByteArray("test")
-            << QString("")
-            << static_cast<int>(QHttpSocket::NotFound);
-
-    QTest::newRow("path")
-            << QRegExp("one/")
-            << QByteArray("one/two")
-            << QString("two")
-            << static_cast<int>(QHttpSocket::OK);
-}
-
-void TestQHttpHandler::testSubHandler()
-{
-    QFETCH(QRegExp, pattern);
-    QFETCH(QByteArray, path);
-    QFETCH(QString, pathRemainder);
-    QFETCH(int, statusCode);
-
-    QSocketPair pair;
-    QTRY_VERIFY(pair.isConnected());
-
-    QSimpleHttpClient client(pair.client());
-    QHttpSocket socket(pair.server(), &pair);
-
-    client.sendHeaders("GET", path, QHttpHeaderMap());
-    QTRY_VERIFY(socket.isHeadersParsed());
-
-    DummyHandler subHandler;
-
-    QHttpHandler handler;
-    handler.addSubHandler(pattern, &subHandler);
-
-    handler.route(&socket, socket.path());
-
-    QTRY_COMPARE(client.statusCode(), statusCode);
-    QCOMPARE(subHandler.mPathRemainder, pathRemainder);
-}
 
 void TestQHttpHandler::testRedirect_data()
 {
@@ -165,6 +112,58 @@ void TestQHttpHandler::testRedirect()
         QFETCH(QByteArray, location);
         QCOMPARE(client.headers().value("Location"), location);
     }
+}
+
+void TestQHttpHandler::testSubHandler_data()
+{
+    QTest::addColumn<QRegExp>("pattern");
+    QTest::addColumn<QByteArray>("path");
+    QTest::addColumn<QString>("pathRemainder");
+    QTest::addColumn<int>("statusCode");
+
+    QTest::newRow("match")
+            << QRegExp("\\w+")
+            << QByteArray("test")
+            << QString("")
+            << static_cast<int>(QHttpSocket::OK);
+
+    QTest::newRow("no match")
+            << QRegExp("\\d+")
+            << QByteArray("test")
+            << QString("")
+            << static_cast<int>(QHttpSocket::NotFound);
+
+    QTest::newRow("path")
+            << QRegExp("one/")
+            << QByteArray("one/two")
+            << QString("two")
+            << static_cast<int>(QHttpSocket::OK);
+}
+
+void TestQHttpHandler::testSubHandler()
+{
+    QFETCH(QRegExp, pattern);
+    QFETCH(QByteArray, path);
+    QFETCH(QString, pathRemainder);
+    QFETCH(int, statusCode);
+
+    QSocketPair pair;
+    QTRY_VERIFY(pair.isConnected());
+
+    QSimpleHttpClient client(pair.client());
+    QHttpSocket socket(pair.server(), &pair);
+
+    client.sendHeaders("GET", path, QHttpHeaderMap());
+    QTRY_VERIFY(socket.isHeadersParsed());
+
+    DummyHandler subHandler;
+    QHttpHandler handler;
+    handler.addSubHandler(pattern, &subHandler);
+
+    handler.route(&socket, socket.path());
+
+    QTRY_COMPARE(client.statusCode(), statusCode);
+    QCOMPARE(subHandler.mPathRemainder, pathRemainder);
 }
 
 QTEST_MAIN(TestQHttpHandler)
