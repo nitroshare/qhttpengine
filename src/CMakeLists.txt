@@ -1,6 +1,6 @@
-configure_file(qhttpengine.h.in "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.h")
-
 file(GLOB HEADERS "${PROJECT_NAME}/*")
+
+configure_file(qhttpengine.h.in "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.h")
 set(HEADERS "${HEADERS}" "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.h")
 
 set(SRC
@@ -40,8 +40,6 @@ set_target_properties(QHttpEngine PROPERTIES
     PUBLIC_HEADER "${HEADERS}"
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
-    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}"
-    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}"
 )
 
 install(TARGETS QHttpEngine EXPORT QHttpEngine-export
