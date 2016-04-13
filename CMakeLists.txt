@@ -28,7 +28,17 @@ set(CMAKECONFIG_INSTALL_DIR "${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME}" CACHE STR
 set(DOC_INSTALL_DIR share/doc/${PROJECT_NAME} CACHE STRING "Documentation installation directory relative to the install prefix")
 set(EXAMPLES_INSTALL_DIR "${LIB_INSTALL_DIR}/${PROJECT_NAME}/examples" CACHE STRING "Examples installation directory relative to the install prefix")
 
-find_package(Qt4 4.8 REQUIRED QtCore QtNetwork)
+find_package(Qt5Network 5.1 QUIET)
+if (NOT Qt5Network_FOUND)
+    find_package(Qt4 4.8 QUIET COMPONENTS QtGui QtCore QtNetwork)
+    if (NOT Qt4_FOUND)
+        message(FATAL_ERROR "One of Qt5 or Qt4 is required")
+    endif()
+
+    find_package(Git REQUIRED)
+    message("-- Updating git submodules for QT4 compilation --")
+    execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive)
+endif()
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
