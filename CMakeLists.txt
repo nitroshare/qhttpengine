@@ -30,13 +30,21 @@ set(EXAMPLES_INSTALL_DIR "${LIB_INSTALL_DIR}/${PROJECT_NAME}/examples" CACHE STR
 
 find_package(Qt5Network 5.1 QUIET)
 if (NOT Qt5Network_FOUND)
+    message("-- QT minimum version 5.1 not found, trying with minimum version 4.8")
+    
     find_package(Qt4 4.8 QUIET COMPONENTS QtGui QtCore QtNetwork)
     if (NOT Qt4_FOUND)
-        message(FATAL_ERROR "One of Qt5 or Qt4 is required")
-    endif()
+        message("-- QT minimum version 4.8 not found")
 
+        message(FATAL_ERROR "Qt minimum versio 4.8 is required")
+    endif()
+endif()
+
+message("-- Using QT version ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}")
+
+if (Qt4_FOUND)
     find_package(Git REQUIRED)
-    message("-- Updating git submodules for QT4 compilation --")
+    message("-- Updating git submodules for QT4 compilation ${Qt4_VERSION}")
     execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive)
 endif()
 
