@@ -1,3 +1,7 @@
+if (Qt4_FOUND)
+find_package(Qt4Test 4.8 REQUIRED)
+endif()
+
 find_package(Qt5Test 5.1 REQUIRED)
 
 add_subdirectory(common)

@@ -20,6 +20,8 @@
  * IN THE SOFTWARE.
  */
 
+#include <QtGlobal>
+
 #if QT_VERSION >= 0x050000   
 #include <QCommandLineOption>
 #include <QCommandLineParser>
