@@ -1,0 +1,6 @@
+[submodule "src/qjson-backport"]
+	path = src/qjson-backport
+	url = https://github.com/5in4/qjson-backport.git
+[submodule "src/mimetypes"]
+	path = src/mimetypes
+	url = http://code.qt.io/cgit/playground/mimetypes.git/
