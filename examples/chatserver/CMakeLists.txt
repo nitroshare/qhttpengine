@@ -3,7 +3,7 @@ set(SRC
     main.cpp
 )
 
-qt5_add_resources(QRC resources.qrc)
+QT4_ADD_RESOURCES(QRC resources.qrc)
 
 add_executable(chatserver ${SRC} ${QRC})
 target_link_libraries(chatserver QHttpEngine)

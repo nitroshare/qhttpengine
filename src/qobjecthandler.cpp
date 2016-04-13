@@ -20,9 +20,8 @@
  * IN THE SOFTWARE.
  */
 
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonParseError>
+#include <qjsondocument.h>
+#include <qjsonobject.h>
 #include <QMetaMethod>
 #include <QMetaObject>
 #include <QMetaType>
@@ -107,7 +106,12 @@ void QObjectHandler::process(QHttpSocket *socket, const QString &path)
 
     // Ensure that the return type of the slot is QVariantMap
     QMetaMethod method = metaObject()->method(index);
+
+#if QT_VERSION >= 0x050000   
     if(method.returnType() != QMetaType::QVariantMap) {
+#else
+    if(!method.typeName() || strcmp(method.typeName(), "QVariantMap") != 0) {
+#endif
         socket->writeError(QHttpSocket::InternalServerError);
         return;
     }
