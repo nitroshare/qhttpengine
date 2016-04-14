@@ -30,6 +30,7 @@
 typedef QList<QByteArray> QByteArrayList;
 
 Q_DECLARE_METATYPE(QHttpHeaderMap)
+Q_DECLARE_METATYPE(QList<QByteArray>)
 
 const QIByteArray Key1 = "a";
 const QByteArray Value1 = "b";

@@ -1,27 +1,46 @@
 if (Qt4_FOUND)
-find_package(Qt4Test 4.8 REQUIRED)
+    find_package(Qt4 4.8 REQUIRED QtTest)
+else()
+    find_package(Qt5Test 5.1 REQUIRED)
 endif()
-
-find_package(Qt5Test 5.1 REQUIRED)
 
 add_subdirectory(common)
 
 set(TESTS
-    TestQFilesystemHandler
-    TestQHttpHandler
     TestQHttpParser
-    TestQHttpServer
-    TestQHttpSocket
     TestQIByteArray
-    TestQIODeviceCopier
     TestQLocalFile
-    TestQObjectHandler
 )
+
+# These don't work with Qt4
+if (NOT Qt4_FOUND)
+    set(TESTS ${TESTS}
+        TestQFilesystemHandler
+        TestQHttpHandler
+        TestQHttpServer
+        TestQHttpSocket
+        TestQIODeviceCopier
+        TestQObjectHandler
+    )
+endif()
 
 foreach(TEST ${TESTS})
     add_executable(${TEST} ${TEST}.cpp)
+    
+if (Qt4_FOUND)
+    target_link_libraries(${TEST} Qt4::QtTest)   
+
+    target_include_directories(${TEST} PRIVATE
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../src/mimetypes/include/QtMimeTypes>"
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../src/mimetypes/src/mimetypes/inqt5>"
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../src/qjson-backport>"
+    )  
+else()
     qt5_use_modules(${TEST} Test)
+endif()
+
     target_link_libraries(${TEST} QHttpEngine common)
+    
     add_test(NAME ${TEST}
         COMMAND ${TEST}
     )

@@ -6,4 +6,8 @@ set(SRC
 add_library(common STATIC ${SRC})
 target_link_libraries(common QHttpEngine)
 
-qt5_use_modules(common Network)
+if (Qt4_FOUND)
+    target_link_libraries(common Qt4::QtNetwork)  
+else()
+    qt5_use_modules(common Network)
+endif()
