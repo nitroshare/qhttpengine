@@ -48,10 +48,22 @@ public:
      */
     QIByteArray(const QByteArray &other);
 
+#if QT_VERSION >= 0x050000
     /**
      * @brief Create a QIByteArray from a const char *
      */
     QIByteArray(const char *data, int size = -1);
+#else
+    /**
+     * @brief Create a QIByteArray from a const char *
+     */
+    QIByteArray(const char *data);
+
+    /**
+     * @brief Create a QIByteArray from a const char *
+     */
+    QIByteArray(const char *data, int size);
+#endif
 };
 
 QHTTPENGINE_EXPORT bool operator==(const QIByteArray &a1, const QIByteArray &a2);
