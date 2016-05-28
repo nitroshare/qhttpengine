@@ -52,41 +52,24 @@ bool QLocalFilePrivate::setPermission()
     // ACL for the file must contain only a single ACE, granting access to the
     // file owner (the current user)
 
-    // Retrieve the owner SID for the file
-    PSID pSID;
-    PSECURITY_DESCRIPTOR pSD;
-    if(GetNamedSecurityInfoW((LPCWSTR)q->fileName().utf16(),
-                             SE_FILE_OBJECT,
-                             OWNER_SECURITY_INFORMATION,
-                             &pSID,
-                             NULL,
-                             NULL,
-                             NULL,
-                             &pSD) != ERROR_SUCCESS) {
-        return false;
-    }
-
     EXPLICIT_ACCESS_W ea;
-    ZeroMemory(&ea, sizeof(EXPLICIT_ACCESS));
+    ZeroMemory(&ea, sizeof(EXPLICIT_ACCESS_W));
     ea.grfAccessPermissions = STANDARD_RIGHTS_REQUIRED;
     ea.grfAccessMode = GRANT_ACCESS;
-    ea.grfInheritance = NO_INHERITANCE;
-    ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
-    ea.Trustee.ptstrName = (LPWSTR)pSID;
+    ea.grfInheritance = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
+    ea.Trustee.TrusteeForm = TRUSTEE_IS_NAME;
+    ea.Trustee.ptstrName = L"CREATOR OWNER";
 
     // Create a new ACL with a single access control entry
     PACL pACL;
     if(SetEntriesInAclW(1, &ea, NULL, &pACL) != ERROR_SUCCESS) {
-        LocalFree(pSD);
         return false;
     }
-
-    LocalFree(pSD);
 
     // Apply the ACL to the file
     if(SetNamedSecurityInfoW((LPWSTR)q->fileName().utf16(),
                              SE_FILE_OBJECT,
-                             DACL_SECURITY_INFORMATION,
+                             DACL_SECURITY_INFORMATION | PROTECTED_DACL_SECURITY_INFORMATION,
                              NULL,
                              NULL,
                              pACL,
