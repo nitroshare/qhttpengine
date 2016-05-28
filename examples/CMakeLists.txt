@@ -1,4 +1,5 @@
 set(EXAMPLES
+    auth
     chatserver
     fileserver
 )
