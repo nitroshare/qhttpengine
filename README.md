@@ -1,6 +1,6 @@
 ## QHTTPEngine
 
-[![Build Status](https://snap-ci.com/nitroshare/qhttpengine/branch/master/build_image)](https://snap-ci.com/nitroshare/qhttpengine/branch/master)
+[![Build Status](https://travis-ci.org/nitroshare/qhttpengine.svg?branch=master)](https://travis-ci.org/nitroshare/qhttpengine)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](http://opensource.org/licenses/MIT)
 
 Simple set of classes for developing HTTP server applications in Qt.

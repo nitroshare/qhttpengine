@@ -1,0 +1,17 @@
+sudo: required
+dist: trusty
+
+language: c++
+
+compiler:
+  - clang
+  - gcc
+
+install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq cmake qtbase5-dev
+
+script:
+  - cmake -DBUILD_TESTS=on .
+  - make
+  - ctest
