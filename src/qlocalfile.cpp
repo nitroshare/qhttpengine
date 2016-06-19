@@ -54,7 +54,7 @@ bool QLocalFilePrivate::setPermission()
 
     EXPLICIT_ACCESS_W ea;
     ZeroMemory(&ea, sizeof(EXPLICIT_ACCESS_W));
-    ea.grfAccessPermissions = STANDARD_RIGHTS_REQUIRED;
+    ea.grfAccessPermissions = GENERIC_ALL;
     ea.grfAccessMode = GRANT_ACCESS;
     ea.grfInheritance = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
     ea.Trustee.TrusteeForm = TRUSTEE_IS_NAME;
