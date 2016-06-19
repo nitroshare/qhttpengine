@@ -63,7 +63,7 @@ int main(int argc, char * argv[])
     // Check the response
     QObject::connect(reply, &QNetworkReply::finished, [&a, reply]() {
         if (reply->error() == QNetworkReply::NoError) {
-            qInfo("Successfully authenticated to server.");
+            qDebug("Successfully authenticated to server.");
             a.exit();
         } else {
             qCritical("Error: %s", reply->errorString().toUtf8().constData());
