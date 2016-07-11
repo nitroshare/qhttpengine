@@ -25,7 +25,7 @@
 
 #if defined(Q_OS_UNIX)
 #  include <sys/stat.h>
-#elif defined(Q_OS_WIN)
+#elif defined(Q_OS_WIN32)
 #  include <aclapi.h>
 #  include <fileapi.h>
 #endif
@@ -46,7 +46,7 @@ bool QLocalFilePrivate::setPermission()
 {
 #if defined(Q_OS_UNIX)
     return chmod(q->fileName().toUtf8().constData(), S_IRUSR | S_IWUSR) == 0;
-#elif defined(Q_OS_WIN)
+#elif defined(Q_OS_WIN32)
     // Windows uses ACLs to control file access - each file contains an ACL
     // which consists of one or more ACEs (access control entries) - so the
     // ACL for the file must contain only a single ACE, granting access to the
@@ -91,7 +91,7 @@ bool QLocalFilePrivate::setHidden()
 #if defined(Q_OS_UNIX)
     // On Unix, anything beginning with a "." is hidden
     return true;
-#elif defined(Q_OS_WIN)
+#elif defined(Q_OS_WIN32)
     return SetFileAttributesW((LPCWSTR)q->fileName().utf16(), FILE_ATTRIBUTE_HIDDEN) != 0;
 #else
     // Unsupported platform, so setHidden() must fail
