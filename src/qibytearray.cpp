@@ -31,6 +31,12 @@ QIByteArray::QIByteArray(const QByteArray &other)
     : QByteArray(other)
 {}
 
+#if QT_VERSION < 0x050000
+QIByteArray::QIByteArray(const char *data)
+    : QByteArray(data)
+{}
+#endif
+
 QIByteArray::QIByteArray(const char *data, int size)
     : QByteArray(data, size)
 {}

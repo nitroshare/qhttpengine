@@ -14,6 +14,27 @@ set(SRC
     qlocalfile.cpp
     qobjecthandler.cpp
 )
+if (Qt4_FOUND)
+    set(SRC "${SRC}"
+        qjson-backport/qjsonarray.cpp
+        qjson-backport/qjson.cpp
+        qjson-backport/qjsondocument.cpp
+        qjson-backport/qjsonobject.cpp
+        qjson-backport/qjsonparser.cpp
+        qjson-backport/qjsonvalue.cpp
+        qjson-backport/qjsonwriter.cpp
+        
+        mimetypes/src/mimetypes/qmimedatabase.cpp
+        mimetypes/src/mimetypes/qmimeglobpattern.cpp
+        mimetypes/src/mimetypes/qmimemagicrule.cpp
+        mimetypes/src/mimetypes/qmimemagicrulematcher.cpp
+        mimetypes/src/mimetypes/qmimeprovider.cpp
+        mimetypes/src/mimetypes/qmimetype.cpp
+        mimetypes/src/mimetypes/qmimetypeparser.cpp    
+        mimetypes/src/mimetypes/inqt5/qstandardpaths.cpp
+        mimetypes/src/mimetypes/inqt5/qstandardpaths_unix.cpp 
+    )
+endif()
 
 if(WIN32)
     configure_file(resource.rc.in "${CMAKE_CURRENT_BINARY_DIR}/resource.rc")
@@ -26,13 +47,23 @@ else()
     add_library(QHttpEngine SHARED ${HEADERS} ${SRC})
 endif()
 
-qt5_use_modules(QHttpEngine Network)
-
 target_include_directories(QHttpEngine PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
     "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>"
 )
+
+if (Qt4_FOUND)
+    target_include_directories(QHttpEngine PRIVATE
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/mimetypes/include/QtMimeTypes>"
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/mimetypes/src/mimetypes/inqt5>"
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/qjson-backport>"
+    )  
+    
+    target_link_libraries(QHttpEngine Qt4::QtCore Qt4::QtNetwork Qt4::QtGui)      
+else()
+    qt5_use_modules(QHttpEngine Network)
+endif()
 
 set_target_properties(QHttpEngine PROPERTIES
     DEFINE_SYMBOL QT_NO_SIGNALS_SLOTS_KEYWORDS
@@ -68,3 +99,5 @@ configure_file(${PROJECT_NAME}.pc.in "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
     DESTINATION "${LIB_INSTALL_DIR}/pkgconfig"
 )
+
+

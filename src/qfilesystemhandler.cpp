@@ -93,19 +93,26 @@ void QFilesystemHandlerPrivate::processFile(QHttpSocket *socket, const QString &
     copier->start();
 }
 
+#if QT_VERSION >= 0x050000
+#    define HTMLESCAPE(x) ((x).toHtmlEscaped())
+#else
+#    include <QtGui/qtextdocument.h>
+#    define HTMLESCAPE(x) (Qt::escape(x))
+#endif
+
 void QFilesystemHandlerPrivate::processDirectory(QHttpSocket *socket, const QString &path, const QString &absolutePath)
 {
     // Add entries for each of the files
     QString listing;
     foreach(QFileInfo info, QDir(absolutePath).entryInfoList()) {
         listing.append(QString("<li><a href=\"%1%2\">%1%2</a></li>")
-                .arg(info.fileName().toHtmlEscaped())
+                .arg(HTMLESCAPE(info.fileName()))
                 .arg(info.isDir() ? "/" : ""));
     }
 
     // Build the response and convert the string to UTF-8
     QByteArray data = ListTemplate
-            .arg("/" + path.toHtmlEscaped())
+            .arg("/" + HTMLESCAPE(path))
             .arg(listing)
             .arg(QHTTPENGINE_VERSION)
             .toUtf8();

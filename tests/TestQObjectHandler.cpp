@@ -20,8 +20,8 @@
  * IN THE SOFTWARE.
  */
 
-#include <QJsonDocument>
-#include <QJsonObject>
+#include <qjsondocument.h>
+#include <qjsonobject.h>
 #include <QObject>
 #include <QTest>
 #include <QVariantMap>

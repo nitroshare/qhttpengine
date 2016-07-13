@@ -46,6 +46,8 @@ void QHttpHandler::addSubHandler(const QRegExp &pattern, QHttpHandler *handler)
     d->subHandlers.append(SubHandler(pattern, handler));
 }
 
+#include <QStringList>
+
 void QHttpHandler::route(QHttpSocket *socket, const QString &path)
 {
     // Check each of the redirects for a match

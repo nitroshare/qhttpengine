@@ -20,8 +20,13 @@
  * IN THE SOFTWARE.
  */
 
+#include <QtGlobal>
+
+#if QT_VERSION >= 0x050000   
 #include <QCommandLineOption>
 #include <QCommandLineParser>
+#endif
+
 #include <QCoreApplication>
 #include <QDir>
 #include <QHostAddress>
@@ -34,6 +39,7 @@ int main(int argc, char * argv[])
 {
     QCoreApplication a(argc, argv);
 
+#if QT_VERSION >= 0x050000   
     // Build the command-line options
     QCommandLineParser parser;
     QCommandLineOption addressOption(
@@ -66,6 +72,11 @@ int main(int argc, char * argv[])
     QHostAddress address = QHostAddress(parser.value(addressOption));
     quint16 port = parser.value(portOption).toInt();
     QString dir = parser.value(dirOption);
+#else
+    QHostAddress address("127.0.0.1");
+    quint16 port = 8000;
+    QString dir = QDir::homePath();
+#endif
 
     // Create the filesystem handler and server
     QFilesystemHandler handler(dir);
