@@ -37,7 +37,7 @@ public:
 
     explicit QObjectHandlerPrivate(QObjectHandler *handler);
 
-    void invokeSlot(QHttpSocket *socket, int index);
+    void invokeSlot(QHttpSocket *socket, int index, QVariantMap *queryString = NULL);
 
     QMap<QObject*, int> map;
 
