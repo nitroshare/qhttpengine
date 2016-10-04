@@ -23,7 +23,6 @@
 #ifndef QHTTPENGINE_QOBJECTHANDLERPRIVATE_H
 #define QHTTPENGINE_QOBJECTHANDLERPRIVATE_H
 
-#include <QMap>
 #include <QObject>
 
 #include "QHttpEngine/qhttpsocket.h"
@@ -37,13 +36,8 @@ public:
 
     explicit QObjectHandlerPrivate(QObjectHandler *handler);
 
-    void invokeSlot(QHttpSocket *socket, int index, QVariantMap *queryString = NULL);
-
-    QMap<QObject*, int> map;
-
-private Q_SLOTS:
-
-    void onReadChannelFinished();
+    void invokeSlot(QHttpSocket *socket, int index, const QVariantMap &query);
+    QVariantMap convertQueryString(const QString &query);
 
 private:
 

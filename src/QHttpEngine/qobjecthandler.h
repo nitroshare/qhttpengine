@@ -33,29 +33,31 @@ class QHTTPENGINE_EXPORT QObjectHandlerPrivate;
  * @headerfile qobjecthandler.h QHttpEngine/QObjectHandler
  *
  * This handler enables incoming requests to invoke a matching slot in a
- * QObject-derived class. The request body is expected to contain parameters
- * encoded as a JSON object. This object is then passed to the slot as a
- * single QVariantMap argument. The slot should return a QVariantMap
- * containing the response.
+ * QObject-derived class. The slot name is used to determine the HTTP verb
+ * that the method expects. For all requests, the query string is parsed and
+ * supplied to the slot as a parameter. For POST requests, the request body is
+ * expected to be a JSON object and it is supplied to the slot as a
+ * QVariantMap. The slot is expected to return a QVariantMap containing the
+ * response, which will be encoded as a JSON object.
  *
  * To use this class, it must be subclassed and one or more slots must be
- * created. The name of the slot will be used to determine the path. For
- * example, the following handler consists of a single method that can be
- * invoked by using the `/doSomething` path.
+ * created. The name of the slot will be used to determine the HTTP method and
+ * path. For example, the following handler consists of two methods that can
+ * be invoked by using the `/something` path.
  *
  * @code
  * class TestHandler : public QObjectHandler
  * {
  *     Q_OBJECT
  * private slots:
- *     QVariantMap doSomething(QVariantMap params);
+ *     QVariantMap get_something(QVariantMap queryString);
+ *     QVariantMap post_something(QVariantMap queryString, QVariantMap parameters);
  * };
  * @endcode
  *
- * The request body must contain valid JSON which will be decoded and passed
- * to the doSomething() slot as a QVariantMap. The slot should return a
- * QVariantMap which will then be encoded as JSON and written to the socket as
- * the response body.
+ * The slot name should begin with the HTTP method, followed by an underscore,
+ * and finally the name of the method which will be used to determine the path
+ * used to invoke it.
  */
 class QHTTPENGINE_EXPORT QObjectHandler : public QHttpHandler
 {

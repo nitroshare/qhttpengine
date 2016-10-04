@@ -24,6 +24,7 @@
 #include <QJsonObject>
 #include <QObject>
 #include <QTest>
+#include <QUrlQuery>
 #include <QVariantMap>
 
 #include <QHttpEngine/QHttpSocket>
@@ -38,8 +39,11 @@ class DummyHandler : public QObjectHandler
 
 private Q_SLOTS:
 
-    void invalidSignature(QVariantMap) {}
-    QVariantMap validSlot(QVariantMap params) {
+    void get_invalidSignature(QVariantMap) {}
+    QVariantMap get_validSlot(QVariantMap query) {
+        return query;
+    }
+    QVariantMap post_validSlot(QVariantMap, QVariantMap params) {
         return params;
     }
 };
@@ -59,42 +63,49 @@ void TestQObjectHandler::testRequests_data()
     QTest::addColumn<QByteArray>("method");
     QTest::addColumn<QByteArray>("path");
     QTest::addColumn<QByteArray>("data");
+    QTest::addColumn<QVariantMap>("response");
     QTest::addColumn<int>("statusCode");
 
-    QVariantMap map;
-    map.insert("param1", 1);
-    map.insert("param2", 2);
+    QVariantMap map({
+        { "param1", 1 },
+        { "param2", 2 }
+    });
 
     QByteArray data = QJsonDocument(QJsonObject::fromVariantMap(map)).toJson();
 
     QTest::newRow("nonexistent slot")
-            << QByteArray("POST")
+            << QByteArray("GET")
             << QByteArray("nonexistent")
-            << data
+            << QByteArray("")
+            << QVariantMap()
             << static_cast<int>(QHttpSocket::NotFound);
 
     QTest::newRow("invalid signature")
-            << QByteArray("POST")
+            << QByteArray("GET")
             << QByteArray("invalidSignature")
-            << data
+            << QByteArray("")
+            << QVariantMap()
             << static_cast<int>(QHttpSocket::InternalServerError);
 
-    QTest::newRow("bad method")
+    QTest::newRow("query string")
             << QByteArray("GET")
-            << QByteArray("validSlot")
-            << data
-            << static_cast<int>(QHttpSocket::MethodNotAllowed);
+            << QByteArray("validSlot?param=value")
+            << QByteArray("")
+            << QVariantMap({{"param", "value"}})
+            << static_cast<int>(QHttpSocket::OK);
 
     QTest::newRow("malformed JSON")
             << QByteArray("POST")
             << QByteArray("validSlot")
             << QByteArray("")
+            << QVariantMap()
             << static_cast<int>(QHttpSocket::BadRequest);
 
-    QTest::newRow("valid slot")
+    QTest::newRow("valid JSON")
             << QByteArray("POST")
             << QByteArray("validSlot")
             << data
+            << map
             << static_cast<int>(QHttpSocket::OK);
 }
 
@@ -103,6 +114,7 @@ void TestQObjectHandler::testRequests()
     QFETCH(QByteArray, method);
     QFETCH(QByteArray, path);
     QFETCH(QByteArray, data);
+    QFETCH(QVariantMap, response);
     QFETCH(int, statusCode);
 
     DummyHandler handler;
@@ -125,10 +137,10 @@ void TestQObjectHandler::testRequests()
 
     QTRY_COMPARE(client.statusCode(), statusCode);
 
-    if(statusCode == QHttpSocket::OK) {
+    if (statusCode == QHttpSocket::OK) {
         QVERIFY(client.headers().contains("Content-Length"));
         QTRY_COMPARE(client.data().length(), client.headers().value("Content-Length").toInt());
-        QCOMPARE(QJsonDocument::fromJson(client.data()), QJsonDocument::fromJson(data));
+        QCOMPARE(QJsonObject::fromVariantMap(response), QJsonDocument::fromJson(client.data()).object());
     }
 }
 
