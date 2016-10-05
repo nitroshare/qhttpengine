@@ -29,6 +29,7 @@
 
 typedef QList<QByteArray> QByteArrayList;
 
+Q_DECLARE_METATYPE(QQueryStringMap)
 Q_DECLARE_METATYPE(QHttpHeaderMap)
 
 const QIByteArray Key1 = "a";
@@ -51,6 +52,9 @@ private Q_SLOTS:
 
     void testSplit_data();
     void testSplit();
+
+    void testParsePath_data();
+    void testParsePath();
 
     void testParseHeaderList_data();
     void testParseHeaderList();
@@ -124,6 +128,38 @@ void TestQHttpParser::testSplit()
     QHttpParser::split(data, delim, maxSplit, outParts);
 
     QCOMPARE(outParts, parts);
+}
+
+void TestQHttpParser::testParsePath_data()
+{
+    QTest::addColumn<QByteArray>("rawPath");
+    QTest::addColumn<QString>("path");
+    QTest::addColumn<QQueryStringMap>("map");
+
+    QTest::newRow("no query string")
+            << QByteArray("/path")
+            << QString("/path")
+            << QQueryStringMap();
+
+    QTest::newRow("single parameter")
+            << QByteArray("/path?a=b")
+            << QString("/path")
+            << QQueryStringMap({{"a", "b"}});
+}
+
+void TestQHttpParser::testParsePath()
+{
+    QFETCH(QByteArray, rawPath);
+    QFETCH(QString, path);
+    QFETCH(QQueryStringMap, map);
+
+    QString outPath;
+    QQueryStringMap outMap;
+
+    QVERIFY(QHttpParser::parsePath(rawPath, outPath, outMap));
+
+    QCOMPARE(path, outPath);
+    QCOMPARE(map, outMap);
 }
 
 void TestQHttpParser::testParseHeaderList_data()

@@ -30,6 +30,8 @@
 #include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"
 
+Q_DECLARE_METATYPE(QQueryStringMap)
+
 // Utility macro (avoids duplication) that creates a pair of connected
 // sockets, a QSimpleHttpClient for the client and a QHttpSocket for the
 // server
@@ -78,7 +80,7 @@ void TestQHttpSocket::testProperties()
     client.sendHeaders(Method, Path, headers);
 
     QTRY_COMPARE(server.method(), Method);
-    QCOMPARE(server.path(), Path);
+    QCOMPARE(server.rawPath(), Path);
     QCOMPARE(server.headers(), headers);
 
     server.setStatusCode(StatusCode, StatusReason);

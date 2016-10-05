@@ -49,7 +49,9 @@ public:
     } readState;
 
     QByteArray requestMethod;
-    QByteArray requestPath;
+    QByteArray requestRawPath;
+    QString requestPath;
+    QQueryStringMap requestQueryString;
     QHttpHeaderMap requestHeaders;
     qint64 requestDataRead;
     qint64 requestDataTotal;

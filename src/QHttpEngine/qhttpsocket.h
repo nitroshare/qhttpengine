@@ -153,12 +153,28 @@ public:
     QByteArray method() const;
 
     /**
-     * @brief Retrieve the request path
+     * @brief Retrieve the raw request path
      *
      * This method may only be called after the request headers have been
      * parsed.
      */
-    QByteArray path() const;
+    QByteArray rawPath() const;
+
+    /**
+     * @brief Retrieve the decoded path with the query string removed
+     *
+     * This method may only be called after the request headers have been
+     * parsed.
+     */
+    QString path() const;
+
+    /**
+     * @brief Retrieve the query string
+     *
+     * This method may only be called after the request headers have been
+     * parsed.
+     */
+    QQueryStringMap queryString() const;
 
     /**
      * @brief Determine if the request headers have been parsed yet

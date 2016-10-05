@@ -21,6 +21,9 @@
  */
 
 #include <QByteArray>
+#include <QPair>
+#include <QUrl>
+#include <QUrlQuery>
 
 #include "QHttpEngine/qhttpparser.h"
 
@@ -41,6 +44,22 @@ void QHttpParser::split(const QByteArray &data, const QByteArray &delim, int max
 
     // Append whatever remains to the list
     parts.append(data.mid(index));
+}
+
+bool QHttpParser::parsePath(const QByteArray &rawPath, QString &path, QQueryStringMap &queryString)
+{
+    QUrl url(rawPath);
+    if (!url.isValid()) {
+        return false;
+    }
+
+    path = url.path();
+    QPair<QString, QString> pair;
+    foreach (pair, QUrlQuery(url.query()).queryItems()) {
+        queryString.insert(pair.first, pair.second);
+    }
+
+    return true;
 }
 
 bool QHttpParser::parseHeaderList(const QList<QByteArray> &lines, QHttpHeaderMap &headers)

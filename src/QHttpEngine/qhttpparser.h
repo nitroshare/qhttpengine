@@ -24,10 +24,15 @@
 #define QHTTPENGINE_QHTTPPARSER_H
 
 #include <QList>
-#include <QMap>
+#include <QMultiMap>
 
 #include "qhttpengine.h"
 #include "qibytearray.h"
+
+/**
+ * @brief Map consisting of query string values
+ */
+typedef QMultiMap<QString, QString> QQueryStringMap;
 
 /**
  * @brief Map consisting of HTTP headers
@@ -35,7 +40,7 @@
  * The key used for the map is the QIByteArray class, which allows for
  * case-insensitive comparison.
  */
-typedef QMap<QIByteArray, QByteArray> QHttpHeaderMap;
+typedef QMultiMap<QIByteArray, QByteArray> QHttpHeaderMap;
 
 /**
  * @brief Utility methods for parsing HTTP requests and responses
@@ -61,6 +66,11 @@ public:
      * number of splits performed.
      */
     static void split(const QByteArray &data, const QByteArray &delim, int maxSplit, QList<QByteArray> &parts);
+
+    /**
+     * @brief Parse and remove the query string from a path
+     */
+    static bool parsePath(const QByteArray &rawPath, QString &path, QQueryStringMap &queryString);
 
     /**
      * @brief Parse a list of lines containing HTTP headers

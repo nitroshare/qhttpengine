@@ -119,7 +119,8 @@ bool QHttpSocketPrivate::readHeaders()
 
     // Attempt to parse the headers and if a problem is encountered, abort
     // the connection (so that no more data is read or written) and return
-    if(!QHttpParser::parseRequestHeaders(readBuffer.left(index), requestMethod, requestPath, requestHeaders)) {
+    if(!QHttpParser::parseRequestHeaders(readBuffer.left(index), requestMethod, requestRawPath, requestHeaders) ||
+            QHttpParser::parsePath(requestRawPath, requestPath, requestQueryString)) {
         q->writeError(QHttpSocket::BadRequest);
         return false;
     }
@@ -201,9 +202,19 @@ QByteArray QHttpSocket::method() const
     return d->requestMethod;
 }
 
-QByteArray QHttpSocket::path() const
+QByteArray QHttpSocket::rawPath() const
+{
+    return d->requestRawPath;
+}
+
+QString QHttpSocket::path() const
 {
     return d->requestPath;
+}
+
+QQueryStringMap QHttpSocket::queryString() const
+{
+    return d->requestQueryString;
 }
 
 bool QHttpSocket::isHeadersParsed() const
