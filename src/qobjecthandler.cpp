@@ -47,6 +47,7 @@ QObjectHandlerPrivate::QObjectHandlerPrivate(QObjectHandler *handler)
 void QObjectHandlerPrivate::invokeSlot(QHttpSocket *socket, int index, const QVariantMap &query)
 {
     QGenericArgument secondArgument;
+    QVariantMap parameters;
 
     // If this is a POST request, then decode the request body
     if (socket->method() == MethodPOST) {
@@ -61,7 +62,8 @@ void QObjectHandlerPrivate::invokeSlot(QHttpSocket *socket, int index, const QVa
             return;
         }
 
-        secondArgument = Q_ARG(QVariantMap, document.object().toVariantMap());
+        parameters = document.object().toVariantMap();
+        secondArgument = Q_ARG(QVariantMap, parameters);
     }
 
     // Attempt to invoke the slot
