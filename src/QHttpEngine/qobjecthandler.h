@@ -77,6 +77,13 @@ protected:
      */
     virtual void process(QHttpSocket *socket, const QString &path);
 
+    /**
+     * @brief Set the status code for the current request
+     *
+     * By default, the status code is set to QHttpSocket::OK.
+     */
+    void setStatusCode(int statusCode);
+
 private:
 
     QObjectHandlerPrivate *const d;

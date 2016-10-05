@@ -43,6 +43,10 @@ private Q_SLOTS:
     QVariantMap get_validSlot(QVariantMap query) {
         return query;
     }
+    QVariantMap get_statusCode(QVariantMap) {
+        setStatusCode(QHttpSocket::Found);
+        return QVariantMap();
+    }
     QVariantMap post_validSlot(QVariantMap, QVariantMap params) {
         return params;
     }
@@ -93,6 +97,13 @@ void TestQObjectHandler::testRequests_data()
             << QByteArray("")
             << QVariantMap({{"param", "value"}})
             << static_cast<int>(QHttpSocket::OK);
+
+    QTest::newRow("status code")
+            << QByteArray("GET")
+            << QByteArray("statusCode")
+            << QByteArray("")
+            << QVariantMap()
+            << static_cast<int>(QHttpSocket::Found);
 
     QTest::newRow("malformed JSON")
             << QByteArray("POST")

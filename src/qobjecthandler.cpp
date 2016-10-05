@@ -49,6 +49,8 @@ void QObjectHandlerPrivate::invokeSlot(QHttpSocket *socket, int index, const QVa
     QGenericArgument secondArgument;
     QVariantMap parameters;
 
+    statusCode = QHttpSocket::OK;
+
     // If this is a POST request, then decode the request body
     if (socket->method() == MethodPOST) {
 
@@ -78,6 +80,7 @@ void QObjectHandlerPrivate::invokeSlot(QHttpSocket *socket, int index, const QVa
 
     // Convert the return value to JSON and write it to the socket
     QByteArray data = QJsonDocument(QJsonObject::fromVariantMap(retVal)).toJson();
+    socket->setStatusCode(statusCode);
     socket->setHeader("Content-Length", QByteArray::number(data.length()));
     socket->setHeader("Content-Type", "application/json");
     socket->write(data);
@@ -145,4 +148,9 @@ void QObjectHandler::process(QHttpSocket *socket, const QString &path)
             d->invokeSlot(socket, index, query);
         });
     }
+}
+
+void QObjectHandler::setStatusCode(int statusCode)
+{
+    d->statusCode = statusCode;
 }

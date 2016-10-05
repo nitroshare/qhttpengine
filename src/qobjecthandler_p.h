@@ -39,6 +39,8 @@ public:
     void invokeSlot(QHttpSocket *socket, int index, const QVariantMap &query);
     QVariantMap convertQueryString(const QString &query);
 
+    int statusCode;
+
 private:
 
     QObjectHandler *const q;
