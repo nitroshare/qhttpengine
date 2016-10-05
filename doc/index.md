@@ -47,8 +47,8 @@ class ApiHandler : public QObjectHandler
 {
     Q_OBJECT
 public slots:
-    QVariantMap doSomething(const QVariantMap &);
+    QVariantMap get_something(const QVariantMap &query);
 };
 @endcode
 
-A client can send a POST request to `/doSomething` with JSON data and receive the response from the slot directly as JSON data. The chatserver example provides a demonstration of this.
+A client can send a GET request to `/something` and receive the response from the slot directly as JSON data. The chatserver example provides a demonstration of this.
