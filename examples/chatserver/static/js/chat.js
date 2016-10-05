@@ -7,9 +7,8 @@ $(function() {
     // Retrieve all messages after the specified index
     function update() {
         $.ajax({
-            type: 'POST',
-            url: '/api/getMessages',
-            data: JSON.stringify({index: index}),
+            url: '/api/messages',
+            data: {index: index},
             contentType: 'application/json',
             complete: function() {
                 window.setTimeout(update, 2000);
@@ -34,7 +33,7 @@ $(function() {
         if(e.which == 13) {
             $.ajax({
                 type: 'POST',
-                url: '/api/postMessage',
+                url: '/api/newMessage',
                 data: JSON.stringify({message: $(this).val()}),
                 contentType: 'application/json'
             });

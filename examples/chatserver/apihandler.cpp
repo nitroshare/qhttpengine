@@ -22,26 +22,14 @@
 
 #include "apihandler.h"
 
-QVariantMap ApiHandler::postMessage(const QVariantMap &params)
-{
-    // Ensure that a valid message was supplied
-    if(!params.contains("message")) {
-        return QVariantMap();
-    }
-
-    // Add the new message to the list
-    mMessages.append(params.value("message").toString());
-    return QVariantMap();
-}
-
-QVariantMap ApiHandler::getMessages(const QVariantMap &params)
+QVariantMap ApiHandler::get_messages(const QVariantMap &query)
 {
     // Ensure an index was supplied
-    if(!params.contains("index")) {
+    if(!query.contains("index")) {
         return QVariantMap();
     }
 
-    int index = params.value("index").toInt();
+    int index = query.value("index").toInt();
     QVariantList messages;
 
     // Construct a list of all messages with an index higher than the one
@@ -60,4 +48,17 @@ QVariantMap ApiHandler::getMessages(const QVariantMap &params)
     QVariantMap data;
     data.insert("messages", messages);
     return data;
+}
+
+
+QVariantMap ApiHandler::post_newMessage(const QVariantMap &query, const QVariantMap &params)
+{
+    // Ensure that a valid message was supplied
+    if(!params.contains("message")) {
+        return QVariantMap();
+    }
+
+    // Add the new message to the list
+    mMessages.append(params.value("message").toString());
+    return QVariantMap();
 }

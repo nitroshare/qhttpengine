@@ -33,8 +33,8 @@ class ApiHandler : public QObjectHandler
 
 public Q_SLOTS:
 
-    QVariantMap postMessage(const QVariantMap &params);
-    QVariantMap getMessages(const QVariantMap &params);
+    QVariantMap get_messages(const QVariantMap &query);
+    QVariantMap post_newMessage(const QVariantMap &query, const QVariantMap &params);
 
 private:
 
