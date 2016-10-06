@@ -120,7 +120,7 @@ bool QHttpSocketPrivate::readHeaders()
     // Attempt to parse the headers and if a problem is encountered, abort
     // the connection (so that no more data is read or written) and return
     if(!QHttpParser::parseRequestHeaders(readBuffer.left(index), requestMethod, requestRawPath, requestHeaders) ||
-            QHttpParser::parsePath(requestRawPath, requestPath, requestQueryString)) {
+            !QHttpParser::parsePath(requestRawPath, requestPath, requestQueryString)) {
         q->writeError(QHttpSocket::BadRequest);
         return false;
     }
