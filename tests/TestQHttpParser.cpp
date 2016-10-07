@@ -240,7 +240,7 @@ void TestQHttpParser::testParseRequestHeaders_data()
     QTest::newRow("GET request")
             << true
             << QByteArray("GET / HTTP/1.0")
-            << QByteArray("GET")
+            << QHttpSocket::GET
             << QByteArray("/");
 }
 
