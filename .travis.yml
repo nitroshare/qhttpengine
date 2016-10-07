@@ -8,10 +8,12 @@ compiler:
   - gcc
 
 install:
+  - sudo add-apt-repository -y ppa:beineri/opt-qt57-trusty
   - sudo apt-get update -qq
-  - sudo apt-get install -qq cmake qtbase5-dev
+  - sudo apt-get install -qq cmake qt57base
 
 script:
+  - /opt/qt57/bin/qt57-env.sh
   - cmake -DBUILD_TESTS=on .
   - make
   - ctest
