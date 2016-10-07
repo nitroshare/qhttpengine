@@ -24,6 +24,7 @@
 #define CHAT_APIHANDLER_H
 
 #include <QStringList>
+#include <QVariantMap>
 
 #include <QHttpEngine/QObjectHandler>
 

@@ -30,7 +30,7 @@
 #include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"
 
-Q_DECLARE_METATYPE(QQueryStringMap)
+Q_DECLARE_METATYPE(QHttpSocket::QQueryStringMap)
 
 // Utility macro (avoids duplication) that creates a pair of connected
 // sockets, a QSimpleHttpClient for the client and a QHttpSocket for the
@@ -64,7 +64,7 @@ private Q_SLOTS:
 
 private:
 
-    QHttpHeaderMap headers;
+    QHttpSocket::QHttpHeaderMap headers;
 };
 
 TestQHttpSocket::TestQHttpSocket()
@@ -79,7 +79,7 @@ void TestQHttpSocket::testProperties()
 
     client.sendHeaders(Method, Path, headers);
 
-    QTRY_COMPARE(server.method(), Method);
+    QTRY_COMPARE(server.method(), QHttpSocket::POST);
     QCOMPARE(server.rawPath(), Path);
     QCOMPARE(server.headers(), headers);
 
@@ -150,7 +150,7 @@ void TestQHttpSocket::testSignals()
     QVERIFY(bytesWrittenSpy.count() > 0);
 
     qint64 bytesWritten = 0;
-    for(int i = 0; i < bytesWrittenSpy.count(); ++i) {
+    for (int i = 0; i < bytesWrittenSpy.count(); ++i) {
         bytesWritten += bytesWrittenSpy.at(i).at(0).toLongLong();
     }
     QCOMPARE(bytesWritten, Data.length());

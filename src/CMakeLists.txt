@@ -1,7 +1,7 @@
-file(GLOB HEADERS "${PROJECT_NAME}/*")
+configure_file(qhttpengine_global.h.in "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine_global.h")
 
-configure_file(qhttpengine.h.in "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.h")
-set(HEADERS "${HEADERS}" "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.h")
+file(GLOB HEADERS "${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/*")
+set(HEADERS "${HEADERS}" "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine_global.h")
 
 set(SRC
     qfilesystemhandler.cpp
@@ -37,7 +37,7 @@ set_target_properties(QHttpEngine PROPERTIES
 )
 
 target_include_directories(QHttpEngine PUBLIC
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+    "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>/include"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
     "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>"
 )

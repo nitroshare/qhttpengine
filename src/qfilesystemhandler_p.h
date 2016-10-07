@@ -27,8 +27,8 @@
 #include <QMimeDatabase>
 #include <QObject>
 
-#include "QHttpEngine/qfilesystemhandler.h"
-#include "QHttpEngine/qhttpsocket.h"
+#include <QHttpEngine/QFilesystemHandler>
+#include <QHttpEngine/QHttpSocket>
 
 class QFilesystemHandlerPrivate : public QObject
 {

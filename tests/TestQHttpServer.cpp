@@ -67,7 +67,7 @@ void TestQHttpServer::testServer()
     QTRY_COMPARE(socket.state(), QAbstractSocket::ConnectedState);
 
     QSimpleHttpClient client(&socket);
-    client.sendHeaders("GET", "/test", QHttpHeaderMap());
+    client.sendHeaders("GET", "/test");
 
     QTRY_VERIFY(handler.mSocket != 0);
     QCOMPARE(handler.mPath, QString("test"));

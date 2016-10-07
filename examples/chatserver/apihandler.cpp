@@ -25,7 +25,7 @@
 QVariantMap ApiHandler::get_messages(const QVariantMap &query)
 {
     // Ensure an index was supplied
-    if(!query.contains("index")) {
+    if (!query.contains("index")) {
         return QVariantMap();
     }
 
@@ -34,8 +34,8 @@ QVariantMap ApiHandler::get_messages(const QVariantMap &query)
 
     // Construct a list of all messages with an index higher than the one
     // that was provided as a parameter
-    if(index >= -1 && index < mMessages.count()) {
-        for(QStringList::const_iterator i = mMessages.constBegin() + index + 1;
+    if (index >= -1 && index < mMessages.count()) {
+        for (QStringList::const_iterator i = mMessages.constBegin() + index + 1;
                 i != mMessages.constEnd(); ++i) {
             QVariantMap data;
             data.insert("index", i - mMessages.constBegin());
@@ -54,7 +54,7 @@ QVariantMap ApiHandler::get_messages(const QVariantMap &query)
 QVariantMap ApiHandler::post_newMessage(const QVariantMap &query, const QVariantMap &params)
 {
     // Ensure that a valid message was supplied
-    if(!params.contains("message")) {
+    if (!params.contains("message")) {
         return QVariantMap();
     }
 

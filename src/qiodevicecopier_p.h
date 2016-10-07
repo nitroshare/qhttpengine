@@ -23,10 +23,10 @@
 #ifndef QHTTPENGINE_QIODEVICECOPIERPRIVATE_H
 #define QHTTPENGINE_QIODEVICECOPIERPRIVATE_H
 
-#include <QIODevice>
 #include <QObject>
 
-#include "QHttpEngine/qiodevicecopier.h"
+class QIODevice;
+class QIODeviceCopier;
 
 class QIODeviceCopierPrivate : public QObject
 {
@@ -41,7 +41,7 @@ public:
 
     qint64 bufferSize;
 
-private Q_SLOTS:
+public Q_SLOTS:
 
     void onReadyRead();
     void onReadChannelFinished();

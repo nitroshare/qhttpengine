@@ -25,7 +25,7 @@
 
 #include <QFile>
 
-#include "qhttpengine.h"
+#include "qhttpengine_global.h"
 
 class QHTTPENGINE_EXPORT QLocalFilePrivate;
 
@@ -39,7 +39,7 @@ class QHTTPENGINE_EXPORT QLocalFilePrivate;
  *
  * @code
  * QLocalFile file;
- * if(file.open()) {
+ * if (file.open()) {
  *     file.write("private data");
  *     file.close();
  * }

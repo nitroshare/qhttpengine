@@ -23,9 +23,11 @@
 #ifndef QHTTPENGINE_QOBJECTHANDLER_H
 #define QHTTPENGINE_QOBJECTHANDLER_H
 
-#include "qhttpengine.h"
-#include "qhttphandler.h"
+#include <QHttpEngine/QHttpHandler>
 
+#include "qhttpengine_global.h"
+
+class QHttpSocket;
 class QHTTPENGINE_EXPORT QObjectHandlerPrivate;
 
 /**

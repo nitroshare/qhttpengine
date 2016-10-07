@@ -21,6 +21,7 @@
  */
 
 #include <QHttpEngine/QHttpHandler>
+#include <QHttpEngine/QHttpSocket>
 
 #include "qhttphandler_p.h"
 
@@ -49,10 +50,10 @@ void QHttpHandler::addSubHandler(const QRegExp &pattern, QHttpHandler *handler)
 void QHttpHandler::route(QHttpSocket *socket, const QString &path)
 {
     // Check each of the redirects for a match
-    foreach(Redirect redirect, d->redirects) {
-        if(redirect.first.indexIn(path) != -1) {
+    foreach (Redirect redirect, d->redirects) {
+        if (redirect.first.indexIn(path) != -1) {
             QString newPath = redirect.second;
-            foreach(QString replacement, redirect.first.capturedTexts().mid(1)) {
+            foreach (QString replacement, redirect.first.capturedTexts().mid(1)) {
                 newPath = newPath.arg(replacement);
             }
             socket->writeRedirect(newPath.toUtf8());
@@ -61,8 +62,8 @@ void QHttpHandler::route(QHttpSocket *socket, const QString &path)
     }
 
     // Check each of the sub-handlers for a match
-    foreach(SubHandler subHandler, d->subHandlers) {
-        if(subHandler.first.indexIn(path) != -1) {
+    foreach (SubHandler subHandler, d->subHandlers) {
+        if (subHandler.first.indexIn(path) != -1) {
             subHandler.second->route(socket, path.mid(subHandler.first.matchedLength()));
             return;
         }

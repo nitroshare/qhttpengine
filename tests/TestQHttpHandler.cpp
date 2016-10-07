@@ -99,7 +99,7 @@ void TestQHttpHandler::testRedirect()
     QSimpleHttpClient client(pair.client());
     QHttpSocket socket(pair.server(), &pair);
 
-    client.sendHeaders("GET", path, QHttpHeaderMap());
+    client.sendHeaders("GET", path);
     QTRY_VERIFY(socket.isHeadersParsed());
 
     QHttpHandler handler;
@@ -108,7 +108,7 @@ void TestQHttpHandler::testRedirect()
 
     QTRY_COMPARE(client.statusCode(), statusCode);
 
-    if(statusCode == QHttpSocket::Found) {
+    if (statusCode == QHttpSocket::Found) {
         QFETCH(QByteArray, location);
         QCOMPARE(client.headers().value("Location"), location);
     }
@@ -153,7 +153,7 @@ void TestQHttpHandler::testSubHandler()
     QSimpleHttpClient client(pair.client());
     QHttpSocket socket(pair.server(), &pair);
 
-    client.sendHeaders("GET", path, QHttpHeaderMap());
+    client.sendHeaders("GET", path);
     QTRY_VERIFY(socket.isHeadersParsed());
 
     DummyHandler subHandler;

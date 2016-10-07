@@ -25,7 +25,7 @@
 
 #include <QObject>
 
-#include "QHttpEngine/qlocalfile.h"
+class QLocalFile;
 
 class QLocalFilePrivate : public QObject
 {

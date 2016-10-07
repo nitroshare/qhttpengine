@@ -27,9 +27,9 @@
 #include <QObject>
 #include <QTcpServer>
 
-#include "qhttpengine.h"
-#include "qhttphandler.h"
+#include "qhttpengine_global.h"
 
+class QHttpHandler;
 class QHTTPENGINE_EXPORT QHttpServerPrivate;
 
 /**
@@ -48,7 +48,7 @@ class QHTTPENGINE_EXPORT QHttpServerPrivate;
  *
  * @code
  * QHttpServer server;
- * if(!server.listen()) {
+ * if (!server.listen()) {
  *     // error handling
  * }
  * @endcode

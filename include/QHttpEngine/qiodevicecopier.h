@@ -23,11 +23,11 @@
 #ifndef QHTTPENGINE_QIODEVICECOPIER_H
 #define QHTTPENGINE_QIODEVICECOPIER_H
 
-#include <QIODevice>
 #include <QObject>
 
-#include "qhttpengine.h"
+#include "qhttpengine_global.h"
 
+class QIODevice;
 class QHTTPENGINE_EXPORT QIODeviceCopierPrivate;
 
 /**

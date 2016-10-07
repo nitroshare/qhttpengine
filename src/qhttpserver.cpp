@@ -22,8 +22,9 @@
 
 #include <QTcpSocket>
 
-#include "QHttpEngine/qhttpserver.h"
-#include "QHttpEngine/qhttpsocket.h"
+#include <QHttpEngine/QHttpHandler>
+#include <QHttpEngine/QHttpSocket>
+
 #include "qhttpserver_p.h"
 
 QHttpServerPrivate::QHttpServerPrivate(QHttpServer *httpServer)
@@ -31,7 +32,7 @@ QHttpServerPrivate::QHttpServerPrivate(QHttpServer *httpServer)
       q(httpServer),
       handler(0)
 {
-    connect(q, SIGNAL(newConnection()), this, SLOT(onIncomingConnection()));
+    connect(q, &QHttpServer::incomingConnection, this, &QHttpServerPrivate::onIncomingConnection);
 }
 
 void QHttpServerPrivate::onIncomingConnection()
@@ -41,28 +42,16 @@ void QHttpServerPrivate::onIncomingConnection()
     QHttpSocket *httpSocket = new QHttpSocket(tcpSocket, this);
 
     // Wait until the socket finishes reading the HTTP headers before routing
-    connect(httpSocket, SIGNAL(headersParsed()), this, SLOT(onHeadersParsed()));
+    connect(httpSocket, &QHttpSocket::headersParsed, [this, httpSocket]() {
+        if (handler) {
+            handler->route(httpSocket, QString(httpSocket->path().mid(1)));
+        } else {
+            httpSocket->writeError(QHttpSocket::InternalServerError);
+        }
+    });
 
     // Destroy the socket once the client is disconnected
-    connect(tcpSocket, SIGNAL(disconnected()), httpSocket, SLOT(deleteLater()));
-}
-
-void QHttpServerPrivate::onHeadersParsed()
-{
-    // Obtain the socket that corresponds with the sender of the signal
-    QHttpSocket *socket = qobject_cast<QHttpSocket*>(sender());
-
-    // Ensure that a handler has been set
-    if(handler) {
-
-        // Obtain the path, strip the initial "/", and pass it along to the handler
-        handler->route(socket, QString(socket->path().mid(1)));
-
-    } else {
-
-        // Return an HTTP 500 error to the client
-        socket->writeError(QHttpSocket::InternalServerError);
-    }
+    connect(tcpSocket, &QTcpSocket::disconnected, httpSocket, &QHttpSocket::deleteLater);
 }
 
 QHttpServer::QHttpServer(QObject *parent)

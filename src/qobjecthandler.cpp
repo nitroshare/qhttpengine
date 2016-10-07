@@ -30,13 +30,11 @@
 #include <QPair>
 #include <QUrl>
 #include <QUrlQuery>
-#include <QVariantMap>
 
-#include "QHttpEngine/qobjecthandler.h"
+#include <QHttpEngine/QHttpSocket>
+#include <QHttpEngine/QObjectHandler>
+
 #include "qobjecthandler_p.h"
-
-const QString MethodGET = "GET";
-const QString MethodPOST = "POST";
 
 QObjectHandlerPrivate::QObjectHandlerPrivate(QObjectHandler *handler)
     : QObject(handler),
@@ -52,7 +50,7 @@ void QObjectHandlerPrivate::invokeSlot(QHttpSocket *socket, int index, const QVa
     statusCode = QHttpSocket::OK;
 
     // If this is a POST request, then decode the request body
-    if (socket->method() == MethodPOST) {
+    if (socket->method() == QHttpSocket::POST) {
 
         // Attempt to decode the JSON from the socket
         QJsonParseError error;
@@ -111,12 +109,12 @@ void QObjectHandler::process(QHttpSocket *socket, const QString &path)
     QUrl url(path);
     QVariantMap query = d->convertQueryString(url.query());
     QString slotName = QString("%1_%2")
-        .arg(QString(socket->method().toLower()))
+        .arg(socket->method() == QHttpSocket::GET ? "get" : "post")
         .arg(url.path());
 
     // Determine the parameters the slot should have based on the method
     QString parameters;
-    if (socket->method() == MethodGET) {
+    if (socket->method() == QHttpSocket::GET) {
         parameters = "QVariantMap";
     } else {
         parameters = "QVariantMap,QVariantMap";

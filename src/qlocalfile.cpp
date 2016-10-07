@@ -30,7 +30,8 @@
 #  include <fileapi.h>
 #endif
 
-#include "QHttpEngine/qlocalfile.h"
+#include <QHttpEngine/QLocalFile>
+
 #include "qlocalfile_p.h"
 
 QLocalFilePrivate::QLocalFilePrivate(QLocalFile *localFile)
@@ -62,12 +63,12 @@ bool QLocalFilePrivate::setPermission()
 
     // Create a new ACL with a single access control entry
     PACL pACL;
-    if(SetEntriesInAclW(1, &ea, NULL, &pACL) != ERROR_SUCCESS) {
+    if (SetEntriesInAclW(1, &ea, NULL, &pACL) != ERROR_SUCCESS) {
         return false;
     }
 
     // Apply the ACL to the file
-    if(SetNamedSecurityInfoW((LPWSTR)q->fileName().utf16(),
+    if (SetNamedSecurityInfoW((LPWSTR)q->fileName().utf16(),
                              SE_FILE_OBJECT,
                              DACL_SECURITY_INFORMATION | PROTECTED_DACL_SECURITY_INFORMATION,
                              NULL,

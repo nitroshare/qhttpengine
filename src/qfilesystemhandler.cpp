@@ -25,8 +25,9 @@
 #include <QFileInfoList>
 #include <QUrl>
 
-#include "QHttpEngine/qfilesystemhandler.h"
-#include "QHttpEngine/qiodevicecopier.h"
+#include <QHttpEngine/QFilesystemHandler>
+#include <QHttpEngine/QIODeviceCopier>
+
 #include "qfilesystemhandler_p.h"
 
 // Template for listing directory contents
@@ -72,7 +73,7 @@ void QFilesystemHandlerPrivate::processFile(QHttpSocket *socket, const QString &
 {
     // Attempt to open the file for reading
     QFile *file = new QFile(absolutePath);
-    if(!file->open(QIODevice::ReadOnly)) {
+    if (!file->open(QIODevice::ReadOnly)) {
         delete file;
 
         socket->writeError(QHttpSocket::Forbidden);
@@ -81,8 +82,8 @@ void QFilesystemHandlerPrivate::processFile(QHttpSocket *socket, const QString &
 
     // Create a QIODeviceCopier to copy the file contents to the socket
     QIODeviceCopier *copier = new QIODeviceCopier(file, socket);
-    connect(copier, SIGNAL(finished()), copier, SLOT(deleteLater()));
-    connect(copier, SIGNAL(finished()), file, SLOT(deleteLater()));
+    connect(copier, &QIODeviceCopier::finished, copier, &QIODeviceCopier::deleteLater);
+    connect(copier, &QIODeviceCopier::finished, file, &QFile::deleteLater);
 
     // Set the mimetype and content length
     socket->setHeader("Content-Type", mimeType(absolutePath));
@@ -97,7 +98,7 @@ void QFilesystemHandlerPrivate::processDirectory(QHttpSocket *socket, const QStr
 {
     // Add entries for each of the files
     QString listing;
-    foreach(QFileInfo info, QDir(absolutePath).entryInfoList()) {
+    foreach (QFileInfo info, QDir(absolutePath).entryInfoList()) {
         listing.append(QString("<li><a href=\"%1%2\">%1%2</a></li>")
                 .arg(info.fileName().toHtmlEscaped())
                 .arg(info.isDir() ? "/" : ""));
@@ -138,7 +139,7 @@ void QFilesystemHandler::setDocumentRoot(const QString &documentRoot)
 void QFilesystemHandler::process(QHttpSocket *socket, const QString &path)
 {
     // If a document root is not set, an error has occurred
-    if(d->documentRoot.path().isNull()) {
+    if (d->documentRoot.path().isNull()) {
         socket->writeError(QHttpSocket::InternalServerError);
         return;
     }
@@ -148,12 +149,12 @@ void QFilesystemHandler::process(QHttpSocket *socket, const QString &path)
 
     // Attempt to retrieve the absolute path
     QString absolutePath;
-    if(!d->absolutePath(decodedPath, absolutePath)) {
+    if (!d->absolutePath(decodedPath, absolutePath)) {
         socket->writeError(QHttpSocket::NotFound);
         return;
     }
 
-    if(QFileInfo(absolutePath).isDir()) {
+    if (QFileInfo(absolutePath).isDir()) {
         d->processDirectory(socket, decodedPath, absolutePath);
     } else {
         d->processFile(socket, absolutePath);

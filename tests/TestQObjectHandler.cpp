@@ -136,7 +136,7 @@ void TestQObjectHandler::testRequests()
     QSimpleHttpClient client(pair.client());
     QHttpSocket socket(pair.server(), &pair);
 
-    QHttpHeaderMap headers;
+    QHttpSocket::QHttpHeaderMap headers;
     headers.insert("Content-Length", QByteArray::number(data.length()));
 
     client.sendHeaders(method, path, headers);

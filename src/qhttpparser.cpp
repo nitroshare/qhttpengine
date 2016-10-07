@@ -20,21 +20,20 @@
  * IN THE SOFTWARE.
  */
 
-#include <QByteArray>
 #include <QPair>
 #include <QUrl>
 #include <QUrlQuery>
 
-#include "QHttpEngine/qhttpparser.h"
+#include <QHttpEngine/QHttpParser>
 
 void QHttpParser::split(const QByteArray &data, const QByteArray &delim, int maxSplit, QList<QByteArray> &parts)
 {
     int index = 0;
 
-    for(int i = 0; !maxSplit || i < maxSplit; ++i) {
+    for (int i = 0; !maxSplit || i < maxSplit; ++i) {
         int nextIndex = data.indexOf(delim, index);
 
-        if(nextIndex == -1) {
+        if (nextIndex == -1) {
             break;
         }
 
@@ -46,7 +45,7 @@ void QHttpParser::split(const QByteArray &data, const QByteArray &delim, int max
     parts.append(data.mid(index));
 }
 
-bool QHttpParser::parsePath(const QByteArray &rawPath, QString &path, QQueryStringMap &queryString)
+bool QHttpParser::parsePath(const QByteArray &rawPath, QString &path, QHttpSocket::QQueryStringMap &queryString)
 {
     QUrl url(rawPath);
     if (!url.isValid()) {
@@ -62,15 +61,15 @@ bool QHttpParser::parsePath(const QByteArray &rawPath, QString &path, QQueryStri
     return true;
 }
 
-bool QHttpParser::parseHeaderList(const QList<QByteArray> &lines, QHttpHeaderMap &headers)
+bool QHttpParser::parseHeaderList(const QList<QByteArray> &lines, QHttpSocket::QHttpHeaderMap &headers)
 {
-    foreach(const QByteArray &line, lines) {
+    foreach (const QByteArray &line, lines) {
 
         QList<QByteArray> parts;
         split(line, ":", 1, parts);
 
         // Ensure that the delimiter (":") was encountered at least once
-        if(parts.count() != 2) {
+        if (parts.count() != 2) {
             return false;
         }
 
@@ -81,7 +80,7 @@ bool QHttpParser::parseHeaderList(const QList<QByteArray> &lines, QHttpHeaderMap
     return true;
 }
 
-bool QHttpParser::parseHeaders(const QByteArray &data, QList<QByteArray> &parts, QHttpHeaderMap &headers)
+bool QHttpParser::parseHeaders(const QByteArray &data, QList<QByteArray> &parts, QHttpSocket::QHttpHeaderMap &headers)
 {
     // Split the data into individual lines
     QList<QByteArray> lines;
@@ -89,35 +88,54 @@ bool QHttpParser::parseHeaders(const QByteArray &data, QList<QByteArray> &parts,
 
     // Split the first line into a maximum of three parts
     split(lines.takeFirst(), " ", 2, parts);
-    if(parts.count() != 3) {
+    if (parts.count() != 3) {
         return false;
     }
 
     return parseHeaderList(lines, headers);
 }
 
-bool QHttpParser::parseRequestHeaders(const QByteArray &data, QByteArray &method, QByteArray &path, QHttpHeaderMap &headers)
+bool QHttpParser::parseRequestHeaders(const QByteArray &data, QHttpSocket::Method &method, QByteArray &path, QHttpSocket::QHttpHeaderMap &headers)
 {
     QList<QByteArray> parts;
-    if(!parseHeaders(data, parts, headers)) {
+    if (!parseHeaders(data, parts, headers)) {
         return false;
     }
 
     // Only HTTP/1.x versions are supported for now
-    if(parts[2] != "HTTP/1.0" && parts[2] != "HTTP/1.1") {
+    if (parts[2] != "HTTP/1.0" && parts[2] != "HTTP/1.1") {
         return false;
     }
 
-    method = parts[0];
+    if (parts[0] == "OPTIONS") {
+        method = QHttpSocket::OPTIONS;
+    } else if (parts[0] == "GET") {
+        method = QHttpSocket::GET;
+    } else if (parts[0] == "HEAD") {
+        method = QHttpSocket::HEAD;
+    } else if (parts[0] == "POST") {
+        method = QHttpSocket::POST;
+    } else if (parts[0] == "PUT") {
+        method = QHttpSocket::PUT;
+    } else if (parts[0] == "DELETE") {
+        method = QHttpSocket::DELETE;
+    } else if (parts[0] == "TRACE") {
+        method = QHttpSocket::TRACE;
+    } else if (parts[0] == "CONNECT") {
+        method = QHttpSocket::CONNECT;
+    } else {
+        return false;
+    }
+
     path = parts[1];
 
     return true;
 }
 
-bool QHttpParser::parseResponseHeaders(const QByteArray &data, int &statusCode, QByteArray &statusReason, QHttpHeaderMap &headers)
+bool QHttpParser::parseResponseHeaders(const QByteArray &data, int &statusCode, QByteArray &statusReason, QHttpSocket::QHttpHeaderMap &headers)
 {
     QList<QByteArray> parts;
-    if(!parseHeaders(data, parts, headers)) {
+    if (!parseHeaders(data, parts, headers)) {
         return false;
     }
 

@@ -4,6 +4,8 @@ set(SRC
 )
 
 add_library(common STATIC ${SRC})
-target_link_libraries(common QHttpEngine)
-
-qt5_use_modules(common Network)
+set_target_properties(common PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED ON
+)
+target_link_libraries(common Qt5::Network QHttpEngine)

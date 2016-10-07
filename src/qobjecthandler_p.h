@@ -25,8 +25,8 @@
 
 #include <QObject>
 
-#include "QHttpEngine/qhttpsocket.h"
-#include "QHttpEngine/qobjecthandler.h"
+class QHttpSocket;
+class QObjectHandler;
 
 class QObjectHandlerPrivate : public QObject
 {

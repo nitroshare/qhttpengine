@@ -23,11 +23,9 @@
 #ifndef QHTTPENGINE_QHTTPSOCKETPRIVATE_H
 #define QHTTPENGINE_QHTTPSOCKETPRIVATE_H
 
-#include <QObject>
-#include <QTcpSocket>
+#include <QHttpEngine/QHttpSocket>
 
-#include "QHttpEngine/qhttpparser.h"
-#include "QHttpEngine/qhttpsocket.h"
+class QTcpSocket;
 
 class QHttpSocketPrivate : public QObject
 {
@@ -48,11 +46,11 @@ public:
         ReadFinished
     } readState;
 
-    QByteArray requestMethod;
+    QHttpSocket::Method requestMethod;
     QByteArray requestRawPath;
     QString requestPath;
-    QQueryStringMap requestQueryString;
-    QHttpHeaderMap requestHeaders;
+    QHttpSocket::QQueryStringMap requestQueryString;
+    QHttpSocket::QHttpHeaderMap requestHeaders;
     qint64 requestDataRead;
     qint64 requestDataTotal;
 
@@ -65,7 +63,7 @@ public:
 
     int responseStatusCode;
     QByteArray responseStatusReason;
-    QHttpHeaderMap responseHeaders;
+    QHttpSocket::QHttpHeaderMap responseHeaders;
     qint64 responseHeaderRemaining;
 
 private Q_SLOTS:
