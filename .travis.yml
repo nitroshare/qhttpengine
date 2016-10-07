@@ -12,8 +12,10 @@ install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq cmake qt57base
 
+before_script:
+  - export PATH=$PATH:/opt/qt57/bin
+
 script:
-  - /opt/qt57/bin/qt57-env.sh
   - cmake -DBUILD_TESTS=on .
   - make
   - ctest
