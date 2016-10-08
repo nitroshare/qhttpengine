@@ -32,7 +32,7 @@ QHttpServerPrivate::QHttpServerPrivate(QHttpServer *httpServer)
       q(httpServer),
       handler(0)
 {
-    connect(q, &QHttpServer::incomingConnection, this, &QHttpServerPrivate::onIncomingConnection);
+    connect(q, &QHttpServer::newConnection, this, &QHttpServerPrivate::onIncomingConnection);
 }
 
 void QHttpServerPrivate::onIncomingConnection()
