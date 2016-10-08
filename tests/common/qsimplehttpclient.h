@@ -28,6 +28,7 @@
 #include <QTcpSocket>
 
 #include <QHttpEngine/QHttpParser>
+#include <QHttpEngine/QHttpSocket>
 
 /**
  * @brief Simple HTTP client for testing purposes
@@ -44,7 +45,7 @@ public:
 
     QSimpleHttpClient(QTcpSocket *socket);
 
-    void sendHeaders(const QByteArray &method, const QByteArray &path, const QHttpHeaderMap &headers);
+    void sendHeaders(const QByteArray &method, const QByteArray &path, const QHttpSocket::QHttpHeaderMap &headers=QHttpSocket::QHttpHeaderMap());
     void sendData(const QByteArray &data);
 
     int statusCode() const {
@@ -55,7 +56,7 @@ public:
         return mStatusReason;
     }
 
-    QHttpHeaderMap headers() const {
+    QHttpSocket::QHttpHeaderMap headers() const {
         return mHeaders;
     }
 
@@ -76,7 +77,7 @@ private:
 
     int mStatusCode;
     QByteArray mStatusReason;
-    QHttpHeaderMap mHeaders;
+    QHttpSocket::QHttpHeaderMap mHeaders;
     QByteArray mData;
 };
 

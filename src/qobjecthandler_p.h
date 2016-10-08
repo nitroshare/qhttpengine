@@ -26,8 +26,8 @@
 #include <QMap>
 #include <QObject>
 
-#include "QHttpEngine/qhttpsocket.h"
-#include "QHttpEngine/qobjecthandler.h"
+class QHttpSocket;
+class QObjectHandler;
 
 class QObjectHandlerPrivate : public QObject
 {
@@ -37,13 +37,32 @@ public:
 
     explicit QObjectHandlerPrivate(QObjectHandler *handler);
 
-    void invokeSlot(QHttpSocket *socket, int index);
+    void invokeSlot(QHttpSocket *socket, const QString &path);
 
-    QMap<QObject*, int> map;
+    // In order to invoke the slot, a "pointer" to it needs to be stored in a
+    // map that lets us look up information by method name
 
-private Q_SLOTS:
+    class Method {
+    public:
+        Method() {}
+        Method(QObject *receiver, const char *method, int acceptedMethods)
+            : receiver(receiver), oldSlot(true), slot(method), acceptedMethods(acceptedMethods) {}
+        Method(QObject *receiver, QtPrivate::QSlotObjectBase *slotObj, int acceptedMethods)
+            : receiver(receiver), oldSlot(false), slot(slotObj), acceptedMethods(acceptedMethods) {}
 
-    void onReadChannelFinished();
+        QObject *receiver;
+        bool oldSlot;
+        union slot{
+            slot() {}
+            slot(const char *method) : method(method) {}
+            slot(QtPrivate::QSlotObjectBase *slotObj) : slotObj(slotObj) {}
+            const char *method;
+            QtPrivate::QSlotObjectBase *slotObj;
+        } slot;
+        int acceptedMethods;
+    };
+
+    QMap<QString, Method> map;
 
 private:
 

@@ -72,7 +72,7 @@ int main(int argc, char * argv[])
     QHttpServer server(&handler);
 
     // Attempt to listen on the specified port
-    if(!server.listen(address, port)) {
+    if (!server.listen(address, port)) {
         qCritical("Unable to listen on the specified port.");
         return 1;
     }

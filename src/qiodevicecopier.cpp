@@ -20,9 +20,11 @@
  * IN THE SOFTWARE.
  */
 
+#include <QIODevice>
 #include <QTimer>
 
-#include "QHttpEngine/qiodevicecopier.h"
+#include <QHttpEngine/QIODeviceCopier>
+
 #include "qiodevicecopier_p.h"
 
 // Default value for the bufferSize property
@@ -39,7 +41,7 @@ QIODeviceCopierPrivate::QIODeviceCopierPrivate(QIODeviceCopier *copier, QIODevic
 
 void QIODeviceCopierPrivate::onReadyRead()
 {
-    if(dest->write(src->readAll()) == -1) {
+    if (dest->write(src->readAll()) == -1) {
         Q_EMIT q->error(dest->errorString());
         src->close();
     }
@@ -48,7 +50,7 @@ void QIODeviceCopierPrivate::onReadyRead()
 void QIODeviceCopierPrivate::onReadChannelFinished()
 {
     // Read any data that remains and signal the end of the operation
-    if(src->bytesAvailable()) {
+    if (src->bytesAvailable()) {
         onReadyRead();
     }
 
@@ -63,14 +65,14 @@ void QIODeviceCopierPrivate::nextBlock()
     qint64 dataRead = src->read(data.data(), bufferSize);
 
     // If an error occurred during the read, emit an error
-    if(dataRead == -1) {
+    if (dataRead == -1) {
         Q_EMIT q->error(src->errorString());
         Q_EMIT q->finished();
         return;
     }
 
     // Write the data to the destination device
-    if(dest->write(data.constData(), dataRead) == -1) {
+    if (dest->write(data.constData(), dataRead) == -1) {
         Q_EMIT q->error(dest->errorString());
         Q_EMIT q->finished();
         return;
@@ -79,10 +81,10 @@ void QIODeviceCopierPrivate::nextBlock()
     // Check if the end of the device has been reached - if so,
     // emit the finished signal and if not, continue to read
     // data at the next iteration of the event loop
-    if(src->atEnd()) {
+    if (src->atEnd()) {
         Q_EMIT q->finished();
     } else {
-        QTimer::singleShot(0, this, SLOT(nextBlock()));
+        QTimer::singleShot(0, this, &QIODeviceCopierPrivate::nextBlock);
     }
 }
 
@@ -90,8 +92,8 @@ QIODeviceCopier::QIODeviceCopier(QIODevice *src, QIODevice *dest, QObject *paren
     : QObject(parent),
       d(new QIODeviceCopierPrivate(this, src, dest))
 {
-    connect(src, SIGNAL(destroyed()), this, SLOT(stop()));
-    connect(dest, SIGNAL(destroyed()), this, SLOT(stop()));
+    connect(src, &QIODevice::destroyed, this, &QIODeviceCopier::stop);
+    connect(dest, &QIODevice::destroyed, this, &QIODeviceCopier::stop);
 }
 
 void QIODeviceCopier::setBufferSize(qint64 size)
@@ -101,16 +103,16 @@ void QIODeviceCopier::setBufferSize(qint64 size)
 
 void QIODeviceCopier::start()
 {
-    if(!d->src->isOpen()) {
-        if(!d->src->open(QIODevice::ReadOnly)) {
+    if (!d->src->isOpen()) {
+        if (!d->src->open(QIODevice::ReadOnly)) {
             Q_EMIT error(tr("Unable to open source device for reading"));
             Q_EMIT finished();
             return;
         }
     }
 
-    if(!d->dest->isOpen()) {
-        if(!d->dest->open(QIODevice::WriteOnly)) {
+    if (!d->dest->isOpen()) {
+        if (!d->dest->open(QIODevice::WriteOnly)) {
             Q_EMIT error(tr("Unable to open destination device for writing"));
             Q_EMIT finished();
             return;
@@ -123,17 +125,19 @@ void QIODeviceCopier::start()
     // readyRead() and readChannelFinished() are only emitted for sequential
     // devices - for other types of devices, it is necessary to check atEnd()
     // in order to determine whether the end of the device has been reached
-    connect(d->src, SIGNAL(readyRead()), d, SLOT(onReadyRead()));
-    connect(d->src, SIGNAL(readChannelFinished()), d, SLOT(onReadChannelFinished()));
+    connect(d->src, &QIODevice::readyRead, d, &QIODeviceCopierPrivate::onReadyRead);
+    connect(d->src, &QIODevice::readChannelFinished, d, &QIODeviceCopierPrivate::onReadChannelFinished);
 
     // The first read from the device needs to be triggered
-    QTimer::singleShot(0, d, d->src->isSequential() ? SLOT(onReadyRead()) : SLOT(nextBlock()));
+    QTimer::singleShot(0, d, d->src->isSequential() ?
+            &QIODeviceCopierPrivate::onReadyRead :
+            &QIODeviceCopierPrivate::nextBlock);
 }
 
 void QIODeviceCopier::stop()
 {
-    disconnect(d->src, SIGNAL(readyRead()), d, SLOT(onReadyRead()));
-    disconnect(d->src, SIGNAL(readChannelFinished()), d, SLOT(onReadChannelFinished()));
+    disconnect(d->src, &QIODevice::readyRead, d, &QIODeviceCopierPrivate::onReadyRead);
+    disconnect(d->src, &QIODevice::readChannelFinished, d, &QIODeviceCopierPrivate::onReadChannelFinished);
 
     Q_EMIT finished();
 }

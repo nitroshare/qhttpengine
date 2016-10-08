@@ -24,10 +24,10 @@
 #define QHTTPENGINE_QHTTPSERVERPRIVATE_H
 
 #include <QObject>
-#include <QTcpServer>
 
-#include "QHttpEngine/qhttphandler.h"
-#include "QHttpEngine/qhttpserver.h"
+#include <QHttpEngine/QHttpServer>
+
+class QHttpHandler;
 
 class QHttpServerPrivate : public QObject
 {
@@ -35,14 +35,13 @@ class QHttpServerPrivate : public QObject
 
 public:
 
-    QHttpServerPrivate(QHttpServer *httpServer);
+    explicit QHttpServerPrivate(QHttpServer *httpServer);
 
     QHttpHandler *handler;
 
 private Q_SLOTS:
 
     void onIncomingConnection();
-    void onHeadersParsed();
 
 private:
 

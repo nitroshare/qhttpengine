@@ -23,11 +23,14 @@
 #ifndef QHTTPENGINE_QHTTPSOCKET_H
 #define QHTTPENGINE_QHTTPSOCKET_H
 
-#include <QTcpSocket>
+#include <QMultiMap>
+#include <QIODevice>
 
-#include "qhttpengine.h"
-#include "qhttpparser.h"
+#include <QHttpEngine/QIByteArray>
 
+#include "qhttpengine_global.h"
+
+class QTcpSocket;
 class QHTTPENGINE_EXPORT QHttpSocketPrivate;
 
 /**
@@ -92,6 +95,44 @@ class QHTTPENGINE_EXPORT QHttpSocket : public QIODevice
 public:
 
     /**
+     * @brief Map consisting of query string values
+     */
+    typedef QMultiMap<QString, QString> QQueryStringMap;
+
+    /**
+     * @brief Map consisting of HTTP headers
+     *
+     * The key used for the map is the QIByteArray class, which allows for
+     * case-insensitive comparison.
+     */
+    typedef QMultiMap<QIByteArray, QByteArray> QHttpHeaderMap;
+
+    /**
+     * HTTP methods
+     *
+     * An integer constant is provided for each of the methods described in
+     * RFC 2616 (HTTP/1.1).
+     */
+    enum Method {
+        /// Request for communications options
+        OPTIONS = 1,
+        /// Request resource
+        GET = 1 << 1,
+        /// Request resource without body
+        HEAD = 1 << 2,
+        /// Store subordinate resource
+        POST = 1 << 3,
+        /// Store resource
+        PUT = 1 << 4,
+        /// Delete resource
+        DELETE = 1 << 5,
+        /// Diagnostic trace
+        TRACE = 1 << 6,
+        /// Proxy connection
+        CONNECT = 1 << 7
+    };
+
+    /**
      * Predefined constants for HTTP status codes
      */
     enum {
@@ -145,25 +186,41 @@ public:
     virtual void close();
 
     /**
+     * @brief Determine if the request headers have been parsed yet
+     */
+    bool isHeadersParsed() const;
+
+    /**
      * @brief Retrieve the request method
      *
      * This method may only be called after the request headers have been
      * parsed.
      */
-    QByteArray method() const;
+    Method method() const;
 
     /**
-     * @brief Retrieve the request path
+     * @brief Retrieve the raw request path
      *
      * This method may only be called after the request headers have been
      * parsed.
      */
-    QByteArray path() const;
+    QByteArray rawPath() const;
 
     /**
-     * @brief Determine if the request headers have been parsed yet
+     * @brief Retrieve the decoded path with the query string removed
+     *
+     * This method may only be called after the request headers have been
+     * parsed.
      */
-    bool isHeadersParsed() const;
+    QString path() const;
+
+    /**
+     * @brief Retrieve the query string
+     *
+     * This method may only be called after the request headers have been
+     * parsed.
+     */
+    QQueryStringMap queryString() const;
 
     /**
      * @brief Retrieve a map of request headers
@@ -197,10 +254,10 @@ public:
      * @brief Set a response header to a specific value
      *
      * This method may only be called before the response headers are written.
-     * If the specified header already has a value set, it will be
-     * overwritten.
+     * Duplicate values will be either appended to the header or used to
+     * replace the original value, depending on the third parameter.
      */
-    void setHeader(const QByteArray &name, const QByteArray &value);
+    void setHeader(const QByteArray &name, const QByteArray &value, bool replace = true);
 
     /**
      * @brief Set the response headers

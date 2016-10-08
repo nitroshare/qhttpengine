@@ -16,8 +16,11 @@ set(TESTS
 
 foreach(TEST ${TESTS})
     add_executable(${TEST} ${TEST}.cpp)
-    qt5_use_modules(${TEST} Test)
-    target_link_libraries(${TEST} QHttpEngine common)
+    set_target_properties(${TEST} PROPERTIES
+        CXX_STANDARD 11
+        CXX_STANDARD_REQUIRED ON
+    )
+    target_link_libraries(${TEST} Qt5::Test QHttpEngine common)
     add_test(NAME ${TEST}
         COMMAND ${TEST}
     )

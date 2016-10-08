@@ -106,7 +106,7 @@ void TestQFilesystemHandler::testRequests()
 
     QTRY_COMPARE(client.statusCode(), statusCode);
 
-    if(!data.isNull()) {
+    if (!data.isNull()) {
         QTRY_COMPARE(client.data(), data);
     }
 }
@@ -114,7 +114,7 @@ void TestQFilesystemHandler::testRequests()
 bool TestQFilesystemHandler::createFile(const QString &path)
 {
     QFile file(QDir(dir.path()).absoluteFilePath(path));
-    if(!file.open(QIODevice::WriteOnly)) {
+    if (!file.open(QIODevice::WriteOnly)) {
         return false;
     }
 

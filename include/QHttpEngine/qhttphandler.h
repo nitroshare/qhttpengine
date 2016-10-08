@@ -24,11 +24,11 @@
 #define QHTTPENGINE_QHTTPHANDLER_H
 
 #include <QObject>
-#include <QRegExp>
 
-#include "qhttpengine.h"
-#include "qhttpsocket.h"
+#include "qhttpengine_global.h"
 
+class QRegExp;
+class QHttpSocket;
 class QHTTPENGINE_EXPORT QHttpHandlerPrivate;
 
 /**

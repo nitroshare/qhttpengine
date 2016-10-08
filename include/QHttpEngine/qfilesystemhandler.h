@@ -23,8 +23,9 @@
 #ifndef QHTTPENGINE_QFILESYSTEMHANDLER_H
 #define QHTTPENGINE_QFILESYSTEMHANDLER_H
 
-#include "qhttpengine.h"
-#include "qhttphandler.h"
+#include <QHttpEngine/QHttpHandler>
+
+#include "qhttpengine_global.h"
 
 class QHTTPENGINE_EXPORT QFilesystemHandlerPrivate;
 

@@ -24,18 +24,10 @@
 #define QHTTPENGINE_QHTTPPARSER_H
 
 #include <QList>
-#include <QMap>
 
-#include "qhttpengine.h"
-#include "qibytearray.h"
+#include <QHttpEngine/QHttpSocket>
 
-/**
- * @brief Map consisting of HTTP headers
- *
- * The key used for the map is the QIByteArray class, which allows for
- * case-insensitive comparison.
- */
-typedef QMap<QIByteArray, QByteArray> QHttpHeaderMap;
+#include "qhttpengine_global.h"
 
 /**
  * @brief Utility methods for parsing HTTP requests and responses
@@ -63,12 +55,17 @@ public:
     static void split(const QByteArray &data, const QByteArray &delim, int maxSplit, QList<QByteArray> &parts);
 
     /**
+     * @brief Parse and remove the query string from a path
+     */
+    static bool parsePath(const QByteArray &rawPath, QString &path, QHttpSocket::QQueryStringMap &queryString);
+
+    /**
      * @brief Parse a list of lines containing HTTP headers
      *
      * Each line is expected to be in the format "name: value". Parsing is
      * immediately aborted if an invalid line is encountered.
      */
-    static bool parseHeaderList(const QList<QByteArray> &lines, QHttpHeaderMap &headers);
+    static bool parseHeaderList(const QList<QByteArray> &lines, QHttpSocket::QHttpHeaderMap &headers);
 
     /**
      * @brief Parse HTTP headers
@@ -77,17 +74,17 @@ public:
      * into a status line and HTTP headers. The parts list will contain the
      * parts from the status line.
      */
-    static bool parseHeaders(const QByteArray &data, QList<QByteArray> &parts, QHttpHeaderMap &headers);
+    static bool parseHeaders(const QByteArray &data, QList<QByteArray> &parts, QHttpSocket::QHttpHeaderMap &headers);
 
     /**
      * @brief Parse HTTP request headers
      */
-    static bool parseRequestHeaders(const QByteArray &data, QByteArray &method, QByteArray &path, QHttpHeaderMap &headers);
+    static bool parseRequestHeaders(const QByteArray &data, QHttpSocket::Method &method, QByteArray &path, QHttpSocket::QHttpHeaderMap &headers);
 
     /**
      * @brief Parse HTTP response headers
      */
-    static bool parseResponseHeaders(const QByteArray &data, int &statusCode, QByteArray &statusReason, QHttpHeaderMap &headers);
+    static bool parseResponseHeaders(const QByteArray &data, int &statusCode, QByteArray &statusReason, QHttpSocket::QHttpHeaderMap &headers);
 };
 
 #endif // QHTTPENGINE_QHTTPPARSER_H

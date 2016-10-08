@@ -22,18 +22,32 @@
 
 #include <cstring>
 
-#include "QHttpEngine/qhttpsocket.h"
+#include <QTcpSocket>
+
+#include <QHttpEngine/QHttpParser>
+
 #include "qhttpsocket_p.h"
 
 // Predefined error response requires a simple HTML template to be returned to
 // the client describing the error condition
 const QString ErrorTemplate =
-        "<!DOCTYPE html><html><head><meta charset=\"utf-8\">"
-        "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
-        "<title>%1 %2</title></head><body><h1>%1 %2</h1><p>"
-        "An error has occurred while trying to display the requested resource. "
-        "Please contact the website owner if this error persists."
-        "</p><hr><p><em>QHttpEngine %3</em></p></body></html>";
+        "<!DOCTYPE html>"
+        "<html>"
+          "<head>"
+            "<meta charset=\"utf-8\">"
+            "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
+            "<title>%1 %2</title>"
+          "</head>"
+          "<body>"
+            "<h1>%1 %2</h1>"
+            "<p>"
+              "An error has occurred while trying to display the requested resource. "
+              "Please contact the website owner if this error persists."
+            "</p>"
+            "<hr>"
+            "<p><em>QHttpEngine %3</em></p>"
+          "</body>"
+        "</html>";
 
 QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket, QTcpSocket *tcpSocket)
     : QObject(httpSocket),
@@ -48,8 +62,8 @@ QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket, QTcpSocket *tcpS
 {
     socket->setParent(this);
 
-    connect(socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
-    connect(socket, SIGNAL(bytesWritten(qint64)), this, SLOT(onBytesWritten(qint64)));
+    connect(socket, &QTcpSocket::readyRead, this, &QHttpSocketPrivate::onReadyRead);
+    connect(socket, &QTcpSocket::bytesWritten, this, &QHttpSocketPrivate::onBytesWritten);
 
     // Process anything already received by the socket
     onReadyRead();
@@ -57,7 +71,7 @@ QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket, QTcpSocket *tcpS
 
 QByteArray QHttpSocketPrivate::statusReason(int statusCode) const
 {
-    switch(statusCode) {
+    switch (statusCode) {
     case QHttpSocket::OK: return "OK";
     case QHttpSocket::MovedPermanently: return "MOVED PERMANENTLY";
     case QHttpSocket::Found: return "FOUND";
@@ -66,7 +80,7 @@ QByteArray QHttpSocketPrivate::statusReason(int statusCode) const
     case QHttpSocket::NotFound: return "NOT FOUND";
     case QHttpSocket::MethodNotAllowed: return "METHOD NOT ALLOWED";
     case QHttpSocket::InternalServerError: return "INTERNAL SERVER ERROR";
-    default: return "UNKNOWN";
+    default: return "UNKNOWN ERROR";
     }
 }
 
@@ -76,26 +90,26 @@ void QHttpSocketPrivate::onReadyRead()
     readBuffer.append(socket->readAll());
 
     // If reading headers, return if they could not be read (yet)
-    if(readState == ReadHeaders) {
-        if(!readHeaders()) {
-            return;
-        }
+    if (readState == ReadHeaders && !readHeaders()) {
+        return;
     }
 
-    if(readState == ReadData) {
+    // Read data if in that state, otherwise discard
+    switch (readState) {
+    case ReadData:
         readData();
-    } else if(readState == ReadFinished) {
-
-        // Any data received here is unexpected and should be ignored
+        break;
+    case ReadFinished:
         readBuffer.clear();
+        break;
     }
 }
 
 void QHttpSocketPrivate::onBytesWritten(qint64 bytes)
 {
     // Check to see if all of the response header was written
-    if(writeState == WriteHeaders) {
-        if(responseHeaderRemaining - bytes > 0) {
+    if (writeState == WriteHeaders) {
+        if (responseHeaderRemaining - bytes > 0) {
             responseHeaderRemaining -= bytes;
         } else {
             writeState = WriteData;
@@ -103,7 +117,8 @@ void QHttpSocketPrivate::onBytesWritten(qint64 bytes)
         }
     }
 
-    if(writeState == WriteData) {
+    // Only emit bytesWritten() for data after the headers
+    if (writeState == WriteData) {
         Q_EMIT q->bytesWritten(bytes);
     }
 }
@@ -113,13 +128,14 @@ bool QHttpSocketPrivate::readHeaders()
     // Check for the double CRLF that signals the end of the headers and
     // if it is not found, wait until the next time readyRead is emitted
     int index = readBuffer.indexOf("\r\n\r\n");
-    if(index == -1) {
+    if (index == -1) {
         return false;
     }
 
     // Attempt to parse the headers and if a problem is encountered, abort
     // the connection (so that no more data is read or written) and return
-    if(!QHttpParser::parseRequestHeaders(readBuffer.left(index), requestMethod, requestPath, requestHeaders)) {
+    if (!QHttpParser::parseRequestHeaders(readBuffer.left(index), requestMethod, requestRawPath, requestHeaders) ||
+            !QHttpParser::parsePath(requestRawPath, requestPath, requestQueryString)) {
         q->writeError(QHttpSocket::BadRequest);
         return false;
     }
@@ -130,7 +146,7 @@ bool QHttpSocketPrivate::readHeaders()
     // Check for the content-length header - if it is present, then
     // prepare to read the specified amount of data, otherwise, no data
     // should be read from the socket and the read channel is finished
-    if(requestHeaders.contains("Content-Length")) {
+    if (requestHeaders.contains("Content-Length")) {
         readState = ReadData;
         requestDataTotal = requestHeaders.value("Content-Length").toLongLong();
     } else {
@@ -141,7 +157,7 @@ bool QHttpSocketPrivate::readHeaders()
     Q_EMIT q->headersParsed();
 
     // If the new readState is ReadFinished, then indicate so
-    if(readState == ReadFinished) {
+    if (readState == ReadFinished) {
         Q_EMIT q->readChannelFinished();
     }
 
@@ -151,13 +167,13 @@ bool QHttpSocketPrivate::readHeaders()
 void QHttpSocketPrivate::readData()
 {
     // Emit the readyRead() signal if any data is available in the buffer
-    if(readBuffer.size()) {
+    if (readBuffer.size()) {
         Q_EMIT q->readyRead();
     }
 
     // Check to see if the specified amount of data has been read from the
     // socket, if so, emit the readChannelFinished() signal
-    if(requestDataRead + readBuffer.size() >= requestDataTotal) {
+    if (requestDataRead + readBuffer.size() >= requestDataTotal) {
         readState = ReadFinished;
         Q_EMIT q->readChannelFinished();
     }
@@ -173,7 +189,7 @@ QHttpSocket::QHttpSocket(QTcpSocket *socket, QObject *parent)
 
 qint64 QHttpSocket::bytesAvailable() const
 {
-    if(d->readState > QHttpSocketPrivate::ReadHeaders) {
+    if (d->readState > QHttpSocketPrivate::ReadHeaders) {
         return d->readBuffer.size() + QIODevice::bytesAvailable();
     } else {
         return 0;
@@ -196,22 +212,32 @@ void QHttpSocket::close()
     d->socket->close();
 }
 
-QByteArray QHttpSocket::method() const
-{
-    return d->requestMethod;
-}
-
-QByteArray QHttpSocket::path() const
-{
-    return d->requestPath;
-}
-
 bool QHttpSocket::isHeadersParsed() const
 {
     return d->readState > QHttpSocketPrivate::ReadHeaders;
 }
 
-QHttpHeaderMap QHttpSocket::headers() const
+QHttpSocket::Method QHttpSocket::method() const
+{
+    return d->requestMethod;
+}
+
+QByteArray QHttpSocket::rawPath() const
+{
+    return d->requestRawPath;
+}
+
+QString QHttpSocket::path() const
+{
+    return d->requestPath;
+}
+
+QHttpSocket::QQueryStringMap QHttpSocket::queryString() const
+{
+    return d->requestQueryString;
+}
+
+QHttpSocket::QHttpHeaderMap QHttpSocket::headers() const
 {
     return d->requestHeaders;
 }
@@ -227,9 +253,13 @@ void QHttpSocket::setStatusCode(int statusCode, const QByteArray &statusReason)
     d->responseStatusReason = statusReason.isNull() ? d->statusReason(statusCode) : statusReason;
 }
 
-void QHttpSocket::setHeader(const QByteArray &name, const QByteArray &value)
+void QHttpSocket::setHeader(const QByteArray &name, const QByteArray &value, bool replace)
 {
-    d->responseHeaders.insert(name, value);
+    if (replace || d->responseHeaders.count(name)) {
+        d->responseHeaders.replace(name, value);
+    } else {
+        d->responseHeaders.replace(name, d->responseHeaders.value(name) + ", " + value);
+    }
 }
 
 void QHttpSocket::setHeaders(const QHttpHeaderMap &headers)
@@ -249,10 +279,10 @@ void QHttpSocket::writeHeaders()
     header.append("\r\n");
 
     // Append each of the headers followed by a CRLF
-    for(QHttpHeaderMap::const_iterator i = d->responseHeaders.constBegin(); i != d->responseHeaders.constEnd(); ++i) {
+    for (auto i = d->responseHeaders.constBegin(); i != d->responseHeaders.constEnd(); ++i) {
         header.append(i.key());
         header.append(": ");
-        header.append(i.value());
+        header.append(d->responseHeaders.values(i.key()).join(", "));
         header.append("\r\n");
     }
 
@@ -296,7 +326,7 @@ void QHttpSocket::writeError(int statusCode, const QByteArray &statusReason)
 qint64 QHttpSocket::readData(char *data, qint64 maxlen)
 {
     // Ensure the connection is in the correct state for reading data
-    if(d->readState == QHttpSocketPrivate::ReadHeaders) {
+    if (d->readState == QHttpSocketPrivate::ReadHeaders) {
         return 0;
     }
 
@@ -315,7 +345,7 @@ qint64 QHttpSocket::writeData(const char *data, qint64 len)
 {
     // If the response headers have not yet been written, they must
     // immediately be written before the data can be
-    if(d->writeState == QHttpSocketPrivate::WriteNone) {
+    if (d->writeState == QHttpSocketPrivate::WriteNone) {
         writeHeaders();
     }
 

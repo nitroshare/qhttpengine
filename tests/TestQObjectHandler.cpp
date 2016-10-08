@@ -32,16 +32,18 @@
 #include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"
 
-class DummyHandler : public QObjectHandler
+class DummyAPI : public QObject
 {
     Q_OBJECT
 
-private Q_SLOTS:
+public Q_SLOTS:
 
-    void invalidSignature(QVariantMap) {}
-    QVariantMap validSlot(QVariantMap params) {
-        return params;
-    }
+    int invalidReturnValue() { return 0; }
+    QVariantMap invalidArguments(int) { return QVariantMap(); }
+    QVariantMap noParameters() { return QVariantMap(); }
+    QVariantMap oneParameter(QHttpSocket *) { return QVariantMap(); }
+    QVariantMap twoParameters(QHttpSocket *, QVariantMap) { return QVariantMap(); }
+    QVariantMap echoPost(QHttpSocket *, QVariantMap d) { return d; }
 };
 
 class TestQObjectHandler : public QObject
@@ -50,62 +52,82 @@ class TestQObjectHandler : public QObject
 
 private Q_SLOTS:
 
-    void testRequests_data();
-    void testRequests();
+    void testOldConnection_data();
+    void testOldConnection();
+    void testNewConnection();
 };
 
-void TestQObjectHandler::testRequests_data()
+void TestQObjectHandler::testOldConnection_data()
 {
-    QTest::addColumn<QByteArray>("method");
-    QTest::addColumn<QByteArray>("path");
-    QTest::addColumn<QByteArray>("data");
+    QTest::addColumn<bool>("registerPost");
+    QTest::addColumn<bool>("requestPost");
+    QTest::addColumn<QByteArray>("slot");
     QTest::addColumn<int>("statusCode");
+    QTest::addColumn<QVariantMap>("data");
 
-    QVariantMap map;
-    map.insert("param1", 1);
-    map.insert("param2", 2);
+    QTest::newRow("invalid return")
+            << false
+            << false
+            << QByteArray(SLOT(invalidReturnValue()))
+            << static_cast<int>(QHttpSocket::InternalServerError)
+            << QVariantMap();
 
-    QByteArray data = QJsonDocument(QJsonObject::fromVariantMap(map)).toJson();
+    QTest::newRow("invalid arguments")
+            << false
+            << false
+            << QByteArray(SLOT(invalidArguments(int)))
+            << static_cast<int>(QHttpSocket::InternalServerError)
+            << QVariantMap();
 
-    QTest::newRow("nonexistent slot")
-            << QByteArray("POST")
-            << QByteArray("nonexistent")
-            << data
-            << static_cast<int>(QHttpSocket::NotFound);
+    QTest::newRow("no parameters")
+            << false
+            << false
+            << QByteArray(SLOT(noParameters()))
+            << static_cast<int>(QHttpSocket::OK)
+            << QVariantMap();
 
-    QTest::newRow("invalid signature")
-            << QByteArray("POST")
-            << QByteArray("invalidSignature")
-            << data
-            << static_cast<int>(QHttpSocket::InternalServerError);
+    QTest::newRow("one parameter")
+            << false
+            << false
+            << QByteArray(SLOT(oneParameter(QHttpSocket*)))
+            << static_cast<int>(QHttpSocket::OK)
+            << QVariantMap();
 
-    QTest::newRow("bad method")
-            << QByteArray("GET")
-            << QByteArray("validSlot")
-            << data
-            << static_cast<int>(QHttpSocket::MethodNotAllowed);
+    QTest::newRow("two parameters")
+            << false
+            << false
+            << QByteArray(SLOT(twoParameters(QHttpSocket*,QVariantMap)))
+            << static_cast<int>(QHttpSocket::OK)
+            << QVariantMap();
 
-    QTest::newRow("malformed JSON")
-            << QByteArray("POST")
-            << QByteArray("validSlot")
-            << QByteArray("")
-            << static_cast<int>(QHttpSocket::BadRequest);
+    QTest::newRow("invalid method")
+            << true
+            << false
+            << QByteArray(SLOT(echoPost(QHttpSocket*,QVariantMap)))
+            << static_cast<int>(QHttpSocket::MethodNotAllowed)
+            << QVariantMap();
 
-    QTest::newRow("valid slot")
-            << QByteArray("POST")
-            << QByteArray("validSlot")
-            << data
-            << static_cast<int>(QHttpSocket::OK);
+    QTest::newRow("post data")
+            << true
+            << true
+            << QByteArray(SLOT(echoPost(QHttpSocket*,QVariantMap)))
+            << static_cast<int>(QHttpSocket::OK)
+            << QVariantMap({{"a", "a"}, {"b", 1}});
 }
 
-void TestQObjectHandler::testRequests()
+void TestQObjectHandler::testOldConnection()
 {
-    QFETCH(QByteArray, method);
-    QFETCH(QByteArray, path);
-    QFETCH(QByteArray, data);
+    QFETCH(bool, registerPost);
+    QFETCH(bool, requestPost);
+    QFETCH(QByteArray, slot);
     QFETCH(int, statusCode);
+    QFETCH(QVariantMap, data);
 
-    DummyHandler handler;
+    QObjectHandler handler;
+    DummyAPI api;
+
+    handler.registerMethod("test", &api, slot.constData(),
+            registerPost ? QHttpSocket::POST : QHttpSocket::GET);
 
     QSocketPair pair;
     QTRY_VERIFY(pair.isConnected());
@@ -113,22 +135,56 @@ void TestQObjectHandler::testRequests()
     QSimpleHttpClient client(pair.client());
     QHttpSocket socket(pair.server(), &pair);
 
-    QHttpHeaderMap headers;
-    headers.insert("Content-Length", QByteArray::number(data.length()));
-
-    client.sendHeaders(method, path, headers);
-    client.sendData(data);
+    if (requestPost) {
+        QByteArray buff = QJsonDocument(QJsonObject::fromVariantMap(data)).toJson();
+        client.sendHeaders("POST", "test", QHttpSocket::QHttpHeaderMap({
+            {"Content-Length", QByteArray::number(buff.length())},
+        }));
+        client.sendData(buff);
+    } else {
+        client.sendHeaders("GET", "test");
+    }
 
     QTRY_VERIFY(socket.isHeadersParsed());
 
     handler.route(&socket, socket.path());
-
     QTRY_COMPARE(client.statusCode(), statusCode);
 
-    if(statusCode == QHttpSocket::OK) {
+    if (requestPost) {
         QVERIFY(client.headers().contains("Content-Length"));
         QTRY_COMPARE(client.data().length(), client.headers().value("Content-Length").toInt());
-        QCOMPARE(QJsonDocument::fromJson(client.data()), QJsonDocument::fromJson(data));
+        QCOMPARE(QJsonDocument::fromJson(client.data()).object(), QJsonObject::fromVariantMap(data));
+    }
+}
+
+void TestQObjectHandler::testNewConnection()
+{
+    QObjectHandler handler;
+    DummyAPI api;
+
+    // Connect to object slot
+    handler.registerMethod("0", &api, &DummyAPI::noParameters);
+    handler.registerMethod("1", &api, &DummyAPI::oneParameter);
+    handler.registerMethod("2", &api, &DummyAPI::twoParameters);
+
+    // Connect to functor
+    handler.registerMethod("3", []() { return QVariantMap(); });
+    handler.registerMethod("4", &api, []() { return QVariantMap(); });
+    handler.registerMethod("5", &api, [](QHttpSocket*) { return QVariantMap(); });
+    handler.registerMethod("6", &api, [](QHttpSocket*, QVariantMap d) { return d; });
+
+    for (int i = 0; i < 7; ++i) {
+        QSocketPair pair;
+        QTRY_VERIFY(pair.isConnected());
+
+        QSimpleHttpClient client(pair.client());
+        QHttpSocket socket(pair.server(), &pair);
+
+        client.sendHeaders("GET", QByteArray::number(i));
+        QTRY_VERIFY(socket.isHeadersParsed());
+
+        handler.route(&socket, socket.path());
+        QTRY_COMPARE(client.statusCode(), static_cast<int>(QHttpSocket::OK));
     }
 }
 
