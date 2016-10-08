@@ -20,18 +20,10 @@
  * IN THE SOFTWARE.
  */
 
+#include <QJsonParseError>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonParseError>
-#include <QList>
-#include <QMetaMethod>
-#include <QMetaObject>
-#include <QMetaType>
-#include <QPair>
-#include <QUrl>
-#include <QUrlQuery>
 
-#include <QHttpEngine/QHttpSocket>
 #include <QHttpEngine/QObjectHandler>
 
 #include "qobjecthandler_p.h"
@@ -42,17 +34,13 @@ QObjectHandlerPrivate::QObjectHandlerPrivate(QObjectHandler *handler)
 {
 }
 
-void QObjectHandlerPrivate::invokeSlot(QHttpSocket *socket, int index, const QVariantMap &query)
+void QObjectHandlerPrivate::invokeSlot(QHttpSocket *socket, const QString &path)
 {
-    QGenericArgument secondArgument;
+    Method m = map.value(path);
     QVariantMap parameters;
 
-    statusCode = QHttpSocket::OK;
-
-    // If this is a POST request, then decode the request body
-    if (socket->method() == QHttpSocket::POST) {
-
-        // Attempt to decode the JSON from the socket
+    // If data was supplied, decode it as JSON
+    if (socket->bytesAvailable()) {
         QJsonParseError error;
         QJsonDocument document = QJsonDocument::fromJson(socket->readAll(), &error);
 
@@ -63,36 +51,30 @@ void QObjectHandlerPrivate::invokeSlot(QHttpSocket *socket, int index, const QVa
         }
 
         parameters = document.object().toVariantMap();
-        secondArgument = Q_ARG(QVariantMap, parameters);
     }
 
-    // Attempt to invoke the slot
+    // Invoke the slot
     QVariantMap retVal;
-    if (!q->metaObject()->method(index).invoke(q,
-            Q_RETURN_ARG(QVariantMap, retVal),
-            Q_ARG(QVariantMap, query),
-            secondArgument)) {
-        socket->writeError(QHttpSocket::InternalServerError);
-        return;
+    if (m.oldSlot) {
+        if (!QMetaObject::invokeMethod(m.receiver, m.slot.method, Q_RETURN_ARG(QVariantMap, retVal), Q_ARG(QHttpSocket*, socket), Q_ARG(QVariantMap, parameters))) {
+            socket->writeError(QHttpSocket::InternalServerError);
+            return;
+        }
+    } else {
+        void *args[3] = {
+            &retVal,
+            &socket,
+            &parameters
+        };
+        m.slot.slotObj->call(m.receiver, args);
     }
 
     // Convert the return value to JSON and write it to the socket
     QByteArray data = QJsonDocument(QJsonObject::fromVariantMap(retVal)).toJson();
-    socket->setStatusCode(statusCode);
     socket->setHeader("Content-Length", QByteArray::number(data.length()));
     socket->setHeader("Content-Type", "application/json");
     socket->write(data);
     socket->close();
-}
-
-QVariantMap QObjectHandlerPrivate::convertQueryString(const QString &query)
-{
-    QVariantMap map;
-    QPair<QString, QString> pair;
-    foreach (pair, QUrlQuery(query).queryItems()) {
-        map.insert(pair.first, pair.second);
-    }
-    return map;
 }
 
 QObjectHandler::QObjectHandler(QObject *parent)
@@ -103,52 +85,37 @@ QObjectHandler::QObjectHandler(QObject *parent)
 
 void QObjectHandler::process(QHttpSocket *socket, const QString &path)
 {
-    // Determine the correct slot name to invoke based on the HTTP method and
-    // the path that was provided - note that the path needs to be split to
-    // remove the query string
-    QUrl url(path);
-    QVariantMap query = d->convertQueryString(url.query());
-    QString slotName = QString("%1_%2")
-        .arg(socket->method() == QHttpSocket::GET ? "get" : "post")
-        .arg(url.path());
-
-    // Determine the parameters the slot should have based on the method
-    QString parameters;
-    if (socket->method() == QHttpSocket::GET) {
-        parameters = "QVariantMap";
-    } else {
-        parameters = "QVariantMap,QVariantMap";
-    }
-
-    // Attempt to find the method's index so we can invoke it later
-    int index = metaObject()->indexOfSlot(QString("%1(%2)").arg(slotName).arg(parameters).toUtf8().data());
-
-    // If the index is invalid, the "resource" was not found
-    // TODO: an HTTP 405 should be returned when the method is incorrect
-    if (index == -1) {
+    // Ensure the method has been registered
+    if (!d->map.contains(path)) {
         socket->writeError(QHttpSocket::NotFound);
         return;
     }
 
-    // Ensure that the return type of the slot is QVariantMap
-    QMetaMethod method = metaObject()->method(index);
-    if (method.returnType() != QMetaType::QVariantMap) {
-        socket->writeError(QHttpSocket::InternalServerError);
+    // Ensure the method is accepted
+    QObjectHandlerPrivate::Method m = d->map.value(path);
+    if (!(m.acceptedMethods & socket->method())) {
+        // TODO: accept header
+        socket->writeError(QHttpSocket::MethodNotAllowed);
         return;
     }
 
     // If the slot has finished receiving all of the data, jump directly to
     // invokeSlot(), otherwise, wait until we have the rest of it
     if (socket->bytesAvailable() >= socket->contentLength()) {
-        d->invokeSlot(socket, index, query);
+        d->invokeSlot(socket, path);
     } else {
-        connect(socket, &QHttpSocket::readChannelFinished, [this, socket, index, &query]() {
-            d->invokeSlot(socket, index, query);
+        connect(socket, &QHttpSocket::readChannelFinished, [this, socket, path]() {
+            d->invokeSlot(socket, path);
         });
     }
 }
 
-void QObjectHandler::setStatusCode(int statusCode)
+void QObjectHandler::registerMethod(const QString &name, QObject *receiver, const char *method, int acceptedStatusCodes)
 {
-    d->statusCode = statusCode;
+    d->map.insert(name, QObjectHandlerPrivate::Method(receiver, method, acceptedStatusCodes));
+}
+
+void QObjectHandler::registerMethodImpl(const QString &name, QObject *receiver, QtPrivate::QSlotObjectBase *slotObj, int acceptedStatusCodes)
+{
+    d->map.insert(name, QObjectHandlerPrivate::Method(receiver, slotObj, acceptedStatusCodes));
 }

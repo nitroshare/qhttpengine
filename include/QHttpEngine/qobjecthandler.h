@@ -23,11 +23,13 @@
 #ifndef QHTTPENGINE_QOBJECTHANDLER_H
 #define QHTTPENGINE_QOBJECTHANDLER_H
 
+#include <QVariantMap>
+
 #include <QHttpEngine/QHttpHandler>
+#include <QHttpEngine/QHttpSocket>
 
 #include "qhttpengine_global.h"
 
-class QHttpSocket;
 class QHTTPENGINE_EXPORT QObjectHandlerPrivate;
 
 /**
@@ -72,6 +74,68 @@ public:
      */
     explicit QObjectHandler(QObject *parent = 0);
 
+    /**
+     * @brief Register a method
+     *
+     * This overload uses the traditional connection syntax with macros.
+     */
+    void registerMethod(const QString &name, QObject *receiver, const char *method, int acceptedStatusCodes = QHttpSocket::GET);
+
+    /**
+     * @brief Register a method
+     *
+     * This overload uses the new connection syntax with member pointers.
+     */
+    template <typename Func1>
+    inline void registerMethod(const QString &name,
+                               const typename QtPrivate::FunctionPointer<Func1>::Object *receiver,
+                               Func1 slot, int acceptedStatusCodes = QHttpSocket::GET) {
+
+        typedef QtPrivate::FunctionPointer<Func1> SlotType;
+
+        // Ensure the slot doesn't have too many parameters
+        Q_STATIC_ASSERT_X(int(SlotType::ArgumentCount) <= 2,
+                          "The slot must have no more than two arguments.");
+
+        // Ensure the parameters are of the correct type
+        Q_STATIC_ASSERT_X((QtPrivate::CheckCompatibleArguments<QtPrivate::List<QHttpSocket*, QVariantMap>, typename SlotType::Arguments>::value),
+                          "The slot parameters do not match");
+
+        // Ensure the return value is correct
+        Q_STATIC_ASSERT_X((QtPrivate::AreArgumentsCompatible<typename SlotType::ReturnType, QVariantMap>::value),
+                          "Return type of the slot is not compatible with the return type of the signal.");
+
+        // Invoke the implementation
+        registerMethodImpl(name, receiver,
+                           new QtPrivate::QSlotObject<Func1, typename SlotType::Arguments, void>(slot),
+                           acceptedStatusCodes);
+    }
+
+    /**
+     * @brief Register a method
+     *
+     * This overload uses the new functor syntax (without context).
+     */
+    template <typename Func1>
+    inline void registerMethod(const QString &name, Func1 slot, int acceptedStatusCodes = QHttpSocket::GET) {
+        registerMethod(name, Q_NULLPTR, slot, acceptedStatusCodes);
+    }
+
+    /**
+     * @brief Register a method
+     *
+     * This overload uses the new functor syntax (with context).
+     */
+    template <typename Func1>
+    inline typename QtPrivate::QEnableIf<!QtPrivate::FunctionPointer<Func1>::IsPointerToMemberFunction &&
+                                         !QtPrivate::is_same<const char*, Func1>::value, void>::Type
+            registerMethod(const QString &name, QObject *context, Func1 slot, int acceptedStatusCodes = QHttpSocket::GET) {
+
+        // There is an easier way to do this but then the header wouldn't
+        // compile on non-C++11 compilers
+        return registerMethod_functor(name, context, slot, &Func1::operator(), acceptedStatusCodes);
+    }
+
 protected:
 
     /**
@@ -79,14 +143,32 @@ protected:
      */
     virtual void process(QHttpSocket *socket, const QString &path);
 
-    /**
-     * @brief Set the status code for the current request
-     *
-     * By default, the status code is set to QHttpSocket::OK.
-     */
-    void setStatusCode(int statusCode);
-
 private:
+
+    template <typename Func1, typename Func1Operator>
+    inline void registerMethod_functor(const QString &name, QObject *context, Func1 slot, Func1Operator, int acceptedStatusCodes) {
+
+        typedef QtPrivate::FunctionPointer<Func1Operator> SlotType;
+
+        // Ensure the slot doesn't have too many parameters
+        Q_STATIC_ASSERT_X(int(SlotType::ArgumentCount) <= 2,
+                          "The slot must have no more than two arguments.");
+
+        // Ensure the parameters are of the correct type
+        Q_STATIC_ASSERT_X((QtPrivate::CheckCompatibleArguments<QtPrivate::List<QHttpSocket*, QVariantMap>, typename SlotType::Arguments>::value),
+                          "The slot parameters do not match");
+
+        // Ensure the return value is correct
+        Q_STATIC_ASSERT_X((QtPrivate::AreArgumentsCompatible<typename SlotType::ReturnType, QVariantMap>::value),
+                          "Return type of the slot is not compatible with the return type of the signal.");
+
+        registerMethodImpl(name, context,
+                           new QtPrivate::QFunctorSlotObject<Func1, SlotType::ArgumentCount,
+                                typename QtPrivate::List_Left<QtPrivate::List<QHttpSocket*, QVariantMap>, SlotType::ArgumentCount>::Value, void>(slot),
+                           acceptedStatusCodes);
+    }
+
+    void registerMethodImpl(const QString &name, QObject *receiver, QtPrivate::QSlotObjectBase *slotObj, int acceptedStatusCodes);
 
     QObjectHandlerPrivate *const d;
     friend class QObjectHandlerPrivate;
