@@ -36,32 +36,42 @@ class QHTTPENGINE_EXPORT QObjectHandlerPrivate;
  * @brief Handler for invoking slots
  * @headerfile qobjecthandler.h QHttpEngine/QObjectHandler
  *
- * This handler enables incoming requests to invoke a matching slot in a
- * QObject-derived class. The slot name is used to determine the HTTP verb
- * that the method expects. For all requests, the query string is parsed and
- * supplied to the slot as a parameter. For POST requests, the request body is
- * expected to be a JSON object and it is supplied to the slot as a
- * QVariantMap. The slot is expected to return a QVariantMap containing the
- * response, which will be encoded as a JSON object.
+ * This handler enables incoming requests to be processed by slots in a
+ * QObject-derived class or functor. Methods are registered by providing a
+ * name and slot to invoke. The slot may take a pointer to the QHttpSocket for
+ * the request as an argument. For requests that include a body, the content
+ * is parsed as a JSON object and provided as a second parameter to the slot.
+ * The slot is expected to return a QVariantMap containing the response, which
+ * will be encoded as a JSON-document.
  *
- * To use this class, it must be subclassed and one or more slots must be
- * created. The name of the slot will be used to determine the HTTP method and
- * path. For example, the following handler consists of two methods that can
- * be invoked by using the `/something` path.
+ * To use this class, simply create an instance and call the appropriate
+ * registerMethod() overload. For example:
  *
  * @code
- * class TestHandler : public QObjectHandler
+ * class Object : public QObject
  * {
  *     Q_OBJECT
- * private slots:
- *     QVariantMap get_something(QVariantMap queryString);
- *     QVariantMap post_something(QVariantMap queryString, QVariantMap parameters);
+ * public slots:
+ *     QVariantMap something(QHttpSocket *socket);
  * };
+ *
+ * QObjectHandler handler;
+ * Object object;
+ * // Old connection syntax
+ * handler.registerMethod("something", &object, SLOT(something(QHttpSocket*)));
+ * // New connection syntax
+ * handler.registerMethod("something", &object, &Object::something);
  * @endcode
  *
- * The slot name should begin with the HTTP method, followed by an underscore,
- * and finally the name of the method which will be used to determine the path
- * used to invoke it.
+ * It is also possible to use this class with a functor, eliminating the need
+ * to create a class and slot:
+ *
+ * @code
+ * QObjectHandler handler;
+ * handler.registerMethod("something", [](QHttpSocket *socket) {
+ *     return QVariantMap();
+ * });
+ * @endcode
  */
 class QHTTPENGINE_EXPORT QObjectHandler : public QHttpHandler
 {
