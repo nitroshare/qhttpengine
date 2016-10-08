@@ -112,7 +112,7 @@ void TestQObjectHandler::testOldConnection_data()
             << true
             << QByteArray(SLOT(echoPost(QHttpSocket*,QVariantMap)))
             << static_cast<int>(QHttpSocket::OK)
-            << QVariantMap({{"a", "a"}, {"b", 1}});
+            << QVariantMap{{"a", "a"}, {"b", 1}};
 }
 
 void TestQObjectHandler::testOldConnection()
@@ -137,9 +137,9 @@ void TestQObjectHandler::testOldConnection()
 
     if (requestPost) {
         QByteArray buff = QJsonDocument(QJsonObject::fromVariantMap(data)).toJson();
-        client.sendHeaders("POST", "test", QHttpSocket::QHttpHeaderMap({
+        client.sendHeaders("POST", "test", QHttpSocket::QHttpHeaderMap{
             {"Content-Length", QByteArray::number(buff.length())},
-        }));
+        });
         client.sendData(buff);
     } else {
         client.sendHeaders("GET", "test");

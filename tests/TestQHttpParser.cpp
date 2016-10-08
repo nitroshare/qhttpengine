@@ -146,7 +146,7 @@ void TestQHttpParser::testParsePath_data()
     QTest::newRow("single parameter")
             << QByteArray("/path?a=b")
             << QString("/path")
-            << QHttpSocket::QQueryStringMap({{"a", "b"}});
+            << QHttpSocket::QQueryStringMap{{"a", "b"}};
 }
 
 void TestQHttpParser::testParsePath()
