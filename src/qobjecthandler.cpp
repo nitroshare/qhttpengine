@@ -20,9 +20,11 @@
  * IN THE SOFTWARE.
  */
 
+#include <QGenericArgument>
 #include <QJsonParseError>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QMetaMethod>
 
 #include <QHttpEngine/QObjectHandler>
 
@@ -53,10 +55,36 @@ void QObjectHandlerPrivate::invokeSlot(QHttpSocket *socket, const QString &path)
         parameters = document.object().toVariantMap();
     }
 
-    // Invoke the slot
     QVariantMap retVal;
+
+    // Invoke the slot
     if (m.oldSlot) {
-        if (!QMetaObject::invokeMethod(m.receiver, m.slot.method, Q_RETURN_ARG(QVariantMap, retVal), Q_ARG(QHttpSocket*, socket), Q_ARG(QVariantMap, parameters))) {
+
+        // Obtain the slot index
+        int index = m.receiver->metaObject()->indexOfSlot(m.slot.method + 1);
+        if (index == -1) {
+            socket->writeError(QHttpSocket::InternalServerError);
+            return;
+        }
+
+        QMetaMethod method = m.receiver->metaObject()->method(index);
+
+        // Ensure the parameters are correct
+        QList<QByteArray> params = method.parameterTypes();
+        if (params.count() > 0 && params.at(0) != "QHttpSocket*" ||
+                params.count() > 1 && params.at(1) != "QVariantMap" ||
+                params.count() > 2 ||
+                method.returnType() != QMetaType::QVariantMap) {
+            socket->writeError(QHttpSocket::InternalServerError);
+            return;
+        }
+
+        // Invoke the method
+        if (!m.receiver->metaObject()->method(index).invoke(
+                    m.receiver,
+                    Q_RETURN_ARG(QVariantMap, retVal),
+                    Q_ARG(QHttpSocket*, socket),
+                    Q_ARG(QVariantMap, parameters))) {
             socket->writeError(QHttpSocket::InternalServerError);
             return;
         }
