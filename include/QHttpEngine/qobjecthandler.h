@@ -88,7 +88,7 @@ public:
      */
     template <typename Func1>
     inline void registerMethod(const QString &name,
-                               const typename QtPrivate::FunctionPointer<Func1>::Object *receiver,
+                               typename QtPrivate::FunctionPointer<Func1>::Object *receiver,
                                Func1 slot, int acceptedStatusCodes = QHttpSocket::GET) {
 
         typedef QtPrivate::FunctionPointer<Func1> SlotType;

@@ -36,7 +36,7 @@ class DummyAPI : public QObject
 {
     Q_OBJECT
 
-private Q_SLOTS:
+public Q_SLOTS:
 
     int invalidReturnValue() { return 0; }
     QVariantMap invalidArguments(int) { return QVariantMap(); }
@@ -54,6 +54,7 @@ private Q_SLOTS:
 
     void testOldConnection_data();
     void testOldConnection();
+    void testNewConnection();
 };
 
 void TestQObjectHandler::testOldConnection_data()
@@ -153,6 +154,37 @@ void TestQObjectHandler::testOldConnection()
         QVERIFY(client.headers().contains("Content-Length"));
         QTRY_COMPARE(client.data().length(), client.headers().value("Content-Length").toInt());
         QCOMPARE(QJsonDocument::fromJson(client.data()).object(), QJsonObject::fromVariantMap(data));
+    }
+}
+
+void TestQObjectHandler::testNewConnection()
+{
+    QObjectHandler handler;
+    DummyAPI api;
+
+    // Connect to object slot
+    handler.registerMethod("0", &api, &DummyAPI::noParameters);
+    handler.registerMethod("1", &api, &DummyAPI::oneParameter);
+    handler.registerMethod("2", &api, &DummyAPI::twoParameters);
+
+    // Connect to functor
+    handler.registerMethod("3", []() { return QVariantMap(); });
+    handler.registerMethod("4", &api, []() { return QVariantMap(); });
+    handler.registerMethod("5", &api, [](QHttpSocket*) { return QVariantMap(); });
+    handler.registerMethod("6", &api, [](QHttpSocket*, QVariantMap d) { return d; });
+
+    for (int i = 0; i < 7; ++i) {
+        QSocketPair pair;
+        QTRY_VERIFY(pair.isConnected());
+
+        QSimpleHttpClient client(pair.client());
+        QHttpSocket socket(pair.server(), &pair);
+
+        client.sendHeaders("GET", QByteArray::number(i));
+        QTRY_VERIFY(socket.isHeadersParsed());
+
+        handler.route(&socket, socket.path());
+        QTRY_COMPARE(client.statusCode(), static_cast<int>(QHttpSocket::OK));
     }
 }
 
