@@ -76,4 +76,5 @@ void QHttpHandler::process(QHttpSocket *socket, const QString &)
 {
     // The default response is simply a 404 error
     socket->writeError(QHttpSocket::NotFound);
+    socket->close();
 }
