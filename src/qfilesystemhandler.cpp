@@ -27,6 +27,7 @@
 
 #include "QHttpEngine/qfilesystemhandler.h"
 #include "QHttpEngine/qiodevicecopier.h"
+#include "QHttpEngine/qhttprange.h"
 #include "qfilesystemhandler_p.h"
 
 // Template for listing directory contents
@@ -84,9 +85,35 @@ void QFilesystemHandlerPrivate::processFile(QHttpSocket *socket, const QString &
     connect(copier, SIGNAL(finished()), copier, SLOT(deleteLater()));
     connect(copier, SIGNAL(finished()), file, SLOT(deleteLater()));
 
+    qint64 fileSize = file->size();
+
+    // Checking for partial content request
+    QByteArray rangeHeader = socket->headers().value("Range");
+    QHttpRange range;
+
+    if(!rangeHeader.isEmpty() && rangeHeader.startsWith("bytes=")) {
+        // Skiping 'bytes=' - first 6 chars and spliting ranges by comma
+        QList<QByteArray> rangeList = rangeHeader.mid(6).split(',');
+
+        // Taking only first range, as multiple ranges require multipart
+        // reply support
+        range = QHttpRange(QString(rangeList.at(0)), fileSize);
+    }
+
+    // If range is valid, send partial content
+    if(range.isValid()) {
+        socket->setStatusCode(QHttpSocket::PartialContent);
+        socket->setHeader("Content-Length", QByteArray::number(range.length()));
+        socket->setHeader("Content-Range", QByteArray("bytes ") + range.contentRange().toLatin1());
+        copier->setRange(range.from(), range.to());
+    } else {
+        // If range is invalid or if it is not a partial content request,
+        // send full file
+        socket->setHeader("Content-Length", QByteArray::number(fileSize));
+    }
+
     // Set the mimetype and content length
     socket->setHeader("Content-Type", mimeType(absolutePath));
-    socket->setHeader("Content-Length", QByteArray::number(file->size()));
     socket->writeHeaders();
 
     // Start the copy

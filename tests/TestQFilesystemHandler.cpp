@@ -43,6 +43,9 @@ private Q_SLOTS:
 
     void initTestCase();
 
+    void testRangeRequests_data();
+    void testRangeRequests();
+
     void testRequests_data();
     void testRequests();
 
@@ -108,6 +111,85 @@ void TestQFilesystemHandler::testRequests()
 
     if(!data.isNull()) {
         QTRY_COMPARE(client.data(), data);
+    }
+}
+
+void TestQFilesystemHandler::testRangeRequests_data()
+{
+    QTest::addColumn<QString>("path");
+    QTest::addColumn<QString>("range");
+    QTest::addColumn<int>("statusCode");
+    QTest::addColumn<QString>("contentRange");
+    QTest::addColumn<QByteArray>("data");
+
+    QTest::newRow("full file")
+            << "inside" << ""
+            << static_cast<int>(QHttpSocket::OK)
+            << ""
+            << Data;
+
+    QTest::newRow("range 0-2")
+            << "inside" << "0-2"
+            << static_cast<int>(QHttpSocket::PartialContent)
+            << "bytes 0-2/4"
+            << Data.mid(0, 3);
+
+    QTest::newRow("range 1-2")
+            << "inside" << "1-2"
+            << static_cast<int>(QHttpSocket::PartialContent)
+            << "bytes 1-2/4"
+            << Data.mid(1, 2);
+
+    QTest::newRow("skip first 1 byte")
+            << "inside" << "1-"
+            << static_cast<int>(QHttpSocket::PartialContent)
+            << "bytes 1-3/4"
+            << Data.mid(1);
+
+    QTest::newRow("last 2 bytes")
+            << "inside" << "-2"
+            << static_cast<int>(QHttpSocket::PartialContent)
+            << "bytes 2-3/4"
+            << Data.mid(2);
+
+    QTest::newRow("bad range request")
+            << "inside" << "abcd"
+            << static_cast<int>(QHttpSocket::OK)
+            << ""
+            << Data;
+}
+
+void TestQFilesystemHandler::testRangeRequests()
+{
+    QFETCH(QString, path);
+    QFETCH(QString, range);
+    QFETCH(int, statusCode);
+    QFETCH(QString, contentRange);
+    QFETCH(QByteArray, data);
+
+    QFilesystemHandler handler(QDir(dir.path()).absoluteFilePath("root"));
+
+    QSocketPair pair;
+    QTRY_VERIFY(pair.isConnected());
+
+    QSimpleHttpClient client(pair.client());
+    QHttpSocket socket(pair.server(), &pair);
+
+    if(!range.isEmpty()) {
+        QHttpHeaderMap inHeaders;
+        inHeaders.insert("Range", QByteArray("bytes=") + range.toUtf8());
+        client.sendHeaders("GET", path.toUtf8(), inHeaders);
+        QTRY_VERIFY(socket.isHeadersParsed());
+    }
+
+    handler.route(&socket, path);
+
+    QTRY_COMPARE(client.statusCode(), statusCode);
+
+    if(!data.isNull()) {
+        QTRY_COMPARE(client.data(), data);
+        QCOMPARE(client.headers().value("Content-Length").toInt(), data.length());
+        QCOMPARE(client.headers().value("Content-Range"), contentRange.toLatin1());
     }
 }
 

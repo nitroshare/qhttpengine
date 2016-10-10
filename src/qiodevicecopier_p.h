@@ -41,6 +41,9 @@ public:
 
     qint64 bufferSize;
 
+    qint64 rangeFrom;
+    qint64 rangeTo;
+
 private Q_SLOTS:
 
     void onReadyRead();
