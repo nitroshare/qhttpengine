@@ -26,6 +26,14 @@
 
 #include "qhttprange_p.h"
 
+QHttpRange::QHttpRange()
+    : d(new QHttpRangePrivate(this))
+{
+    d->from = 1;
+    d->to = 0;
+    d->dataSize = -1;
+}
+
 QHttpRangePrivate::QHttpRangePrivate(QHttpRange *range)
     : q(range)
 {
@@ -38,13 +46,13 @@ QHttpRange::QHttpRange(const QString &range, qint64 dataSize)
 
     int from = 0, to = -1;
 
-    if(regExp.indexIn(range.trimmed()) != -1) {
+    if (regExp.indexIn(range.trimmed()) != -1) {
         QString fromStr = regExp.cap(1);
         QString toStr = regExp.cap(2);
 
         // If both strings are empty - range is invalid. Setting to out of
         // bounds range and returning.
-        if(fromStr.isEmpty() && toStr.isEmpty()) {
+        if (fromStr.isEmpty() && toStr.isEmpty()) {
             d->from = 1;
             d->to = 0;
             d->dataSize = -1;
@@ -53,22 +61,22 @@ QHttpRange::QHttpRange(const QString &range, qint64 dataSize)
 
         bool okFrom = true, okTo = true;
 
-        if(!fromStr.isEmpty()) {
+        if (!fromStr.isEmpty()) {
             from = fromStr.toInt(&okFrom);
         }
-        if(!toStr.isEmpty()) {
+        if (!toStr.isEmpty()) {
             to = toStr.toInt(&okTo);
         }
 
         // If failed to parse value - set to invalid range and return.
-        if(!okFrom) {
+        if (!okFrom) {
             d->from = 1;
             d->to = 0;
             d->dataSize = -1;
             return;
         }
 
-        if(!okTo) {
+        if (!okTo) {
             d->from = 1;
             d->to = 0;
             d->dataSize = -1;
@@ -77,7 +85,7 @@ QHttpRange::QHttpRange(const QString &range, qint64 dataSize)
 
         // In case of 'last N bytes' range (Ex.: "Range: bytes=-500"),
         // set from to -to and to to -1
-        if(fromStr.isEmpty()) {
+        if (fromStr.isEmpty()) {
             from = -to;
             to = -1;
         }
@@ -109,14 +117,6 @@ QHttpRange::QHttpRange(const QHttpRange &other, qint64 dataSize)
     d->dataSize = dataSize;
 }
 
-QHttpRange::QHttpRange()
-    : d(new QHttpRangePrivate(this))
-{
-    d->from = 1;
-    d->to = 0;
-    d->dataSize = -1;
-}
-
 QHttpRange::~QHttpRange()
 {
     delete d;
@@ -124,7 +124,7 @@ QHttpRange::~QHttpRange()
 
 QHttpRange& QHttpRange::operator=(const QHttpRange &other)
 {
-    if(&other != this) {
+    if (&other != this) {
         d->from = other.d->from;
         d->to = other.d->to;
         d->dataSize = other.d->dataSize;
@@ -136,16 +136,16 @@ QHttpRange& QHttpRange::operator=(const QHttpRange &other)
 qint64 QHttpRange::from() const
 {
     // Last N bytes requested
-    if(d->from < 0 && d->dataSize != -1) {
+    if (d->from < 0 && d->dataSize != -1) {
         // Check if data is smaller then requested range
-        if(- d->from >= d->dataSize) {
+        if (- d->from >= d->dataSize) {
             return 0;
         }
         return d->dataSize + d->from;
     }
 
     // Check if d->from is bigger than d->to or d->dataSize
-    if((d->from > d->to && d->to != -1) ||
+    if ((d->from > d->to && d->to != -1) ||
             (d->from >= d->dataSize && d->dataSize != -1)) {
         return 0;
     }
@@ -156,22 +156,22 @@ qint64 QHttpRange::from() const
 qint64 QHttpRange::to() const
 {
     // Last N bytes requested
-    if(d->from < 0 && d->dataSize != -1) {
+    if (d->from < 0 && d->dataSize != -1) {
         return d->dataSize - 1;
     }
 
     // Skip first N bytes requested
-    if(d->from > 0 && d->to == -1 && d->dataSize != -1) {
+    if (d->from > 0 && d->to == -1 && d->dataSize != -1) {
         return d->dataSize - 1;
     }
 
     // Check if d->from is bigger then d->to
-    if(d->from > d->to && d->to != -1) {
+    if (d->from > d->to && d->to != -1) {
         return d->from;
     }
 
     // When d->to overshoots dataSize
-    if((d->to >= d->dataSize || d->to == -1) && d->dataSize != -1) {
+    if ((d->to >= d->dataSize || d->to == -1) && d->dataSize != -1) {
         return d->dataSize - 1;
     }
 
@@ -180,22 +180,22 @@ qint64 QHttpRange::to() const
 
 qint64 QHttpRange::length() const
 {
-    if(!isValid()) {
+    if (!isValid()) {
         return -1;
     }
 
     // Last n bytes
-    if(d->from < 0) {
+    if (d->from < 0) {
         return -(d->from);
     }
 
     // From and to are set
-    if(d->to >= 0) {
+    if (d->to >= 0) {
         return d->to - d->from + 1;
     }
 
     // From to to end
-    if(d->dataSize >= 0) {
+    if (d->dataSize >= 0) {
         return d->dataSize - d->from;
     }
 
@@ -218,32 +218,32 @@ bool QHttpRange::isValid() const
     // 6. "10-600/*"    => from:   10, to: 600; dataSize:   -1
 
     // DataSize is set
-    if(d->dataSize >= 0) {
-        if(d->from < 0) { // Last n bytes
+    if (d->dataSize >= 0) {
+        if (d->from < 0) { // Last n bytes
             // Check if from is in range of dataSize
-            if(d->dataSize + d->from >= 0) {
+            if (d->dataSize + d->from >= 0) {
                 return true;
             }
         } else {
-            if(d->to <= -1) { // To isn't set, range is up to the end
+            if (d->to <= -1) { // To isn't set, range is up to the end
                 // Check if from is in range of dataSize
-                if(d->from < d->dataSize) {
+                if (d->from < d->dataSize) {
                     return true;
                 }
             } else { // from, to and dataSize are set
-                if(d->from <= d->to && d->to < d->dataSize) {
+                if (d->from <= d->to && d->to < d->dataSize) {
                     return true;
                 }
             }
         }
     } else { // dataSize is not set
-        if(d->from < 0) { // Last n bytes
+        if (d->from < 0) { // Last n bytes
             return true;
         } else {
-            if(d->to <= -1) { // To isn't set, range is up to the end
+            if (d->to <= -1) { // To isn't set, range is up to the end
                 return true;
             } else { // from and to are set
-                if(d->from <= d->to) {
+                if (d->from <= d->to) {
                     return true;
                 }
             }
@@ -257,8 +257,8 @@ QString QHttpRange::contentRange() const
 {
     QString fromStr, toStr, sizeStr = "*";
 
-    if(d->dataSize >= 0) {
-        if(isValid()) {
+    if (d->dataSize >= 0) {
+        if (isValid()) {
             fromStr = QString::number(from());
             toStr = QString::number(to());
             sizeStr = QString::number(dataSize());
@@ -266,7 +266,7 @@ QString QHttpRange::contentRange() const
             sizeStr = QString::number(dataSize());
         }
     } else {
-        if(isValid()) {
+        if (isValid()) {
             fromStr = QString::number(from());
             toStr = QString::number(to());
         } else {
@@ -274,7 +274,7 @@ QString QHttpRange::contentRange() const
         }
     }
 
-    if(fromStr.isEmpty() || toStr.isEmpty()) {
+    if (fromStr.isEmpty() || toStr.isEmpty()) {
         return QString("*/%1").arg(sizeStr);
     }
 

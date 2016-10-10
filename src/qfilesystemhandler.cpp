@@ -92,7 +92,7 @@ void QFilesystemHandlerPrivate::processFile(QHttpSocket *socket, const QString &
     QByteArray rangeHeader = socket->headers().value("Range");
     QHttpRange range;
 
-    if(!rangeHeader.isEmpty() && rangeHeader.startsWith("bytes=")) {
+    if (!rangeHeader.isEmpty() && rangeHeader.startsWith("bytes=")) {
         // Skiping 'bytes=' - first 6 chars and spliting ranges by comma
         QList<QByteArray> rangeList = rangeHeader.mid(6).split(',');
 
@@ -102,7 +102,7 @@ void QFilesystemHandlerPrivate::processFile(QHttpSocket *socket, const QString &
     }
 
     // If range is valid, send partial content
-    if(range.isValid()) {
+    if (range.isValid()) {
         socket->setStatusCode(QHttpSocket::PartialContent);
         socket->setHeader("Content-Length", QByteArray::number(range.length()));
         socket->setHeader("Content-Range", QByteArray("bytes ") + range.contentRange().toLatin1());

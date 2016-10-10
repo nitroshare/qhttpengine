@@ -75,7 +75,7 @@ void QIODeviceCopierPrivate::nextBlock()
 
     // If range is specified (rangeTo >= 0), check if end of range is reached;
     // if it is, send only part from buffer truncated by range end
-    if(rangeTo != -1 && src->pos() > rangeTo) {
+    if (rangeTo != -1 && src->pos() > rangeTo) {
         dataRead -= src->pos() - rangeTo - 1;
     }
 
@@ -134,8 +134,8 @@ void QIODeviceCopier::start()
     }
 
     // If range is set and d->src is not sequential, seek to starting position
-    if(d->rangeFrom > 0 && !d->src->isSequential()) {
-        if(!d->src->seek(d->rangeFrom)) {
+    if (d->rangeFrom > 0 && !d->src->isSequential()) {
+        if (!d->src->seek(d->rangeFrom)) {
             Q_EMIT error(tr("Unable to seek source device for specified range"));
             Q_EMIT finished();
             return;

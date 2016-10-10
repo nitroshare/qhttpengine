@@ -23,7 +23,7 @@
 #ifndef QHTTPENGINE_QHTTPRANGEPRIVATE_H
 #define QHTTPENGINE_QHTTPRANGEPRIVATE_H
 
-#include "QHttpEngine/qhttprange.h"
+#include <QHttpEngine/QHttpRange>
 
 class QHttpRangePrivate
 {

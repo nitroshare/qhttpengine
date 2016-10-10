@@ -31,10 +31,10 @@ class QHTTPENGINE_EXPORT QHttpRangePrivate;
 
 /**
  * @brief HTTP range representation
- * @headerfile qhttpparser.h QHttpEngine/QHttpParser
+ * @headerfile qhttprange.h QHttpEngine/QHttpRange
  *
  * This class provides a representation of HTTP range, described in RFC 7233
- * and used when partial content is requested by client. When object is
+ * and used when partial content is requested by the client. When an object is
  * created, optional dataSize can be specified, so that relative ranges can
  * be represented as absolute.
  *
@@ -67,7 +67,14 @@ class QHTTPENGINE_EXPORT QHttpRange
 public:
 
     /**
-     * @brief Constructs QHttpRange by parsing range.
+     * @brief Default QHttpRange constructor
+     *
+     * An empty QHttpRange is considered invalid.
+     */
+    QHttpRange();
+
+    /**
+     * @brief Construct QHttpRange by parsing range
      *
      * Parses string representation range and constructs new QHttpRange.
      * For raw header "Range: bytes=0-100" only "0-100" should be passed to
@@ -77,7 +84,7 @@ public:
     QHttpRange(const QString &range, qint64 dataSize = -1);
 
     /**
-     * @brief Constructs QHttpRange, using from and to values.
+     * @brief Construct QHttpRange, using from and to values
      *
      * Initialises a new QHttpRange with from and to values. dataSize may be
      * supplied so that relative ranges could be represented as
@@ -86,7 +93,7 @@ public:
     QHttpRange(qint64 from, qint64 to, qint64 dataSize = -1);
 
     /**
-     * @brief Constructs QHttpRange from other QHttpRange and dataSize.
+     * @brief Construct QHttpRange from other QHttpRange and dataSize
      *
      * Initialises a new QHttpRange with from and to values of other
      * QHttpRequest. Supplied dataSize is used instead of other dataSize.
@@ -94,17 +101,17 @@ public:
     QHttpRange(const QHttpRange &other, qint64 dataSize);
 
     /**
-     * @brief Default QHttpRange constructor.
-     *
-     * Default empty QHttpRange is considered invalid.
+     * @brief Destroy the range
      */
-    QHttpRange();
     ~QHttpRange();
 
+    /**
+     * @brief Assignment operator
+     */
     QHttpRange& operator=(const QHttpRange &other);
 
     /**
-     * @brief Returns starting position of range.
+     * @brief Return starting position of range
      *
      * If range is set as 'last N bytes' and dataSize is not set, returns -N.
      *
@@ -258,7 +265,6 @@ public:
 private:
 
     QHttpRangePrivate *const d;
-    friend class QHttpRangePrivate;
 };
 
 #endif // QHTTPENGINE_QHTTPRANGE_H

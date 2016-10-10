@@ -239,7 +239,7 @@ void TestQHttpRange::testParseFromString()
 
     QCOMPARE(range.isValid(), valid);
 
-    if(valid) {
+    if (valid) {
         QFETCH(int, from);
         QFETCH(int, to);
         QFETCH(int, length);
