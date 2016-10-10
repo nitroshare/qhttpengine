@@ -25,7 +25,7 @@
 
 #include <QString>
 
-#include "qhttpengine.h"
+#include "qhttpengine_global.h"
 
 class QHTTPENGINE_EXPORT QHttpRangePrivate;
 
