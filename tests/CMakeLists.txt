@@ -6,6 +6,7 @@ set(TESTS
     TestQFilesystemHandler
     TestQHttpHandler
     TestQHttpParser
+    TestQHttpRange
     TestQHttpServer
     TestQHttpSocket
     TestQIByteArray

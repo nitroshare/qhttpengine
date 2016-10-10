@@ -76,6 +76,11 @@ public:
      */
     void setBufferSize(qint64 size);
 
+    /**
+     * @brief Set range of data to copy, if src device is not sequential
+     */
+    void setRange(qint64 from, qint64 to);
+
 Q_SIGNALS:
 
     /**

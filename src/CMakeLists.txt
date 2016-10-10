@@ -7,6 +7,7 @@ set(SRC
     qfilesystemhandler.cpp
     qhttphandler.cpp
     qhttpparser.cpp
+    qhttprange.cpp
     qhttpserver.cpp
     qhttpsocket.cpp
     qibytearray.cpp

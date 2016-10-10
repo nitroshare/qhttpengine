@@ -138,6 +138,8 @@ public:
     enum {
         /// Request was successful
         OK = 200,
+        /// Range request was successful
+        PartialContent = 206,
         /// Resource has moved permanently
         MovedPermanently = 301,
         /// Resource is available at an alternate URI

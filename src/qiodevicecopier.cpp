@@ -35,7 +35,9 @@ QIODeviceCopierPrivate::QIODeviceCopierPrivate(QIODeviceCopier *copier, QIODevic
       q(copier),
       src(srcDevice),
       dest(destDevice),
-      bufferSize(DefaultBufferSize)
+      bufferSize(DefaultBufferSize),
+      rangeFrom(0),
+      rangeTo(-1)
 {
 }
 
@@ -71,6 +73,12 @@ void QIODeviceCopierPrivate::nextBlock()
         return;
     }
 
+    // If range is specified (rangeTo >= 0), check if end of range is reached;
+    // if it is, send only part from buffer truncated by range end
+    if(rangeTo != -1 && src->pos() > rangeTo) {
+        dataRead -= src->pos() - rangeTo - 1;
+    }
+
     // Write the data to the destination device
     if (dest->write(data.constData(), dataRead) == -1) {
         Q_EMIT q->error(dest->errorString());
@@ -78,10 +86,10 @@ void QIODeviceCopierPrivate::nextBlock()
         return;
     }
 
-    // Check if the end of the device has been reached - if so,
-    // emit the finished signal and if not, continue to read
-    // data at the next iteration of the event loop
-    if (src->atEnd()) {
+    // Check if the end of the device has been reached or if the end of
+    // the requested range is reached - if so, emit the finished signal and
+    // if not, continue to read data at the next iteration of the event loop
+    if (src->atEnd() || (rangeTo != -1 && src->pos() > rangeTo)) {
         Q_EMIT q->finished();
     } else {
         QTimer::singleShot(0, this, &QIODeviceCopierPrivate::nextBlock);
@@ -101,6 +109,12 @@ void QIODeviceCopier::setBufferSize(qint64 size)
     d->bufferSize = size;
 }
 
+void QIODeviceCopier::setRange(qint64 from, qint64 to)
+{
+    d->rangeFrom = from;
+    d->rangeTo = to;
+}
+
 void QIODeviceCopier::start()
 {
     if (!d->src->isOpen()) {
@@ -114,6 +128,15 @@ void QIODeviceCopier::start()
     if (!d->dest->isOpen()) {
         if (!d->dest->open(QIODevice::WriteOnly)) {
             Q_EMIT error(tr("Unable to open destination device for writing"));
+            Q_EMIT finished();
+            return;
+        }
+    }
+
+    // If range is set and d->src is not sequential, seek to starting position
+    if(d->rangeFrom > 0 && !d->src->isSequential()) {
+        if(!d->src->seek(d->rangeFrom)) {
+            Q_EMIT error(tr("Unable to seek source device for specified range"));
             Q_EMIT finished();
             return;
         }

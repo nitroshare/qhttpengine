@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Nathan Osman
+ * Copyright (c) 2016 Aleksei Ermakov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -20,40 +20,24 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QIODEVICECOPIERPRIVATE_H
-#define QHTTPENGINE_QIODEVICECOPIERPRIVATE_H
+#ifndef QHTTPENGINE_QHTTPRANGEPRIVATE_H
+#define QHTTPENGINE_QHTTPRANGEPRIVATE_H
 
-#include <QObject>
+#include "QHttpEngine/qhttprange.h"
 
-class QIODevice;
-class QIODeviceCopier;
-
-class QIODeviceCopierPrivate : public QObject
+class QHttpRangePrivate
 {
-    Q_OBJECT
-
 public:
 
-    QIODeviceCopierPrivate(QIODeviceCopier *copier, QIODevice *srcDevice, QIODevice *destDevice);
+    explicit QHttpRangePrivate(QHttpRange *range);
 
-    QIODevice *const src;
-    QIODevice *const dest;
-
-    qint64 bufferSize;
-
-    qint64 rangeFrom;
-    qint64 rangeTo;
-
-public Q_SLOTS:
-
-    void onReadyRead();
-    void onReadChannelFinished();
-
-    void nextBlock();
+    qint64 from;
+    qint64 to;
+    qint64 dataSize;
 
 private:
 
-    QIODeviceCopier *const q;
+    QHttpRange *const q;
 };
 
-#endif // QHTTPENGINE_QIODEVICECOPIERPRIVATE_H
+#endif // QHTTPENGINE_QHTTPRANGEPRIVATE_H
