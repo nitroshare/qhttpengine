@@ -54,7 +54,7 @@ int main(int argc, char * argv[])
         QStringList() << "d" << "directory",
         "directory to serve",
         "directory",
-        QDir::homePath()
+        QDir::currentPath()
     );
     parser.addOption(dirOption);
     parser.addHelpOption();
