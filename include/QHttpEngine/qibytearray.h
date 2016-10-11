@@ -23,6 +23,8 @@
 #ifndef QHTTPENGINE_QIBYTEARRAY_H
 #define QHTTPENGINE_QIBYTEARRAY_H
 
+#include <cctype>
+
 #include <QByteArray>
 
 #include "qhttpengine_global.h"
@@ -38,28 +40,57 @@ class QHTTPENGINE_EXPORT QIByteArray : public QByteArray
 {
 public:
 
-    /**
-     * @brief Create an empty QIByteArray
-     */
-    QIByteArray();
+    QIByteArray() {}
+    QIByteArray(const QByteArray &other) : QByteArray(other) {}
+    QIByteArray(const QIByteArray &other) : QByteArray(other) {}
+    QIByteArray(const char *data, int size = -1) : QByteArray(data, size) {}
 
-    /**
-     * @brief QIByteArray copy constructor
-     */
-    QIByteArray(const QByteArray &other);
+    inline bool operator==(const QString &s2) const { return toLower() == s2.toLower(); }
+    inline bool operator!=(const QString &s2) const { return toLower() != s2.toLower(); }
+    inline bool operator<(const QString &s2) const { return toLower() < s2.toLower(); }
+    inline bool operator>(const QString &s2) const { return toLower() > s2.toLower(); }
+    inline bool operator<=(const QString &s2) const { return toLower() <= s2.toLower(); }
+    inline bool operator>=(const QString &s2) const { return toLower() >= s2.toLower(); }
 
-    /**
-     * @brief Create a QIByteArray from a const char *
-     */
-    QIByteArray(const char *data, int size = -1);
+    bool contains(char c) const { return toLower().contains(tolower(c)); }
+    bool contains(const char *c) const { return toLower().contains(QByteArray(c).toLower()); }
+    bool contains(const QByteArray &a) const { return toLower().contains(a.toLower()); }
 };
 
-QHTTPENGINE_EXPORT bool operator==(const QIByteArray &a1, const QIByteArray &a2);
-QHTTPENGINE_EXPORT bool operator==(const QIByteArray &a1, const QString &a2);
-QHTTPENGINE_EXPORT bool operator==(const QString &a1, const QIByteArray &a2);
-QHTTPENGINE_EXPORT bool operator==(const QIByteArray &a1, const QByteArray &a2);
-QHTTPENGINE_EXPORT bool operator==(const QByteArray &a1, const QIByteArray &a2);
-QHTTPENGINE_EXPORT bool operator==(const QIByteArray &a1, const char *a2);
-QHTTPENGINE_EXPORT bool operator==(const char *a1, const QIByteArray &a2);
+inline bool operator==(const QIByteArray &a1, const char *a2) { return a1.toLower() == QByteArray(a2).toLower(); }
+inline bool operator==(const char *a1, const QIByteArray &a2) { return QByteArray(a1).toLower() == a2.toLower(); }
+inline bool operator==(const QIByteArray &a1, const QByteArray &a2) { return a1.toLower() == a2.toLower(); }
+inline bool operator==(const QByteArray &a1, const QIByteArray &a2) { return a1.toLower() == a2.toLower(); }
+inline bool operator==(const QIByteArray &a1, const QIByteArray &a2) { return a1.toLower() == a2.toLower(); }
+
+inline bool operator!=(const QIByteArray &a1, const char *a2) { return a1.toLower() != QByteArray(a2).toLower(); }
+inline bool operator!=(const char *a1, const QIByteArray &a2) { return QByteArray(a1).toLower() != a2.toLower(); }
+inline bool operator!=(const QIByteArray &a1, const QByteArray &a2) { return a1.toLower() != a2.toLower(); }
+inline bool operator!=(const QByteArray &a1, const QIByteArray &a2) { return a1.toLower() != a2.toLower(); }
+inline bool operator!=(const QIByteArray &a1, const QIByteArray &a2) { return a1.toLower() != a2.toLower(); }
+
+inline bool operator<(const QIByteArray &a1, const char *a2) { return a1.toLower() < QByteArray(a2).toLower(); }
+inline bool operator<(const char *a1, const QIByteArray &a2) { return QByteArray(a1).toLower() < a2.toLower(); }
+inline bool operator<(const QIByteArray &a1, const QByteArray &a2) { return a1.toLower() < a2.toLower(); }
+inline bool operator<(const QByteArray &a1, const QIByteArray &a2) { return a1.toLower() < a2.toLower(); }
+inline bool operator<(const QIByteArray &a1, const QIByteArray &a2) { return a1.toLower() < a2.toLower(); }
+
+inline bool operator>(const QIByteArray &a1, const char *a2) { return a1.toLower() > QByteArray(a2).toLower(); }
+inline bool operator>(const char *a1, const QIByteArray &a2) { return QByteArray(a1).toLower() > a2.toLower(); }
+inline bool operator>(const QIByteArray &a1, const QByteArray &a2) { return a1.toLower() > a2.toLower(); }
+inline bool operator>(const QByteArray &a1, const QIByteArray &a2) { return a1.toLower() > a2.toLower(); }
+inline bool operator>(const QIByteArray &a1, const QIByteArray &a2) { return a1.toLower() > a2.toLower(); }
+
+inline bool operator<=(const QIByteArray &a1, const char *a2) { return a1.toLower() <= QByteArray(a2).toLower(); }
+inline bool operator<=(const char *a1, const QIByteArray &a2) { return QByteArray(a1).toLower() <= a2.toLower(); }
+inline bool operator<=(const QIByteArray &a1, const QByteArray &a2) { return a1.toLower() <= a2.toLower(); }
+inline bool operator<=(const QByteArray &a1, const QIByteArray &a2) { return a1.toLower() <= a2.toLower(); }
+inline bool operator<=(const QIByteArray &a1, const QIByteArray &a2) { return a1.toLower() <= a2.toLower(); }
+
+inline bool operator>=(const QIByteArray &a1, const char *a2) { return a1.toLower() >= QByteArray(a2).toLower(); }
+inline bool operator>=(const char *a1, const QIByteArray &a2) { return QByteArray(a1).toLower() >= a2.toLower(); }
+inline bool operator>=(const QIByteArray &a1, const QByteArray &a2) { return a1.toLower() >= a2.toLower(); }
+inline bool operator>=(const QByteArray &a1, const QIByteArray &a2) { return a1.toLower() >= a2.toLower(); }
+inline bool operator>=(const QIByteArray &a1, const QIByteArray &a2) { return a1.toLower() >= a2.toLower(); }
 
 #endif // QHTTPENGINE_QIBYTEARRAY_H

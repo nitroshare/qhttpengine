@@ -28,33 +28,41 @@
 const char *Value1 = "test";
 const char *Value2 = "TEST";
 
+// Helpful macros to cut down on the amount of duplicated code
+#define TEST_OPERATOR(tn,t,on,o,v) void test##tn##on() \
+    { \
+        QCOMPARE(QIByteArray(Value1) o static_cast<t>(Value2), v); \
+        QCOMPARE(static_cast<t>(Value1) o QIByteArray(Value1), v); \
+    }
+#define TEST_TYPE(tn,t) \
+    TEST_OPERATOR(tn, t, Equals, ==, true) \
+    TEST_OPERATOR(tn, t, NotEquals, !=, false) \
+    TEST_OPERATOR(tn, t, Less, <, false) \
+    TEST_OPERATOR(tn, t, Greater, >, false) \
+    TEST_OPERATOR(tn, t, LessEqual, <=, true) \
+    TEST_OPERATOR(tn, t, GreaterEqual, >=, true)
+
 class TestQIByteArray : public QObject
 {
     Q_OBJECT
 
 private Q_SLOTS:
 
-    void testQString();
-    void testQByteArray();
-    void testCharPtr();
+    TEST_TYPE(ConstChar, const char *)
+    TEST_TYPE(QByteArray, QByteArray)
+    TEST_TYPE(QIByteArray, QIByteArray)
+    TEST_TYPE(QString, QString)
+
+    void testContains();
 };
 
-void TestQIByteArray::testQString()
+void TestQIByteArray::testContains()
 {
-    QVERIFY(QIByteArray(Value1) == QString(Value2));
-    QVERIFY(QString(Value1) == QIByteArray(Value2));
-}
+    QIByteArray v(Value1);
 
-void TestQIByteArray::testQByteArray()
-{
-    QVERIFY(QIByteArray(Value1) == QByteArray(Value2));
-    QVERIFY(QByteArray(Value1) == QIByteArray(Value2));
-}
-
-void TestQIByteArray::testCharPtr()
-{
-    QVERIFY(QIByteArray(Value1) == Value2);
-    QVERIFY(Value1 == QIByteArray(Value2));
+    QVERIFY(v.contains('t'));
+    QVERIFY(v.contains(Value2));
+    QVERIFY(v.contains(QByteArray(Value2)));
 }
 
 QTEST_MAIN(TestQIByteArray)
