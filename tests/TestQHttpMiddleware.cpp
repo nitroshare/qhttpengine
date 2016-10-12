@@ -20,34 +20,55 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPHANDLERPRIVATE_H
-#define QHTTPENGINE_QHTTPHANDLERPRIVATE_H
+#include <QTest>
 
-#include <QList>
-#include <QObject>
-#include <QPair>
-#include <QRegExp>
+#include <QHttpEngine/QHttpHandler>
+#include <QHttpEngine/QHttpMiddleware>
+#include <QHttpEngine/QHttpSocket>
 
-#include "QHttpEngine/qhttphandler.h"
+#include "common/qsimplehttpclient.h"
+#include "common/qsocketpair.h"
 
-typedef QPair<QRegExp, QString> Redirect;
-typedef QPair<QRegExp, QHttpHandler*> SubHandler;
-
-class QHttpHandlerPrivate : public QObject
+class DummyMiddleware : public QHttpMiddleware
 {
     Q_OBJECT
 
 public:
 
-    explicit QHttpHandlerPrivate(QHttpHandler *handler);
-
-    QList<Redirect> redirects;
-    QList<SubHandler> subHandlers;
-    QList<QHttpMiddleware*> middleware;
-
-private:
-
-    QHttpHandler *const q;
+    virtual bool process(QHttpSocket *socket)
+    {
+        socket->writeError(QHttpSocket::Forbidden);
+        return false;
+    }
 };
 
-#endif // QHTTPENGINE_QHTTPHANDLERPRIVATE_H
+class TestQHttpMiddleware : public QObject
+{
+    Q_OBJECT
+
+private Q_SLOTS:
+
+    void testProcess();
+};
+
+void TestQHttpMiddleware::testProcess()
+{
+    QSocketPair pair;
+    QTRY_VERIFY(pair.isConnected());
+
+    QSimpleHttpClient client(pair.client());
+    QHttpSocket socket(pair.server(), &pair);
+
+    client.sendHeaders("GET", "/");
+    QTRY_VERIFY(socket.isHeadersParsed());
+
+    DummyMiddleware middleware;
+    QHttpHandler handler;
+    handler.addMiddleware(&middleware);
+    handler.route(&socket, "/");
+
+    QTRY_COMPARE(client.statusCode(), static_cast<int>(QHttpSocket::Forbidden));
+}
+
+QTEST_MAIN(TestQHttpMiddleware)
+#include "TestQHttpMiddleware.moc"

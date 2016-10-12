@@ -21,6 +21,7 @@
  */
 
 #include <QHttpEngine/QHttpHandler>
+#include <QHttpEngine/QHttpMiddleware>
 #include <QHttpEngine/QHttpSocket>
 
 #include "qhttphandler_p.h"
@@ -37,6 +38,11 @@ QHttpHandler::QHttpHandler(QObject *parent)
 {
 }
 
+void QHttpHandler::addMiddleware(QHttpMiddleware *middleware)
+{
+    d->middleware.append(middleware);
+}
+
 void QHttpHandler::addRedirect(const QRegExp &pattern, const QString &path)
 {
     d->redirects.append(Redirect(pattern, path));
@@ -49,6 +55,13 @@ void QHttpHandler::addSubHandler(const QRegExp &pattern, QHttpHandler *handler)
 
 void QHttpHandler::route(QHttpSocket *socket, const QString &path)
 {
+    // Run through each of the middleware
+    foreach (QHttpMiddleware *middleware, d->middleware) {
+        if (!middleware->process(socket)) {
+            return;
+        }
+    }
+
     // Check each of the redirects for a match
     foreach (Redirect redirect, d->redirects) {
         if (redirect.first.indexIn(path) != -1) {

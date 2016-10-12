@@ -28,6 +28,7 @@
 #include "qhttpengine_global.h"
 
 class QRegExp;
+class QHttpMiddleware;
 class QHttpSocket;
 class QHTTPENGINE_EXPORT QHttpHandlerPrivate;
 
@@ -78,6 +79,11 @@ public:
      * @brief Base constructor for a handler
      */
     explicit QHttpHandler(QObject *parent = 0);
+
+    /**
+     * @brief Add middleware to the handler
+     */
+    void addMiddleware(QHttpMiddleware *middleware);
 
     /**
      * @brief Add a redirect for a specific pattern

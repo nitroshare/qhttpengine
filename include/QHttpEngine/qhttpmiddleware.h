@@ -20,34 +20,40 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPHANDLERPRIVATE_H
-#define QHTTPENGINE_QHTTPHANDLERPRIVATE_H
+#ifndef QHTTPENGINE_QHTTPMIDDLEWARE_H
+#define QHTTPENGINE_QHTTPMIDDLEWARE_H
 
-#include <QList>
 #include <QObject>
-#include <QPair>
-#include <QRegExp>
 
-#include "QHttpEngine/qhttphandler.h"
+#include "qhttpengine_global.h"
 
-typedef QPair<QRegExp, QString> Redirect;
-typedef QPair<QRegExp, QHttpHandler*> SubHandler;
+class QHttpSocket;
 
-class QHttpHandlerPrivate : public QObject
+/**
+ * @brief Pre-handler request processor
+ *
+ * Middleware sits between the server and the final request handler,
+ * determining whether the request should be passed on to the handler.
+ */
+class QHTTPENGINE_EXPORT QHttpMiddleware : public QObject
 {
     Q_OBJECT
 
 public:
 
-    explicit QHttpHandlerPrivate(QHttpHandler *handler);
+    /**
+     * @brief Base constructor for middleware
+     */
+    explicit QHttpMiddleware(QObject *parent = Q_NULLPTR) : QObject(parent) {}
 
-    QList<Redirect> redirects;
-    QList<SubHandler> subHandlers;
-    QList<QHttpMiddleware*> middleware;
-
-private:
-
-    QHttpHandler *const q;
+    /**
+     * @brief Determine if request processing should continue
+     *
+     * This method is invoked when a new request comes in. If true is
+     * returned, processing continues. Otherwise, it is assumed that an
+     * appropriate error was written to the socket.
+     */
+    virtual bool process(QHttpSocket *socket) = 0;
 };
 
-#endif // QHTTPENGINE_QHTTPHANDLERPRIVATE_H
+#endif // QHTTPENGINE_QHTTPMIDDLEWARE_H
