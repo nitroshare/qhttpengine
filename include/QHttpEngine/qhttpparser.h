@@ -52,7 +52,7 @@ public:
      * items. If maxSplit is equal to zero, there will be no limit on the
      * number of splits performed.
      */
-    static void split(const QByteArray &data, const QByteArray &delim, int maxSplit, QList<QByteArray> &parts);
+    static void split(const QByteArray &data, const QByteArray &delim, int maxSplit, QByteArrayList &parts);
 
     /**
      * @brief Parse and remove the query string from a path

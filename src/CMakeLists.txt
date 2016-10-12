@@ -5,6 +5,7 @@ set(HEADERS "${HEADERS}" "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine_global.h")
 
 set(SRC
     qfilesystemhandler.cpp
+    qhttpbasicauth.cpp
     qhttphandler.cpp
     qhttpparser.cpp
     qhttprange.cpp

@@ -77,6 +77,7 @@ QByteArray QHttpSocketPrivate::statusReason(int statusCode) const
     case QHttpSocket::MovedPermanently: return "MOVED PERMANENTLY";
     case QHttpSocket::Found: return "FOUND";
     case QHttpSocket::BadRequest: return "BAD REQUEST";
+    case QHttpSocket::Unauthorized: return "UNAUTHORIZED";
     case QHttpSocket::Forbidden: return "FORBIDDEN";
     case QHttpSocket::NotFound: return "NOT FOUND";
     case QHttpSocket::MethodNotAllowed: return "METHOD NOT ALLOWED";

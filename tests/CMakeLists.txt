@@ -4,6 +4,7 @@ add_subdirectory(common)
 
 set(TESTS
     TestQFilesystemHandler
+    TestQHttpBasicAuth
     TestQHttpHandler
     TestQHttpMiddleware
     TestQHttpParser

@@ -146,6 +146,8 @@ public:
         Found = 302,
         /// Bad client request
         BadRequest = 400,
+        /// Client is unauthorized to access the resource
+        Unauthorized = 401,
         /// Access to the resource is forbidden
         Forbidden = 403,
         /// Resource was not found
