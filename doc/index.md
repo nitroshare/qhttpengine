@@ -14,7 +14,7 @@ All of QHttpEngine's functionality is included in a single monolithic library.
 QHttpEngine has been tested on the following combinations of compiler and operating system:
 
 - Visual C++ 2013 on 32 and 64-bit editions of Windows
-- Clang on Mac OS X
+- g++ and Clang on Mac OS X
 - g++ on i386, amd64, and ARM builds of Linux
 
 QHttpEngine is designed in a portable way, so it may run on other compilers and operating systems than the ones listed above. However, the list represents the combinations that are actively tested and officially supported.
@@ -40,15 +40,19 @@ QHttpServer server(&handler);
 server.listen();
 @endcode
 
-QHttpEngine can also be used to easily add an HTTP API to an existing application by deriving a class from QObjectHandler. Each signal that takes a single QVariantMap parameter and returns a QVariantMap can be directly invoked by using its name in the request path. For example:
+QHttpEngine can also be used to easily add an HTTP API to an existing application by deriving a class from QObjectHandler. For example:
 
 @code
-class ApiHandler : public QObjectHandler
+class Api : public QObject
 {
     Q_OBJECT
 public slots:
-    QVariantMap get_something(const QVariantMap &query);
+    void something(QHttpSocket *socket);
 };
+
+QHttpHandler handler;
+Api api;
+handler.registerMethod("something", &api, &Api::something);
 @endcode
 
-A client can send a GET request to `/something` and receive the response from the slot directly as JSON data. The chatserver example provides a demonstration of this.
+A client can send a GET request to `/something` and the appropriate slot will be invoked. The chatserver example provides a demonstration of this.
