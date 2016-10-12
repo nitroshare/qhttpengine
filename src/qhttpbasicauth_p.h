@@ -34,7 +34,7 @@ public:
 
     explicit QHttpBasicAuthPrivate(QObject *parent, const QString &realm);
 
-    const QString &realm;
+    const QString realm;
     QMap<QString, QString> map;
 };
 
