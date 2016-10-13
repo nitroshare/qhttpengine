@@ -21,8 +21,10 @@
  */
 
 #include <QGenericArgument>
+#include <QJsonDocument>
 #include <QMetaMethod>
 
+#include <QHttpEngine/QHttpSocket>
 #include <QHttpEngine/QObjectHandler>
 
 #include "qobjecthandler_p.h"
@@ -39,16 +41,8 @@ QObjectHandler::QObjectHandler(QObject *parent)
 {
 }
 
-void QObjectHandler::process(QHttpSocket *socket, const QString &path)
+void QObjectHandlerPrivate::invokeSlot(QHttpSocket *socket, Method m)
 {
-    // Ensure the method has been registered
-    if (!d->map.contains(path)) {
-        socket->writeError(QHttpSocket::NotFound);
-        return;
-    }
-
-    QObjectHandlerPrivate::Method m = d->map.value(path);
-
     // Invoke the slot
     if (m.oldSlot) {
 
@@ -83,12 +77,55 @@ void QObjectHandler::process(QHttpSocket *socket, const QString &path)
     }
 }
 
-void QObjectHandler::registerMethod(const QString &name, QObject *receiver, const char *method)
+bool QObjectHandler::readJson(QHttpSocket *socket, QJsonDocument &document)
 {
-    d->map.insert(name, QObjectHandlerPrivate::Method(receiver, method));
+    QJsonParseError error;
+    document = QJsonDocument::fromJson(socket->readAll(), &error);
+
+    if (error.error != QJsonParseError::NoError) {
+        socket->writeError(QHttpSocket::BadRequest);
+        return false;
+    }
+
+    return true;
 }
 
-void QObjectHandler::registerMethodImpl(const QString &name, QObject *receiver, QtPrivate::QSlotObjectBase *slotObj)
+void QObjectHandler::writeJson(QHttpSocket *socket, const QJsonDocument &document)
 {
-    d->map.insert(name, QObjectHandlerPrivate::Method(receiver, slotObj));
+    QByteArray data = document.toJson();
+    socket->setHeader("Content-Length", QByteArray::number(data.length()));
+    socket->setHeader("Content-Type", "application/json");
+    socket->write(data);
+    socket->close();
+}
+
+void QObjectHandler::process(QHttpSocket *socket, const QString &path)
+{
+    // Ensure the method has been registered
+    if (!d->map.contains(path)) {
+        socket->writeError(QHttpSocket::NotFound);
+        return;
+    }
+
+    QObjectHandlerPrivate::Method m = d->map.value(path);
+
+    // If the slot requires all data to be received, check to see if this is
+    // already the case, otherwise, wait until the rest of it arrives
+    if (!m.readAll || socket->bytesAvailable() >= socket->contentLength()) {
+        d->invokeSlot(socket, m);
+    } else {
+        connect(socket, &QHttpSocket::readChannelFinished, [this, socket, m]() {
+            d->invokeSlot(socket, m);
+        });
+    }
+}
+
+void QObjectHandler::registerMethod(const QString &name, QObject *receiver, const char *method, bool readAll)
+{
+    d->map.insert(name, QObjectHandlerPrivate::Method(receiver, method, readAll));
+}
+
+void QObjectHandler::registerMethodImpl(const QString &name, QObject *receiver, QtPrivate::QSlotObjectBase *slotObj, bool readAll)
+{
+    d->map.insert(name, QObjectHandlerPrivate::Method(receiver, slotObj, readAll));
 }

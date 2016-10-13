@@ -43,10 +43,10 @@ public:
     class Method {
     public:
         Method() {}
-        Method(QObject *receiver, const char *method)
-            : receiver(receiver), oldSlot(true), slot(method) {}
-        Method(QObject *receiver, QtPrivate::QSlotObjectBase *slotObj)
-            : receiver(receiver), oldSlot(false), slot(slotObj) {}
+        Method(QObject *receiver, const char *method, bool readAll)
+            : receiver(receiver), oldSlot(true), slot(method), readAll(readAll) {}
+        Method(QObject *receiver, QtPrivate::QSlotObjectBase *slotObj, bool readAll)
+            : receiver(receiver), oldSlot(false), slot(slotObj), readAll(readAll) {}
 
         QObject *receiver;
         bool oldSlot;
@@ -57,7 +57,10 @@ public:
             const char *method;
             QtPrivate::QSlotObjectBase *slotObj;
         } slot;
+        bool readAll;
     };
+
+    void invokeSlot(QHttpSocket *socket, Method m);
 
     QMap<QString, Method> map;
 

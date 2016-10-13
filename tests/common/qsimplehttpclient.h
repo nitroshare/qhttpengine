@@ -64,6 +64,8 @@ public:
         return mData;
     }
 
+    bool isDataReceived() const;
+
 private Q_SLOTS:
 
     void onReadyRead();

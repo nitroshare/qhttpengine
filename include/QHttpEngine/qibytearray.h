@@ -40,6 +40,7 @@ class QHTTPENGINE_EXPORT QIByteArray : public QByteArray
 {
 public:
 
+    /// \{
     QIByteArray() {}
     QIByteArray(const QByteArray &other) : QByteArray(other) {}
     QIByteArray(const QIByteArray &other) : QByteArray(other) {}
@@ -55,6 +56,7 @@ public:
     bool contains(char c) const { return toLower().contains(tolower(c)); }
     bool contains(const char *c) const { return toLower().contains(QByteArray(c).toLower()); }
     bool contains(const QByteArray &a) const { return toLower().contains(a.toLower()); }
+    /// \}
 };
 
 inline bool operator==(const QIByteArray &a1, const char *a2) { return a1.toLower() == QByteArray(a2).toLower(); }

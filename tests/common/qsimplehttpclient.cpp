@@ -66,3 +66,9 @@ void QSimpleHttpClient::onReadyRead()
         }
     }
 }
+
+bool QSimpleHttpClient::isDataReceived() const
+{
+    return mHeaders.contains("Content-Length") &&
+            mData.length() >= mHeaders.value("Content-Length").toInt();
+}

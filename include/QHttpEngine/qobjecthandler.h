@@ -23,13 +23,12 @@
 #ifndef QHTTPENGINE_QOBJECTHANDLER_H
 #define QHTTPENGINE_QOBJECTHANDLER_H
 
-#include <QVariantMap>
-
 #include <QHttpEngine/QHttpHandler>
-#include <QHttpEngine/QHttpSocket>
 
 #include "qhttpengine_global.h"
 
+class QHttpSocket;
+class QJsonDocument;
 class QHTTPENGINE_EXPORT QObjectHandlerPrivate;
 
 /**
@@ -85,8 +84,11 @@ public:
      * @brief Register a method
      *
      * This overload uses the traditional connection syntax with macros.
+     *
+     * The readAll parameter determines whether all data must be received by
+     * the socket before invoking the slot.
      */
-    void registerMethod(const QString &name, QObject *receiver, const char *method);
+    void registerMethod(const QString &name, QObject *receiver, const char *method, bool readAll = true);
 
 #ifdef DOXYGEN
     /**
@@ -94,26 +96,27 @@ public:
      *
      * This overload uses the new connection syntax with member pointers.
      */
-    void registerMethod(const QString &name, QObject *receiver, PointerToMemberFunction method);
+    void registerMethod(const QString &name, QObject *receiver, PointerToMemberFunction method, bool readAll = true);
 
     /**
      * @brief Register a method
      *
      * This overload uses the new functor syntax (without context).
      */
-    void registerMethod(const QString &name, Functor functor);
+    void registerMethod(const QString &name, Functor functor, bool readAll = true);
 
     /**
      * @brief Register a method
      *
      * This overload uses the new functor syntax (with context).
      */
-    void registerMethod(const QString &name, QObject *receiver, Functor functor);
+    void registerMethod(const QString &name, QObject *receiver, Functor functor, bool readAll = true);
 #else
     template <typename Func1>
     inline void registerMethod(const QString &name,
                                typename QtPrivate::FunctionPointer<Func1>::Object *receiver,
-                               Func1 slot) {
+                               Func1 slot,
+                               bool readAll = true) {
 
         typedef QtPrivate::FunctionPointer<Func1> SlotType;
 
@@ -126,24 +129,38 @@ public:
                           "The slot parameters do not match");
 
         // Invoke the implementation
-        registerMethodImpl(name, receiver, new QtPrivate::QSlotObject<Func1, typename SlotType::Arguments, void>(slot));
+        registerMethodImpl(name, receiver, new QtPrivate::QSlotObject<Func1, typename SlotType::Arguments, void>(slot), readAll);
     }
 
     template <typename Func1>
-    inline void registerMethod(const QString &name, Func1 slot) {
-        registerMethod(name, Q_NULLPTR, slot);
+    inline typename QtPrivate::QEnableIf<!QtPrivate::is_convertible<Func1, QObject*>::value, void>::Type
+            registerMethod(const QString &name, Func1 slot, bool readAll = true) {
+        registerMethod(name, Q_NULLPTR, slot, readAll);
     }
 
     template <typename Func1>
     inline typename QtPrivate::QEnableIf<!QtPrivate::FunctionPointer<Func1>::IsPointerToMemberFunction &&
                                          !QtPrivate::is_same<const char*, Func1>::value, void>::Type
-            registerMethod(const QString &name, QObject *context, Func1 slot) {
+            registerMethod(const QString &name, QObject *context, Func1 slot, bool readAll = true) {
 
         // There is an easier way to do this but then the header wouldn't
         // compile on non-C++11 compilers
-        return registerMethod_functor(name, context, slot, &Func1::operator());
+        return registerMethod_functor(name, context, slot, &Func1::operator(), readAll);
     }
 #endif
+
+    /**
+     * @brief Read the request data from the socket as a JSON document
+     *
+     * If an error occurs reading the request, an error is automatically
+     * written to the socket.
+     */
+    static bool readJson(QHttpSocket *socket, QJsonDocument &document);
+
+    /**
+     * @brief Write the response to the socket as a JSON document
+     */
+    static void writeJson(QHttpSocket *socket, const QJsonDocument &document);
 
 protected:
 
@@ -155,7 +172,7 @@ protected:
 private:
 
     template <typename Func1, typename Func1Operator>
-    inline void registerMethod_functor(const QString &name, QObject *context, Func1 slot, Func1Operator) {
+    inline void registerMethod_functor(const QString &name, QObject *context, Func1 slot, Func1Operator, bool readAll) {
 
         typedef QtPrivate::FunctionPointer<Func1Operator> SlotType;
 
@@ -168,10 +185,11 @@ private:
                           "The slot parameters do not match");
 
         registerMethodImpl(name, context,
-                           new QtPrivate::QFunctorSlotObject<Func1, 1, typename SlotType::Arguments, void>(slot));
+                           new QtPrivate::QFunctorSlotObject<Func1, 1, typename SlotType::Arguments, void>(slot),
+                           readAll);
     }
 
-    void registerMethodImpl(const QString &name, QObject *receiver, QtPrivate::QSlotObjectBase *slotObj);
+    void registerMethodImpl(const QString &name, QObject *receiver, QtPrivate::QSlotObjectBase *slotObj, bool readAll);
 
     QObjectHandlerPrivate *const d;
     friend class QObjectHandlerPrivate;
