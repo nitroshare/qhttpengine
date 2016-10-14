@@ -119,7 +119,7 @@ void TestQObjectHandler::testOldConnection()
 
     if (sendObject) {
         QByteArray data = QJsonDocument(object).toJson();
-        client.sendHeaders("POST", "test", QHttpSocket::QHttpHeaderMap{
+        client.sendHeaders("POST", "test", QHttpSocket::HeaderMap{
             {"Content-Length", QByteArray::number(data.length())},
             {"Content-Type", "application/json"}
         });

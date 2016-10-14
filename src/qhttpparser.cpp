@@ -45,7 +45,7 @@ void QHttpParser::split(const QByteArray &data, const QByteArray &delim, int max
     parts.append(data.mid(index));
 }
 
-bool QHttpParser::parsePath(const QByteArray &rawPath, QString &path, QHttpSocket::QQueryStringMap &queryString)
+bool QHttpParser::parsePath(const QByteArray &rawPath, QString &path, QHttpSocket::QueryStringMap &queryString)
 {
     QUrl url(rawPath);
     if (!url.isValid()) {
@@ -61,7 +61,7 @@ bool QHttpParser::parsePath(const QByteArray &rawPath, QString &path, QHttpSocke
     return true;
 }
 
-bool QHttpParser::parseHeaderList(const QList<QByteArray> &lines, QHttpSocket::QHttpHeaderMap &headers)
+bool QHttpParser::parseHeaderList(const QList<QByteArray> &lines, QHttpSocket::HeaderMap &headers)
 {
     foreach (const QByteArray &line, lines) {
 
@@ -80,7 +80,7 @@ bool QHttpParser::parseHeaderList(const QList<QByteArray> &lines, QHttpSocket::Q
     return true;
 }
 
-bool QHttpParser::parseHeaders(const QByteArray &data, QList<QByteArray> &parts, QHttpSocket::QHttpHeaderMap &headers)
+bool QHttpParser::parseHeaders(const QByteArray &data, QList<QByteArray> &parts, QHttpSocket::HeaderMap &headers)
 {
     // Split the data into individual lines
     QList<QByteArray> lines;
@@ -95,7 +95,7 @@ bool QHttpParser::parseHeaders(const QByteArray &data, QList<QByteArray> &parts,
     return parseHeaderList(lines, headers);
 }
 
-bool QHttpParser::parseRequestHeaders(const QByteArray &data, QHttpSocket::Method &method, QByteArray &path, QHttpSocket::QHttpHeaderMap &headers)
+bool QHttpParser::parseRequestHeaders(const QByteArray &data, QHttpSocket::Method &method, QByteArray &path, QHttpSocket::HeaderMap &headers)
 {
     QList<QByteArray> parts;
     if (!parseHeaders(data, parts, headers)) {
@@ -132,7 +132,7 @@ bool QHttpParser::parseRequestHeaders(const QByteArray &data, QHttpSocket::Metho
     return true;
 }
 
-bool QHttpParser::parseResponseHeaders(const QByteArray &data, int &statusCode, QByteArray &statusReason, QHttpSocket::QHttpHeaderMap &headers)
+bool QHttpParser::parseResponseHeaders(const QByteArray &data, int &statusCode, QByteArray &statusReason, QHttpSocket::HeaderMap &headers)
 {
     QList<QByteArray> parts;
     if (!parseHeaders(data, parts, headers)) {

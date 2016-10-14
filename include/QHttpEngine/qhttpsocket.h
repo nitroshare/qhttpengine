@@ -97,7 +97,7 @@ public:
     /**
      * @brief Map consisting of query string values
      */
-    typedef QMultiMap<QString, QString> QQueryStringMap;
+    typedef QMultiMap<QString, QString> QueryStringMap;
 
     /**
      * @brief Map consisting of HTTP headers
@@ -105,7 +105,7 @@ public:
      * The key used for the map is the QIByteArray class, which allows for
      * case-insensitive comparison.
      */
-    typedef QMultiMap<QIByteArray, QByteArray> QHttpHeaderMap;
+    typedef QMultiMap<QIByteArray, QByteArray> HeaderMap;
 
     /**
      * HTTP methods
@@ -224,7 +224,7 @@ public:
      * This method may only be called after the request headers have been
      * parsed.
      */
-    QQueryStringMap queryString() const;
+    QueryStringMap queryString() const;
 
     /**
      * @brief Retrieve a map of request headers
@@ -233,7 +233,7 @@ public:
      * parsed. The original case of the headers is preserved but comparisons
      * are performed in a case-insensitive manner.
      */
-    QHttpHeaderMap headers() const;
+    HeaderMap headers() const;
 
     /**
      * @brief Retrieve the length of the content
@@ -269,7 +269,7 @@ public:
      * This method may only be called before the response headers are written.
      * All existing headers will be overwritten.
      */
-    void setHeaders(const QHttpHeaderMap &headers);
+    void setHeaders(const HeaderMap &headers);
 
     /**
      * @brief Write response headers to the socket

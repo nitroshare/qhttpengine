@@ -30,7 +30,7 @@
 #include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"
 
-Q_DECLARE_METATYPE(QHttpSocket::QQueryStringMap)
+Q_DECLARE_METATYPE(QHttpSocket::QueryStringMap)
 
 // Utility macro (avoids duplication) that creates a pair of connected
 // sockets, a QSimpleHttpClient for the client and a QHttpSocket for the
@@ -64,7 +64,7 @@ private Q_SLOTS:
 
 private:
 
-    QHttpSocket::QHttpHeaderMap headers;
+    QHttpSocket::HeaderMap headers;
 };
 
 TestQHttpSocket::TestQHttpSocket()

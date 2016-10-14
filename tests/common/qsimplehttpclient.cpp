@@ -33,7 +33,7 @@ QSimpleHttpClient::QSimpleHttpClient(QTcpSocket *socket)
     onReadyRead();
 }
 
-void QSimpleHttpClient::sendHeaders(const QByteArray &method, const QByteArray &path, const QHttpSocket::QHttpHeaderMap &headers)
+void QSimpleHttpClient::sendHeaders(const QByteArray &method, const QByteArray &path, const QHttpSocket::HeaderMap &headers)
 {
     QByteArray data = method + " " + path + " HTTP/1.0\r\n";
     for (auto i = headers.constBegin(); i != headers.constEnd(); ++i) {

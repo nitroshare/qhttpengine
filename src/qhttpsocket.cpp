@@ -234,12 +234,12 @@ QString QHttpSocket::path() const
     return d->requestPath;
 }
 
-QHttpSocket::QQueryStringMap QHttpSocket::queryString() const
+QHttpSocket::QueryStringMap QHttpSocket::queryString() const
 {
     return d->requestQueryString;
 }
 
-QHttpSocket::QHttpHeaderMap QHttpSocket::headers() const
+QHttpSocket::HeaderMap QHttpSocket::headers() const
 {
     return d->requestHeaders;
 }
@@ -264,7 +264,7 @@ void QHttpSocket::setHeader(const QByteArray &name, const QByteArray &value, boo
     }
 }
 
-void QHttpSocket::setHeaders(const QHttpHeaderMap &headers)
+void QHttpSocket::setHeaders(const HeaderMap &headers)
 {
     d->responseHeaders = headers;
 }

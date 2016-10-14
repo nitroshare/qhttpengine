@@ -49,8 +49,8 @@ public:
     QHttpSocket::Method requestMethod;
     QByteArray requestRawPath;
     QString requestPath;
-    QHttpSocket::QQueryStringMap requestQueryString;
-    QHttpSocket::QHttpHeaderMap requestHeaders;
+    QHttpSocket::QueryStringMap requestQueryString;
+    QHttpSocket::HeaderMap requestHeaders;
     qint64 requestDataRead;
     qint64 requestDataTotal;
 
@@ -63,7 +63,7 @@ public:
 
     int responseStatusCode;
     QByteArray responseStatusReason;
-    QHttpSocket::QHttpHeaderMap responseHeaders;
+    QHttpSocket::HeaderMap responseHeaders;
     qint64 responseHeaderRemaining;
 
 private Q_SLOTS:

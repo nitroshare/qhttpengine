@@ -96,7 +96,7 @@ void TestQHttpBasicAuth::testProcess()
     QSimpleHttpClient client(pair.client());
     QHttpSocket socket(pair.server(), &pair);
 
-    QHttpSocket::QHttpHeaderMap headers;
+    QHttpSocket::HeaderMap headers;
 
     if (header) {
         headers.insert(

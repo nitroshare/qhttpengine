@@ -57,7 +57,7 @@ public:
     /**
      * @brief Parse and remove the query string from a path
      */
-    static bool parsePath(const QByteArray &rawPath, QString &path, QHttpSocket::QQueryStringMap &queryString);
+    static bool parsePath(const QByteArray &rawPath, QString &path, QHttpSocket::QueryStringMap &queryString);
 
     /**
      * @brief Parse a list of lines containing HTTP headers
@@ -65,7 +65,7 @@ public:
      * Each line is expected to be in the format "name: value". Parsing is
      * immediately aborted if an invalid line is encountered.
      */
-    static bool parseHeaderList(const QList<QByteArray> &lines, QHttpSocket::QHttpHeaderMap &headers);
+    static bool parseHeaderList(const QList<QByteArray> &lines, QHttpSocket::HeaderMap &headers);
 
     /**
      * @brief Parse HTTP headers
@@ -74,17 +74,17 @@ public:
      * into a status line and HTTP headers. The parts list will contain the
      * parts from the status line.
      */
-    static bool parseHeaders(const QByteArray &data, QList<QByteArray> &parts, QHttpSocket::QHttpHeaderMap &headers);
+    static bool parseHeaders(const QByteArray &data, QList<QByteArray> &parts, QHttpSocket::HeaderMap &headers);
 
     /**
      * @brief Parse HTTP request headers
      */
-    static bool parseRequestHeaders(const QByteArray &data, QHttpSocket::Method &method, QByteArray &path, QHttpSocket::QHttpHeaderMap &headers);
+    static bool parseRequestHeaders(const QByteArray &data, QHttpSocket::Method &method, QByteArray &path, QHttpSocket::HeaderMap &headers);
 
     /**
      * @brief Parse HTTP response headers
      */
-    static bool parseResponseHeaders(const QByteArray &data, int &statusCode, QByteArray &statusReason, QHttpSocket::QHttpHeaderMap &headers);
+    static bool parseResponseHeaders(const QByteArray &data, int &statusCode, QByteArray &statusReason, QHttpSocket::HeaderMap &headers);
 };
 
 #endif // QHTTPENGINE_QHTTPPARSER_H

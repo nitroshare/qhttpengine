@@ -176,7 +176,7 @@ void TestQFilesystemHandler::testRangeRequests()
     QHttpSocket socket(pair.server(), &pair);
 
     if (!range.isEmpty()) {
-        QHttpSocket::QHttpHeaderMap inHeaders;
+        QHttpSocket::HeaderMap inHeaders;
         inHeaders.insert("Range", QByteArray("bytes=") + range.toUtf8());
         client.sendHeaders("GET", path.toUtf8(), inHeaders);
         QTRY_VERIFY(socket.isHeadersParsed());
