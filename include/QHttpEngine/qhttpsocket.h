@@ -30,6 +30,7 @@
 
 #include "qhttpengine_global.h"
 
+class QJsonDocument;
 class QTcpSocket;
 class QHTTPENGINE_EXPORT QHttpSocketPrivate;
 
@@ -288,6 +289,11 @@ public:
      * @brief Write an HTTP error to the socket
      */
     void writeError(int statusCode, const QByteArray &statusReason = QByteArray());
+
+    /**
+     * @brief Write the specified JSON document to the socket and close it
+     */
+    void writeJson(const QJsonDocument &document, int statusCode = OK);
 
 Q_SIGNALS:
 

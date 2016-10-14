@@ -22,6 +22,7 @@
 
 #include <cstring>
 
+#include <QJsonDocument>
 #include <QTcpSocket>
 
 #include <QHttpEngine/QHttpParser>
@@ -321,6 +322,16 @@ void QHttpSocket::writeError(int statusCode, const QByteArray &statusReason)
     setHeader("Content-Type", "text/html");
 
     writeHeaders();
+    write(data);
+    close();
+}
+
+void QHttpSocket::writeJson(const QJsonDocument &document, int statusCode)
+{
+    QByteArray data = document.toJson();
+    setStatusCode(statusCode);
+    setHeader("Content-Length", QByteArray::number(data.length()));
+    setHeader("Content-Type", "application/json");
     write(data);
     close();
 }

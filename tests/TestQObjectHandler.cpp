@@ -45,7 +45,7 @@ public Q_SLOTS:
     void echo(QHttpSocket *socket) {
         QJsonDocument document;
         if (QObjectHandler::readJson(socket, document)) {
-            QObjectHandler::writeJson(socket, document);
+            socket->writeJson(document);
         }
     }
 };

@@ -157,11 +157,6 @@ public:
      */
     static bool readJson(QHttpSocket *socket, QJsonDocument &document);
 
-    /**
-     * @brief Write the response to the socket as a JSON document
-     */
-    static void writeJson(QHttpSocket *socket, const QJsonDocument &document);
-
 protected:
 
     /**

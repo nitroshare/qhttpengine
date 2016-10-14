@@ -90,15 +90,6 @@ bool QObjectHandler::readJson(QHttpSocket *socket, QJsonDocument &document)
     return true;
 }
 
-void QObjectHandler::writeJson(QHttpSocket *socket, const QJsonDocument &document)
-{
-    QByteArray data = document.toJson();
-    socket->setHeader("Content-Length", QByteArray::number(data.length()));
-    socket->setHeader("Content-Type", "application/json");
-    socket->write(data);
-    socket->close();
-}
-
 void QObjectHandler::process(QHttpSocket *socket, const QString &path)
 {
     // Ensure the method has been registered
