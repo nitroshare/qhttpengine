@@ -38,7 +38,7 @@ set_target_properties(QHttpEngine PROPERTIES
 )
 
 target_include_directories(QHttpEngine PUBLIC
-    "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>/include"
+    "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
     "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>"
 )
