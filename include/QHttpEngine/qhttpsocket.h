@@ -245,6 +245,22 @@ public:
     qint64 contentLength() const;
 
     /**
+     * @brief Parse the request body as a JSON document
+     *
+     * This method may only be called after the request headers **and** the
+     * request body have been received. The most effective way to confirm that
+     * this is the case is by using:
+     *
+     * @code
+     * socket->bytesAvailable() >= socket->contentLength()
+     * @endcode
+     *
+     * If the JSON received is invalid, an error will be immediately written
+     * to the socket. The return value indicates whether the JSON was valid.
+     */
+    bool readJson(QJsonDocument &document);
+
+    /**
      * @brief Set the response code
      *
      * This method may only be called before the response headers are written.

@@ -23,6 +23,7 @@
 #include <cstring>
 
 #include <QJsonDocument>
+#include <QJsonParseError>
 #include <QTcpSocket>
 
 #include <QHttpEngine/QHttpParser>
@@ -248,6 +249,19 @@ QHttpSocket::HeaderMap QHttpSocket::headers() const
 qint64 QHttpSocket::contentLength() const
 {
     return d->requestDataTotal;
+}
+
+bool QHttpSocket::readJson(QJsonDocument &document)
+{
+    QJsonParseError error;
+    document = QJsonDocument::fromJson(readAll(), &error);
+
+    if (error.error != QJsonParseError::NoError) {
+        writeError(QHttpSocket::BadRequest);
+        return false;
+    }
+
+    return true;
 }
 
 void QHttpSocket::setStatusCode(int statusCode, const QByteArray &statusReason)

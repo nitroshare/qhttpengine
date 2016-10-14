@@ -20,6 +20,8 @@
  * IN THE SOFTWARE.
  */
 
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QObject>
 #include <QSignalSpy>
 #include <QTest>
@@ -61,6 +63,7 @@ private Q_SLOTS:
     void testData();
     void testRedirect();
     void testSignals();
+    void testJson();
 
 private:
 
@@ -158,6 +161,27 @@ void TestQHttpSocket::testSignals()
     QTRY_COMPARE(aboutToCloseSpy.count(), 0);
     server.close();
     QTRY_COMPARE(aboutToCloseSpy.count(), 1);
+}
+
+void TestQHttpSocket::testJson()
+{
+    CREATE_SOCKET_PAIR();
+
+    QJsonObject object{{"a", "b"}, {"c", 123}};
+    QByteArray data = QJsonDocument(object).toJson();
+
+    client.sendHeaders(Method, Path, QHttpSocket::HeaderMap{
+        {"Content-Length", QByteArray::number(data.length())},
+        {"Content-Type", "application/json"}
+    });
+    client.sendData(data);
+
+    QTRY_VERIFY(server.isHeadersParsed());
+    QTRY_VERIFY(server.bytesAvailable() >= server.contentLength());
+
+    QJsonDocument document;
+    QVERIFY(server.readJson(document));
+    QCOMPARE(document.object(), object);
 }
 
 QTEST_MAIN(TestQHttpSocket)

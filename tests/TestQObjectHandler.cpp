@@ -20,8 +20,6 @@
  * IN THE SOFTWARE.
  */
 
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QObject>
 #include <QTest>
 
@@ -42,12 +40,6 @@ public Q_SLOTS:
     void valid(QHttpSocket *socket) {
         socket->writeError(QHttpSocket::OK);
     }
-    void echo(QHttpSocket *socket) {
-        QJsonDocument document;
-        if (QObjectHandler::readJson(socket, document)) {
-            socket->writeJson(document);
-        }
-    }
 };
 
 class TestQObjectHandler : public QObject
@@ -63,46 +55,28 @@ private Q_SLOTS:
 
 void TestQObjectHandler::testOldConnection_data()
 {
-    QTest::addColumn<bool>("sendObject");
-    QTest::addColumn<QJsonObject>("object");
     QTest::addColumn<QByteArray>("slot");
     QTest::addColumn<int>("statusCode");
 
     QTest::newRow("invalid slot")
-            << false
-            << QJsonObject()
             << QByteArray(SLOT(invalid()))
             << static_cast<int>(QHttpSocket::InternalServerError);
 
     QTest::newRow("wrong argument count")
-            << false
-            << QJsonObject()
             << QByteArray(SLOT(wrongArgumentCount()))
             << static_cast<int>(QHttpSocket::InternalServerError);
 
     QTest::newRow("wrong argument type")
-            << false
-            << QJsonObject()
             << QByteArray(SLOT(wrongArgumentType(int)))
             << static_cast<int>(QHttpSocket::InternalServerError);
 
     QTest::newRow("valid")
-            << false
-            << QJsonObject()
             << QByteArray(SLOT(valid(QHttpSocket*)))
-            << static_cast<int>(QHttpSocket::OK);
-
-    QTest::newRow("json")
-            << true
-            << QJsonObject{{"a", "b"}, {"c", 1}}
-            << QByteArray(SLOT(echo(QHttpSocket*)))
             << static_cast<int>(QHttpSocket::OK);
 }
 
 void TestQObjectHandler::testOldConnection()
 {
-    QFETCH(bool, sendObject);
-    QFETCH(QJsonObject, object);
     QFETCH(QByteArray, slot);
     QFETCH(int, statusCode);
 
@@ -117,28 +91,11 @@ void TestQObjectHandler::testOldConnection()
     QSimpleHttpClient client(pair.client());
     QHttpSocket socket(pair.server(), &pair);
 
-    if (sendObject) {
-        QByteArray data = QJsonDocument(object).toJson();
-        client.sendHeaders("POST", "test", QHttpSocket::HeaderMap{
-            {"Content-Length", QByteArray::number(data.length())},
-            {"Content-Type", "application/json"}
-        });
-        client.sendData(data);
-    } else {
-        client.sendHeaders("GET", "test");
-    }
-
+    client.sendHeaders("GET", "test");
     QTRY_VERIFY(socket.isHeadersParsed());
 
     handler.route(&socket, socket.path());
     QTRY_COMPARE(client.statusCode(), statusCode);
-
-    if (sendObject) {
-        QTRY_VERIFY(client.isDataReceived());
-
-        QJsonObject outObject = QJsonDocument::fromJson(client.data()).object();
-        QCOMPARE(object, outObject);
-    }
 }
 
 void TestQObjectHandler::testNewConnection()

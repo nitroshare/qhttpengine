@@ -21,7 +21,6 @@
  */
 
 #include <QGenericArgument>
-#include <QJsonDocument>
 #include <QMetaMethod>
 
 #include <QHttpEngine/QHttpSocket>
@@ -75,19 +74,6 @@ void QObjectHandlerPrivate::invokeSlot(QHttpSocket *socket, Method m)
         };
         m.slot.slotObj->call(m.receiver, args);
     }
-}
-
-bool QObjectHandler::readJson(QHttpSocket *socket, QJsonDocument &document)
-{
-    QJsonParseError error;
-    document = QJsonDocument::fromJson(socket->readAll(), &error);
-
-    if (error.error != QJsonParseError::NoError) {
-        socket->writeError(QHttpSocket::BadRequest);
-        return false;
-    }
-
-    return true;
 }
 
 void QObjectHandler::process(QHttpSocket *socket, const QString &path)

@@ -28,7 +28,6 @@
 #include "qhttpengine_global.h"
 
 class QHttpSocket;
-class QJsonDocument;
 class QHTTPENGINE_EXPORT QObjectHandlerPrivate;
 
 /**
@@ -148,14 +147,6 @@ public:
         return registerMethod_functor(name, context, slot, &Func1::operator(), readAll);
     }
 #endif
-
-    /**
-     * @brief Read the request data from the socket as a JSON document
-     *
-     * If an error occurs reading the request, an error is automatically
-     * written to the socket.
-     */
-    static bool readJson(QHttpSocket *socket, QJsonDocument &document);
 
 protected:
 
