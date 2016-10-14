@@ -133,7 +133,7 @@ public:
     }
 
     template <typename Func1>
-    inline typename QtPrivate::QEnableIf<!QtPrivate::is_convertible<Func1, QObject*>::value, void>::Type
+    inline typename QtPrivate::QEnableIf<!QtPrivate::AreArgumentsCompatible<Func1, QObject*>::value, void>::Type
             registerMethod(const QString &name, Func1 slot, bool readAll = true) {
         registerMethod(name, Q_NULLPTR, slot, readAll);
     }
