@@ -13,6 +13,7 @@ set(TESTS
     TestQHttpSocket
     TestQIByteArray
     TestQIODeviceCopier
+    TestQLocalAuth
     TestQLocalFile
     TestQObjectHandler
 )

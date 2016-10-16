@@ -12,6 +12,7 @@ set(SRC
     qhttpserver.cpp
     qhttpsocket.cpp
     qiodevicecopier.cpp
+    qlocalauth.cpp
     qlocalfile.cpp
     qobjecthandler.cpp
 )
