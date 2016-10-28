@@ -30,8 +30,7 @@
 #include "qhttpengine_global.h"
 
 #if !defined(QT_NO_SSL)
-class QSslCertificate;
-class QSslKey;
+class QSslConfiguration;
 #endif
 
 class QHttpHandler;
@@ -85,14 +84,12 @@ public:
 
 #if !defined(QT_NO_SSL)
     /**
-     * @brief Set the certificate to use for TLS
+     * @brief Set the SSL configuration for the server
+     *
+     * If the configuration is not NULL, the server will begin negotiating
+     * connections using SSL/TLS.
      */
-    void setCertificate(const QSslCertificate &certificate);
-
-    /**
-     * @brief Set the private key to use for TLS
-     */
-    void setPrivateKey(const QSslKey &key);
+    void setSslConfiguration(const QSslConfiguration &configuration);
 #endif
 
 protected:

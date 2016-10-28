@@ -72,14 +72,9 @@ void QHttpServer::setHandler(QHttpHandler *handler)
 }
 
 #if !defined(QT_NO_SSL)
-void QHttpServer::setCertificate(const QSslCertificate &certificate)
+void QHttpServer::setSslConfiguration(const QSslConfiguration &configuration)
 {
-    d->configuration.setLocalCertificate(certificate);
-}
-
-void QHttpServer::setPrivateKey(const QSslKey &key)
-{
-    d->configuration.setPrivateKey(key);
+    d->configuration = configuration;
 }
 #endif
 
@@ -89,22 +84,25 @@ void QHttpServer::incomingConnection(qintptr socketDescriptor)
     if (!d->configuration.isNull()) {
 
         // Initialize the socket with the SSL configuration
-        QSslSocket *sslSocket = new QSslSocket(this);
+        QSslSocket *socket = new QSslSocket(this);
 
         // Wait until encryption is complete before processing the socket
-        connect(sslSocket, &QSslSocket::encrypted, [this, sslSocket]() {
-            d->process(sslSocket);
+        connect(socket, &QSslSocket::encrypted, [this, socket]() {
+            d->process(socket);
         });
 
-        sslSocket->setSocketDescriptor(socketDescriptor);
-        sslSocket->setSslConfiguration(d->configuration);
-        sslSocket->startServerEncryption();
+        socket->setSocketDescriptor(socketDescriptor);
+        socket->setSslConfiguration(d->configuration);
+        socket->startServerEncryption();
 
     } else {
 #endif
 
+        QTcpSocket *socket = new QTcpSocket(this);
+        socket->setSocketDescriptor(socketDescriptor);
+
         // Process the socket immediately
-        d->process(new QTcpSocket(this));
+        d->process(socket);
 
 #if !defined(QT_NO_SSL)
     }
