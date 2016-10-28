@@ -139,6 +139,10 @@ public:
     enum {
         /// Request was successful
         OK = 200,
+        /// Request was successful and a resource was created
+        Created = 201,
+        /// Request was accepted for processing, not completed yet.
+        Accepted = 202,
         /// Range request was successful
         PartialContent = 206,
         /// Resource has moved permanently
@@ -155,8 +159,16 @@ public:
         NotFound = 404,
         /// Method is not valid for the resource
         MethodNotAllowed = 405,
+        /// The request could not be completed due to a conflict with the current state of the resource
+        Conflict = 409,
         /// An internal server error occurred
-        InternalServerError = 500
+        InternalServerError = 500,
+        /// Invalid response from server while acting as a gateway
+        BadGateway = 502,
+        /// Server unable to handle request due to overload
+        ServiceUnavailable = 503,
+        /// Server does not supports the HTTP version in the request
+        HttpVersionNotSupported = 505
     };
 
     /**
