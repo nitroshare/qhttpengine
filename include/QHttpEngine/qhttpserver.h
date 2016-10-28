@@ -29,6 +29,11 @@
 
 #include "qhttpengine_global.h"
 
+#if !defined(QT_NO_SSL)
+class QSslCertificate;
+class QSslKey;
+#endif
+
 class QHttpHandler;
 class QHTTPENGINE_EXPORT QHttpServerPrivate;
 
@@ -77,6 +82,25 @@ public:
      * @brief Set the root handler for all new requests
      */
     void setHandler(QHttpHandler *handler);
+
+#if !defined(QT_NO_SSL)
+    /**
+     * @brief Set the certificate to use for TLS
+     */
+    void setCertificate(const QSslCertificate &certificate);
+
+    /**
+     * @brief Set the private key to use for TLS
+     */
+    void setPrivateKey(const QSslKey &key);
+#endif
+
+protected:
+
+    /**
+     * @brief Implementation of QTcpServer::incomingConnection()
+     */
+    void incomingConnection(qintptr socketDescriptor);
 
 private:
 

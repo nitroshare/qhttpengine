@@ -24,6 +24,11 @@
 #define QHTTPENGINE_QHTTPSERVERPRIVATE_H
 
 #include <QObject>
+#include <QTcpSocket>
+
+#if !defined(QT_NO_SSL)
+#  include <QSslConfiguration>
+#endif
 
 #include <QHttpEngine/QHttpServer>
 
@@ -37,11 +42,13 @@ public:
 
     explicit QHttpServerPrivate(QHttpServer *httpServer);
 
+    void process(QTcpSocket *socket);
+
     QHttpHandler *handler;
 
-private Q_SLOTS:
-
-    void onIncomingConnection();
+#if !defined(QT_NO_SSL)
+    QSslConfiguration configuration;
+#endif
 
 private:
 
