@@ -24,6 +24,14 @@
 #include <QTcpSocket>
 #include <QTest>
 
+#if !defined(QT_NO_SSL)
+#  include <QFile>
+#  include <QSslCertificate>
+#  include <QSslConfiguration>
+#  include <QSslKey>
+#  include <QSslSocket>
+#endif
+
 #include <QHttpEngine/QHttpServer>
 #include <QHttpEngine/QHttpHandler>
 
@@ -53,6 +61,10 @@ class TestQHttpServer : public QObject
 private Q_SLOTS:
 
     void testServer();
+
+#if !defined(QT_NO_SSL)
+    void testSsl();
+#endif
 };
 
 void TestQHttpServer::testServer()
@@ -76,6 +88,36 @@ void TestQHttpServer::testServer()
     handler.mSocket->close();
     QTRY_COMPARE(destroyedSpy.count(), 1);
 }
+
+#if !defined(QT_NO_SSL)
+void TestQHttpServer::testSsl()
+{
+    QFile keyFile(":/key.pem");
+    QVERIFY(keyFile.open(QIODevice::ReadOnly));
+
+    QSslKey key(&keyFile, QSsl::Rsa);
+    QList<QSslCertificate> certs = QSslCertificate::fromPath(":/cert.pem");
+
+    QSslConfiguration config;
+    config.setPrivateKey(key);
+    config.setLocalCertificateChain(certs);
+
+    QHttpServer server;
+    server.setSslConfiguration(config);
+
+    QVERIFY(server.listen(QHostAddress::LocalHost));
+
+    QSslSocket socket;
+    socket.setCaCertificates(certs);
+    socket.connectToHost(server.serverAddress(), server.serverPort());
+    socket.setPeerVerifyName("localhost");
+
+    QTRY_COMPARE(socket.state(), QAbstractSocket::ConnectedState);
+
+    socket.startClientEncryption();
+    QTRY_VERIFY(socket.isEncrypted());
+}
+#endif
 
 QTEST_MAIN(TestQHttpServer)
 #include "TestQHttpServer.moc"

@@ -18,8 +18,10 @@ set(TESTS
     TestQObjectHandler
 )
 
+qt5_add_resources(QRC resource.qrc)
+
 foreach(TEST ${TESTS})
-    add_executable(${TEST} ${TEST}.cpp)
+    add_executable(${TEST} ${TEST}.cpp ${QRC})
     set_target_properties(${TEST} PROPERTIES
         CXX_STANDARD 11
         CXX_STANDARD_REQUIRED ON
