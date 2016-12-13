@@ -222,6 +222,11 @@ void QHttpSocket::close()
     d->socket->close();
 }
 
+QHostAddress QHttpSocket::peerAddress() const
+{
+    return d->socket->peerAddress();
+}
+
 bool QHttpSocket::isHeadersParsed() const
 {
     return d->readState > QHttpSocketPrivate::ReadHeaders;

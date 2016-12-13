@@ -23,6 +23,7 @@
 #ifndef QHTTPENGINE_QHTTPSOCKET_H
 #define QHTTPENGINE_QHTTPSOCKET_H
 
+#include <QHostAddress>
 #include <QMultiMap>
 #include <QIODevice>
 
@@ -201,6 +202,11 @@ public:
      * device. It will also close the underlying QTcpSocket.
      */
     virtual void close();
+
+    /**
+     * @brief Retrive the address of the remote peer
+     */
+    QHostAddress peerAddress() const;
 
     /**
      * @brief Determine if the request headers have been parsed yet
