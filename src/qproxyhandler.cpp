@@ -70,6 +70,18 @@ void QProxyHandler::process(QHttpSocket *socket, const QString &path)
         request.setRawHeader(i.key(), i.value());
     }
 
+    // Add peer to X-Forwarded-For and set X-Real-IP if not already set
+    QByteArray peerIP = socket->peerAddress().toString().toUtf8();
+    QByteArray origFwd = socket->headers().value("X-Forwarded-For");
+    if (origFwd.isNull()) {
+        request.setRawHeader("X-Forwarded-For", peerIP);
+    } else {
+        request.setRawHeader("X-Forwarded-For", origFwd + ", " + peerIP);
+    }
+    if (!socket->headers().contains("X-Real-IP")) {
+        request.setRawHeader("X-Real-IP", peerIP);
+    }
+
     // Begin the request
     QNetworkReply *reply = d->networkAccessManager.sendCustomRequest(
         request,
