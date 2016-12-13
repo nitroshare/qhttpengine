@@ -46,6 +46,7 @@ QByteArray QProxyHandlerPrivate::methodToString(QHttpSocket::Method method)
     case QHttpSocket::DELETE: return "DELETE";
     case QHttpSocket::TRACE: return "TRACE";
     case QHttpSocket::CONNECT: return "CONNECT";
+    default: return QByteArray();
     }
 }
 
@@ -61,7 +62,7 @@ void QProxyHandler::process(QHttpSocket *socket, const QString &path)
     socket->setParent(this);
 
     // Build the request for the upstream server
-    QUrl url(QString("http://%s:%d/%s").arg(d->address.toString()).arg(d->port).arg(path));
+    QUrl url(QString("http://%1:%2/%3").arg(d->address.toString()).arg(d->port).arg(path));
     QNetworkRequest request(url);
 
     // Copy all of the request headers
@@ -72,7 +73,8 @@ void QProxyHandler::process(QHttpSocket *socket, const QString &path)
     // Begin the request
     QNetworkReply *reply = d->networkAccessManager.sendCustomRequest(
         request,
-        d->methodToString(socket->method())
+        d->methodToString(socket->method()),
+        socket
     );
     reply->setParent(this);
 
@@ -89,16 +91,8 @@ void QProxyHandler::process(QHttpSocket *socket, const QString &path)
         socket->write(reply->readAll());
     });
 
-    // When data arrives from downstream, send it upstream
-    connect(socket, &QHttpSocket::readyRead, [socket, reply]() {
-        reply->write(socket->readAll());
-    });
-
     // When either end disconnects, sever everything and tear it down
-    auto teardown = [socket, reply]() {
-        socket->deleteLater();
-        reply->deleteLater();
-    };
-    connect(reply, &QNetworkReply::finished, teardown);
-    connect(socket, &QHttpSocket::aboutToClose, teardown);
+    connect(socket, &QHttpSocket::aboutToClose, reply, &QNetworkReply::close);
+    connect(reply, &QNetworkReply::finished, socket, &QHttpSocket::close);
+    connect(reply, &QNetworkReply::finished, reply, &QNetworkReply::deleteLater);
 }

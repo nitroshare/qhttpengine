@@ -16,6 +16,7 @@ set(TESTS
     TestQLocalAuth
     TestQLocalFile
     TestQObjectHandler
+    TestQProxyHandler
 )
 
 qt5_add_resources(QRC resource.qrc)
