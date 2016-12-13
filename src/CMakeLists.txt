@@ -15,6 +15,7 @@ set(SRC
     qlocalauth.cpp
     qlocalfile.cpp
     qobjecthandler.cpp
+    qproxyhandler.cpp
 )
 
 if(WIN32)
