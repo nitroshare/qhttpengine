@@ -66,6 +66,7 @@ QHttpSocketPrivate::QHttpSocketPrivate(QHttpSocket *httpSocket, QTcpSocket *tcpS
 
     connect(socket, &QTcpSocket::readyRead, this, &QHttpSocketPrivate::onReadyRead);
     connect(socket, &QTcpSocket::bytesWritten, this, &QHttpSocketPrivate::onBytesWritten);
+    connect(socket, &QTcpSocket::readChannelFinished, q, &QHttpSocket::readChannelFinished);
 
     // Process anything already received by the socket
     onReadyRead();
@@ -152,24 +153,17 @@ bool QHttpSocketPrivate::readHeaders()
 
     // Remove the headers from the buffer
     readBuffer.remove(0, index + 4);
+    readState = ReadData;
 
-    // Check for the content-length header - if it is present, then
-    // prepare to read the specified amount of data, otherwise, no data
-    // should be read from the socket and the read channel is finished
+    // If the content-length header is present, use it to determine
+    // how much data to expect from the socket - not all requests
+    // use this header - WebSocket requests, for example, do not
     if (requestHeaders.contains("Content-Length")) {
-        readState = ReadData;
         requestDataTotal = requestHeaders.value("Content-Length").toLongLong();
-    } else {
-        readState = ReadFinished;
     }
 
     // Indicate that the headers have been parsed
     Q_EMIT q->headersParsed();
-
-    // If the new readState is ReadFinished, then indicate so
-    if (readState == ReadFinished) {
-        Q_EMIT q->readChannelFinished();
-    }
 
     return true;
 }
@@ -183,7 +177,8 @@ void QHttpSocketPrivate::readData()
 
     // Check to see if the specified amount of data has been read from the
     // socket, if so, emit the readChannelFinished() signal
-    if (requestDataRead + readBuffer.size() >= requestDataTotal) {
+    if (requestDataTotal != -1 &&
+            requestDataRead + readBuffer.size() >= requestDataTotal) {
         readState = ReadFinished;
         Q_EMIT q->readChannelFinished();
     }
