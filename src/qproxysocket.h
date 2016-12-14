@@ -56,7 +56,6 @@ private:
     QTcpSocket mUpstreamSocket;
 
     QString mPath;
-    bool mHeadersSent;
     bool mHeadersParsed;
     QByteArray mBuffer;
 };

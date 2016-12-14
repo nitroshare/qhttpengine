@@ -28,7 +28,6 @@ QProxySocket::QProxySocket(QHttpSocket *socket, const QString &path, const QHost
     : QObject(socket),
       mDownstreamSocket(socket),
       mPath(path),
-      mHeadersSent(false),
       mHeadersParsed(false)
 {
     connect(mDownstreamSocket, &QHttpSocket::readyRead, this, &QProxySocket::onDownstreamReadyRead);
@@ -78,9 +77,6 @@ void QProxySocket::onUpstreamConnected()
         mUpstreamSocket.write(i.key() + ": " + i.value() + "\r\n");
     }
     mUpstreamSocket.write("\r\n");
-
-    // Remember that headers were sent
-    mHeadersSent = true;
 }
 
 void QProxySocket::onUpstreamReadyRead()
@@ -121,7 +117,7 @@ void QProxySocket::onUpstreamReadyRead()
 
 void QProxySocket::onUpstreamError(QAbstractSocket::SocketError socketError)
 {
-    if (mHeadersSent) {
+    if (mHeadersParsed) {
         mDownstreamSocket->close();
     } else {
         mDownstreamSocket->writeError(QHttpSocket::BadGateway);
