@@ -1,0 +1,143 @@
+/*
+ * Copyright (c) 2016 Nathan Osman
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
+
+#include <QHttpEngine/QHttpParser>
+
+#include "qproxysocket.h"
+
+QProxySocket::QProxySocket(QHttpSocket *socket, const QString &path, const QHostAddress &address, quint16 port)
+    : QObject(socket),
+      mDownstreamSocket(socket),
+      mPath(path),
+      mHeadersSent(false),
+      mHeadersParsed(false)
+{
+    connect(mDownstreamSocket, &QHttpSocket::readyRead, this, &QProxySocket::onDownstreamReadyRead);
+
+    connect(&mUpstreamSocket, &QTcpSocket::connected, this, &QProxySocket::onUpstreamConnected);
+    connect(&mUpstreamSocket, &QTcpSocket::readyRead, this, &QProxySocket::onUpstreamReadyRead);
+    connect(
+        &mUpstreamSocket,
+        static_cast<void(QAbstractSocket::*)(QAbstractSocket::SocketError)>(&QAbstractSocket::error),
+        this,
+        &QProxySocket::onUpstreamError
+    );
+
+    mUpstreamSocket.connectToHost(address, port);
+}
+
+void QProxySocket::onDownstreamReadyRead()
+{
+    mUpstreamSocket.write(mDownstreamSocket->readAll());
+}
+
+void QProxySocket::onUpstreamConnected()
+{
+    // Write the status line using the stripped path from the handler
+    mUpstreamSocket.write(
+        QString("%1 /%2 HTTP/1.0\r\n")
+            .arg(methodToString(mDownstreamSocket->method()))
+            .arg(mPath)
+            .toUtf8()
+    );
+
+    // Use the existing headers but insert proxy-related ones
+    QHttpSocket::HeaderMap headers = mDownstreamSocket->headers();
+    QByteArray peerIP = mDownstreamSocket->peerAddress().toString().toUtf8();
+    QByteArray origFwd = headers.value("X-Forwarded-For");
+    if (origFwd.isNull()) {
+        headers.insert("X-Forwarded-For", peerIP);
+    } else {
+        headers.insert("X-Forwarded-For", origFwd + ", " + peerIP);
+    }
+    if (!headers.contains("X-Real-IP")) {
+        headers.insert("X-Real-IP", peerIP);
+    }
+
+    // Write the headers to the socket with the terminating CRLF
+    for (auto i = headers.constBegin(); i != headers.constEnd(); ++i) {
+        mUpstreamSocket.write(i.key() + ": " + i.value() + "\r\n");
+    }
+    mUpstreamSocket.write("\r\n");
+
+    // Remember that headers were sent
+    mHeadersSent = true;
+}
+
+void QProxySocket::onUpstreamReadyRead()
+{
+    // If the headers have not yet been parsed, then check to see if the end
+    // has been reached yet; if they have, just dump data
+
+    if (!mHeadersParsed) {
+
+        // Add to the buffer and check to see if the end was reached
+        mBuffer.append(mUpstreamSocket.readAll());
+        int index = mBuffer.indexOf("\r\n\r\n");
+        if (index != -1) {
+
+            // Parse the headers
+            int statusCode;
+            QByteArray statusReason;
+            QHttpSocket::HeaderMap headers;
+            if (!QHttpParser::parseResponseHeaders(mBuffer.left(index), statusCode, statusReason, headers)) {
+                mDownstreamSocket->writeError(QHttpSocket::BadGateway);
+                return;
+            }
+
+            // Dump the headers back downstream
+            mDownstreamSocket->setStatusCode(statusCode, statusReason);
+            mDownstreamSocket->setHeaders(headers);
+            mDownstreamSocket->writeHeaders();
+            mDownstreamSocket->write(mBuffer.mid(index + 4));
+
+            // Remember that headers were parsed and empty the buffer
+            mHeadersParsed = true;
+            mBuffer.clear();
+        }
+    } else {
+        mDownstreamSocket->write(mUpstreamSocket.readAll());
+    }
+}
+
+void QProxySocket::onUpstreamError(QAbstractSocket::SocketError socketError)
+{
+    if (mHeadersSent) {
+        mDownstreamSocket->close();
+    } else {
+        mDownstreamSocket->writeError(QHttpSocket::BadGateway);
+    }
+}
+
+QString QProxySocket::methodToString(QHttpSocket::Method method) const
+{
+    switch (method) {
+    case QHttpSocket::OPTIONS: return "OPTIONS";
+    case QHttpSocket::GET: return "GET";
+    case QHttpSocket::HEAD: return "HEAD";
+    case QHttpSocket::POST: return "POST";
+    case QHttpSocket::PUT: return "PUT";
+    case QHttpSocket::DELETE: return "DELETE";
+    case QHttpSocket::TRACE: return "TRACE";
+    case QHttpSocket::CONNECT: return "CONNECT";
+    }
+}

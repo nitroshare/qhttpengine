@@ -20,29 +20,45 @@
  * IN THE SOFTWARE.
  */
 
-#include <QHttpEngine/QProxyHandler>
+#ifndef QHTTPENGINE_QPROXYSOCKET_H
+#define QHTTPENGINE_QPROXYSOCKET_H
 
-#include "qproxyhandler_p.h"
-#include "qproxysocket.h"
+#include <QHostAddress>
+#include <QObject>
+#include <QTcpSocket>
 
-QProxyHandlerPrivate::QProxyHandlerPrivate(QObject *parent, const QHostAddress &address, quint16 port)
-    : QObject(parent),
-      address(address),
-      port(port)
+#include <QHttpEngine/QHttpSocket>
+
+/**
+ * @brief HTTP socket for connecting to a proxy
+ */
+class QProxySocket : public QObject
 {
-}
+    Q_OBJECT
 
-QProxyHandler::QProxyHandler(const QHostAddress &address, quint16 port, QObject *parent)
-    : QHttpHandler(parent),
-      d(new QProxyHandlerPrivate(this, address, port))
-{
-}
+public:
 
-void QProxyHandler::process(QHttpSocket *socket, const QString &path)
-{
-    // Parent the socket to the proxy
-    socket->setParent(this);
+    explicit QProxySocket(QHttpSocket *socket, const QString &path, const QHostAddress &address, quint16 port);
 
-    // Create a new proxy socket
-    new QProxySocket(socket, path, d->address, d->port);
-}
+private Q_SLOTS:
+
+    void onDownstreamReadyRead();
+
+    void onUpstreamConnected();
+    void onUpstreamReadyRead();
+    void onUpstreamError(QTcpSocket::SocketError socketError);
+
+private:
+
+    QString methodToString(QHttpSocket::Method method) const;
+
+    QHttpSocket *mDownstreamSocket;
+    QTcpSocket mUpstreamSocket;
+
+    QString mPath;
+    bool mHeadersSent;
+    bool mHeadersParsed;
+    QByteArray mBuffer;
+};
+
+#endif // QHTTPENGINE_QPROXYSOCKET_H

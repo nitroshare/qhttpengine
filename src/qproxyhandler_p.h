@@ -24,7 +24,6 @@
 #define QHTTPENGINE_QPROXYHANDLERPRIVATE_H
 
 #include <QHostAddress>
-#include <QNetworkAccessManager>
 #include <QObject>
 
 #include <QHttpEngine/QHttpSocket>
@@ -35,11 +34,7 @@ class QProxyHandlerPrivate : public QObject
 
 public:
 
-    explicit QProxyHandlerPrivate(QObject *parent, const QHostAddress &address, quint16 port);
-
-    QByteArray methodToString(QHttpSocket::Method method);
-
-    QNetworkAccessManager networkAccessManager;
+    QProxyHandlerPrivate(QObject *parent, const QHostAddress &address, quint16 port);
 
     QHostAddress address;
     quint16 port;

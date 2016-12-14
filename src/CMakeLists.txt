@@ -16,6 +16,7 @@ set(SRC
     qlocalfile.cpp
     qobjecthandler.cpp
     qproxyhandler.cpp
+    qproxysocket.cpp
 )
 
 if(WIN32)
