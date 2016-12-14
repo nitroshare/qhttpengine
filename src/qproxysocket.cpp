@@ -53,7 +53,7 @@ void QProxySocket::onUpstreamConnected()
 {
     // Write the status line using the stripped path from the handler
     mUpstreamSocket.write(
-        QString("%1 /%2 HTTP/1.0\r\n")
+        QString("%1 /%2 HTTP/1.1\r\n")
             .arg(methodToString(mDownstreamSocket->method()))
             .arg(mPath)
             .toUtf8()
