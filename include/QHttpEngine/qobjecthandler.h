@@ -139,7 +139,12 @@ public:
 
     template <typename Func1>
     inline typename QtPrivate::QEnableIf<!QtPrivate::FunctionPointer<Func1>::IsPointerToMemberFunction &&
-                                         !QtPrivate::is_same<const char*, Func1>::value, void>::Type
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
+                                             !std::is_same<const char*, Func1>::value,
+#else
+                                             !QtPrivate::is_same<const char*, Func1>::value,
+#endif
+                                         void>::Type
             registerMethod(const QString &name, QObject *context, Func1 slot, bool readAll = true) {
 
         // There is an easier way to do this but then the header wouldn't
