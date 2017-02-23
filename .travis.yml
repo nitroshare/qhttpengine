@@ -13,7 +13,7 @@ install:
   - sudo apt-get install -qq cmake qt58base
 
 before_script:
-  - export PATH=$PATH:/opt/qt57/bin
+  - export PATH=$PATH:/opt/qt58/bin
 
 script:
   - cmake -DBUILD_TESTS=on .
