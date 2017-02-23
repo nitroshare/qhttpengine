@@ -10,7 +10,7 @@ compiler:
 install:
   - sudo add-apt-repository -y ppa:beineri/opt-qt58-trusty
   - sudo apt-get update -qq
-  - sudo apt-get install -qq cmake qt57base
+  - sudo apt-get install -qq cmake qt58base
 
 before_script:
   - export PATH=$PATH:/opt/qt57/bin
