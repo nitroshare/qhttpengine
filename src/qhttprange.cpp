@@ -26,17 +26,17 @@
 
 #include "qhttprange_p.h"
 
+QHttpRangePrivate::QHttpRangePrivate(QHttpRange *range)
+    : q(range)
+{
+}
+
 QHttpRange::QHttpRange()
     : d(new QHttpRangePrivate(this))
 {
     d->from = 1;
     d->to = 0;
     d->dataSize = -1;
-}
-
-QHttpRangePrivate::QHttpRangePrivate(QHttpRange *range)
-    : q(range)
-{
 }
 
 QHttpRange::QHttpRange(const QString &range, qint64 dataSize)
