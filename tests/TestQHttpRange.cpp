@@ -286,6 +286,5 @@ void TestQHttpRange::testContentRange()
     QCOMPARE(range.contentRange(), contentRange);
 }
 
-
 QTEST_MAIN(TestQHttpRange)
 #include "TestQHttpRange.moc"
