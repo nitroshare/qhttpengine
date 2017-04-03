@@ -27,7 +27,7 @@
 #  include <sys/stat.h>
 #elif defined(Q_OS_WIN32)
 #  include <aclapi.h>
-#  include <fileapi.h>
+#  include <windows.h>
 #endif
 
 #include <QHttpEngine/QLocalFile>
