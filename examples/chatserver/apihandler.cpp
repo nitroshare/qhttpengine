@@ -20,45 +20,34 @@
  * IN THE SOFTWARE.
  */
 
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QVariantMap>
+
 #include "apihandler.h"
 
-QVariantMap ApiHandler::get_messages(const QVariantMap &query)
+void ApiHandler::messages(QHttpSocket *socket)
 {
-    // Ensure an index was supplied
-    if (!query.contains("index")) {
-        return QVariantMap();
-    }
-
-    int index = query.value("index").toInt();
-    QVariantList messages;
-
-    // Construct a list of all messages with an index higher than the one
-    // that was provided as a parameter
-    if (index >= -1 && index < mMessages.count()) {
-        for (QStringList::const_iterator i = mMessages.constBegin() + index + 1;
-                i != mMessages.constEnd(); ++i) {
-            QVariantMap data;
-            data.insert("index", i - mMessages.constBegin());
-            data.insert("message", *i);
-            messages.append(data);
-        }
-    }
-
-    // Return the list of messages
-    QVariantMap data;
-    data.insert("messages", messages);
-    return data;
+    QJsonObject object;
+    object.insert("messages", QJsonArray::fromStringList(mMessages));
+    socket->writeJson(QJsonDocument(object));
 }
 
 
-QVariantMap ApiHandler::post_newMessage(const QVariantMap &query, const QVariantMap &params)
+void ApiHandler::messagesNew(QHttpSocket *socket)
 {
-    // Ensure that a valid message was supplied
-    if (!params.contains("message")) {
-        return QVariantMap();
+    QJsonDocument document;
+    if (socket->readJson(document)) {
+        QVariantMap data = document.object().toVariantMap();
+        if (data.contains("message")) {
+            mMessages.append(data.value("message").toString());
+            socket->writeHeaders();
+            socket->close();
+            return;
+        }
     }
 
-    // Add the new message to the list
-    mMessages.append(params.value("message").toString());
-    return QVariantMap();
+    // If execution reaches this point, malformed data was supplied
+    socket->writeError(QHttpSocket::BadRequest);
 }

@@ -30,6 +30,7 @@
 #include <QHttpEngine/QFilesystemHandler>
 #include <QHttpEngine/QHttpHandler>
 #include <QHttpEngine/QHttpServer>
+#include <QHttpEngine/QObjectHandler>
 
 #include "apihandler.h"
 
@@ -66,7 +67,10 @@ int main(int argc, char * argv[])
     QFilesystemHandler handler(":/static");
     handler.addRedirect(QRegExp("^$"), "/index.html");
 
-    ApiHandler apiHandler;
+    ApiHandler renameMe;
+    QObjectHandler apiHandler;
+    apiHandler.registerMethod("messages", &renameMe, &ApiHandler::messages);
+    apiHandler.registerMethod("messages/new", &renameMe, &ApiHandler::messagesNew);
     handler.addSubHandler(QRegExp("api/"), &apiHandler);
 
     QHttpServer server(&handler);

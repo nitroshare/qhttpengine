@@ -1,25 +1,23 @@
 $(function() {
 
-    var index = -1,
-        $document = $(document),
+    var $document = $(document),
         $messages = $('.messages');
 
     // Retrieve all messages after the specified index
     function update() {
         $.ajax({
             url: '/api/messages',
-            data: {index: index},
             contentType: 'application/json',
             complete: function() {
                 window.setTimeout(update, 2000);
             },
             success: function(data) {
-                $.each(data.messages, function(i, e) {
+                $messages.empty();
+                $.each(data.messages, function() {
                     $('<div>')
                         .addClass('message')
-                        .text(e.message)
+                        .text(this)
                         .appendTo($messages);
-                    index = e.index;
                 });
                 $document.scrollTop(10000);
             }
@@ -30,10 +28,10 @@ $(function() {
 
     // Find the message input box and set the appropriate handler for [enter]
     var $input = $('#input').focus().keypress(function(e) {
-        if(e.which == 13) {
+        if(e.which === 13) {
             $.ajax({
                 type: 'POST',
-                url: '/api/newMessage',
+                url: '/api/messages/new',
                 data: JSON.stringify({message: $(this).val()}),
                 contentType: 'application/json'
             });

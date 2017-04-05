@@ -23,19 +23,19 @@
 #ifndef CHAT_APIHANDLER_H
 #define CHAT_APIHANDLER_H
 
+#include <QObject>
 #include <QStringList>
-#include <QVariantMap>
 
-#include <QHttpEngine/QObjectHandler>
+#include <QHttpEngine/QHttpSocket>
 
-class ApiHandler : public QObjectHandler
+class ApiHandler : public QObject
 {
     Q_OBJECT
 
 public Q_SLOTS:
 
-    QVariantMap get_messages(const QVariantMap &query);
-    QVariantMap post_newMessage(const QVariantMap &query, const QVariantMap &params);
+    void messages(QHttpSocket *socket);
+    void messagesNew(QHttpSocket *socket);
 
 private:
 
