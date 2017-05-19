@@ -122,6 +122,7 @@ void QFilesystemHandlerPrivate::processFile(QHttpSocket *socket, const QString &
 
     // Start the copy
     copier->start();
+    socket->close();
 }
 
 void QFilesystemHandlerPrivate::processDirectory(QHttpSocket *socket, const QString &path, const QString &absolutePath)
