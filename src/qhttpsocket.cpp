@@ -26,7 +26,7 @@
 #include <QJsonParseError>
 #include <QTcpSocket>
 
-#include <QHttpEngine/QHttpParser>
+#include <qhttpengine/qhttpparser.h>
 
 #include "qhttpsocket_p.h"
 

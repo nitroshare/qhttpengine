@@ -30,7 +30,7 @@
 #include <QNetworkReply>
 #include <QUrl>
 
-#include <QHttpEngine/QLocalFile>
+#include <qhttpengine/qlocalfile.h>
 
 int main(int argc, char * argv[])
 {

@@ -23,8 +23,8 @@
 #include <QGenericArgument>
 #include <QMetaMethod>
 
-#include <QHttpEngine/QHttpSocket>
-#include <QHttpEngine/QObjectHandler>
+#include <qhttpengine/qhttpsocket.h>
+#include <qhttpengine/qobjecthandler.h>
 
 #include "qobjecthandler_p.h"
 

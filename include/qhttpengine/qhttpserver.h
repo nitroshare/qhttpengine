@@ -38,7 +38,6 @@ class QHTTPENGINE_EXPORT QHttpServerPrivate;
 
 /**
  * @brief TCP server for HTTP requests
- * @headerfile qhttpserver.h QHttpEngine/QHttpServer
  *
  * This class provides a TCP server that listens for HTTP requests on the
  * specified address and port. When a new request is received, a QHttpSocket

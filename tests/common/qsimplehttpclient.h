@@ -27,8 +27,8 @@
 #include <QObject>
 #include <QTcpSocket>
 
-#include <QHttpEngine/QHttpParser>
-#include <QHttpEngine/QHttpSocket>
+#include <qhttpengine/qhttpparser.h>
+#include <qhttpengine/qhttpsocket.h>
 
 /**
  * @brief Simple HTTP client for testing purposes

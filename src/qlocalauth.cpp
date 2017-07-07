@@ -24,8 +24,8 @@
 #include <QJsonObject>
 #include <QUuid>
 
-#include <QHttpEngine/QHttpSocket>
-#include <QHttpEngine/QLocalAuth>
+#include <qhttpengine/qhttpsocket.h>
+#include <qhttpengine/qlocalauth.h>
 
 #include "qlocalauth_p.h"
 

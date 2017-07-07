@@ -24,10 +24,10 @@
 #include <QObject>
 #include <QTest>
 
-#include <QHttpEngine/QHttpServer>
-#include <QHttpEngine/QHttpSocket>
-#include <QHttpEngine/QObjectHandler>
-#include <QHttpEngine/QProxyHandler>
+#include <qhttpengine/qhttpserver.h>
+#include <qhttpengine/qhttpsocket.h>
+#include <qhttpengine/qobjecthandler.h>
+#include <qhttpengine/qproxyhandler.h>
 
 #include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"

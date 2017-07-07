@@ -23,8 +23,8 @@
 #include <QRegExp>
 #include <QTest>
 
-#include <QHttpEngine/QHttpSocket>
-#include <QHttpEngine/QHttpHandler>
+#include <qhttpengine/qhttpsocket.h>
+#include <qhttpengine/qhttphandler.h>
 
 #include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"

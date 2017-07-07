@@ -30,7 +30,7 @@
 #  include <windows.h>
 #endif
 
-#include <QHttpEngine/QLocalFile>
+#include <qhttpengine/qlocalfile.h>
 
 #include "qlocalfile_p.h"
 

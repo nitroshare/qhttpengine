@@ -20,7 +20,7 @@
  * IN THE SOFTWARE.
  */
 
-#include <QHttpEngine/QProxyHandler>
+#include <qhttpengine/qproxyhandler.h>
 
 #include "qproxyhandler_p.h"
 #include "qproxysocket.h"

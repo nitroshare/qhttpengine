@@ -32,8 +32,8 @@
 #  include <QSslSocket>
 #endif
 
-#include <QHttpEngine/QHttpServer>
-#include <QHttpEngine/QHttpHandler>
+#include <qhttpengine/qhttpserver.h>
+#include <qhttpengine/qhttphandler.h>
 
 #include "common/qsimplehttpclient.h"
 

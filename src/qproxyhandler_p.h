@@ -26,7 +26,7 @@
 #include <QHostAddress>
 #include <QObject>
 
-#include <QHttpEngine/QHttpSocket>
+#include <qhttpengine/qhttpsocket.h>
 
 class QProxyHandlerPrivate : public QObject
 {

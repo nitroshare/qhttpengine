@@ -30,7 +30,7 @@
 #  include <QSslConfiguration>
 #endif
 
-#include <QHttpEngine/QHttpServer>
+#include <qhttpengine/qhttpserver.h>
 
 class QHttpHandler;
 

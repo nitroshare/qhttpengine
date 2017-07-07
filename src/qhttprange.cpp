@@ -22,7 +22,7 @@
 
 #include <QRegExp>
 
-#include <QHttpEngine/QHttpRange>
+#include <qhttpengine/qhttprange.h>
 
 #include "qhttprange_p.h"
 

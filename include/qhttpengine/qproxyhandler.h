@@ -25,7 +25,7 @@
 
 #include <QHostAddress>
 
-#include <QHttpEngine/QHttpHandler>
+#include <qhttpengine/qhttphandler.h>
 
 #include "qhttpengine_global.h"
 

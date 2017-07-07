@@ -25,13 +25,12 @@
 
 #include <QList>
 
-#include <QHttpEngine/QHttpSocket>
+#include <qhttpengine/qhttpsocket.h>
 
 #include "qhttpengine_global.h"
 
 /**
  * @brief Utility methods for parsing HTTP requests and responses
- * @headerfile qhttpparser.h QHttpEngine/QHttpParser
  *
  * This class provides a set of static methods for parsing HTTP request and
  * response headers. Functionality is broken up into smaller methods in order

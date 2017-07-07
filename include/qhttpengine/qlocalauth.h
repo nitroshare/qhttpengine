@@ -25,7 +25,7 @@
 
 #include <QVariantMap>
 
-#include <QHttpEngine/QHttpMiddleware>
+#include <qhttpengine/qhttpmiddleware.h>
 
 #include "qhttpengine_global.h"
 

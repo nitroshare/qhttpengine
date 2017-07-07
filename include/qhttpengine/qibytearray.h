@@ -31,7 +31,6 @@
 
 /**
  * @brief Case-insensitive subclass of QByteArray
- * @headerfile qibytearray.h QHttpEngine/QIByteArray
  *
  * The QIByteArray is identical to the QByteArray class in all aspects except
  * that it performs comparisons in a case-insensitive manner.

@@ -27,8 +27,8 @@
 #include <QTemporaryDir>
 #include <QTest>
 
-#include <QHttpEngine/QHttpSocket>
-#include <QHttpEngine/QFilesystemHandler>
+#include <qhttpengine/qhttpsocket.h>
+#include <qhttpengine/qfilesystemhandler.h>
 
 #include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"

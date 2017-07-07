@@ -20,9 +20,9 @@
  * IN THE SOFTWARE.
  */
 
-#include <QHttpEngine/QHttpHandler>
-#include <QHttpEngine/QHttpMiddleware>
-#include <QHttpEngine/QHttpSocket>
+#include <qhttpengine/qhttphandler.h>
+#include <qhttpengine/qhttpmiddleware.h>
+#include <qhttpengine/qhttpsocket.h>
 
 #include "qhttphandler_p.h"
 

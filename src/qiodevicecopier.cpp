@@ -23,7 +23,7 @@
 #include <QIODevice>
 #include <QTimer>
 
-#include <QHttpEngine/QIODeviceCopier>
+#include <qhttpengine/qiodevicecopier.h>
 
 #include "qiodevicecopier_p.h"
 

@@ -34,7 +34,6 @@ class QHTTPENGINE_EXPORT QHttpHandlerPrivate;
 
 /**
  * @brief Base class for HTTP handlers
- * @headerfile qhttphandler.h QHttpEngine/QHttpHandler
  *
  * When a request is received by a QHttpServer, it invokes the route() method
  * of the root handler which is used to determine what happens to the request.

@@ -24,7 +24,7 @@
 #include <QString>
 #include <QTest>
 
-#include <QHttpEngine/QHttpRange>
+#include <qhttpengine/qhttprange.h>
 
 class TestQHttpRange : public QObject
 {

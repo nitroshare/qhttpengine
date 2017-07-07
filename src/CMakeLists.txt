@@ -1,6 +1,6 @@
 configure_file(qhttpengine_global.h.in "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine_global.h")
 
-file(GLOB HEADERS "${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/*")
+file(GLOB HEADERS "${CMAKE_SOURCE_DIR}/include/qhttpengine/*")
 set(HEADERS "${HEADERS}" "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine_global.h")
 
 set(SRC

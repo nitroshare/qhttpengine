@@ -24,8 +24,8 @@
 #  include <QSslSocket>
 #endif
 
-#include <QHttpEngine/QHttpHandler>
-#include <QHttpEngine/QHttpSocket>
+#include <qhttpengine/qhttphandler.h>
+#include <qhttpengine/qhttpsocket.h>
 
 #include "qhttpserver_p.h"
 

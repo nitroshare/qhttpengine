@@ -31,7 +31,6 @@ class QHTTPENGINE_EXPORT QHttpRangePrivate;
 
 /**
  * @brief HTTP range representation
- * @headerfile qhttprange.h QHttpEngine/QHttpRange
  *
  * This class provides a representation of HTTP range, described in RFC 7233
  * and used when partial content is requested by the client. When an object is

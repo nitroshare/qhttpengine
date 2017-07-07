@@ -26,7 +26,7 @@
 #include <QObject>
 #include <QVariantMap>
 
-#include <QHttpEngine/QLocalFile>
+#include <qhttpengine/qlocalfile.h>
 
 class QLocalAuthPrivate : public QObject
 {

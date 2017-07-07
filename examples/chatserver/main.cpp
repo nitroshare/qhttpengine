@@ -27,10 +27,10 @@
 #include <QRegExp>
 #include <QStringList>
 
-#include <QHttpEngine/QFilesystemHandler>
-#include <QHttpEngine/QHttpHandler>
-#include <QHttpEngine/QHttpServer>
-#include <QHttpEngine/QObjectHandler>
+#include <qhttpengine/qfilesystemhandler.h>
+#include <qhttpengine/qhttphandler.h>
+#include <qhttpengine/qhttpserver.h>
+#include <qhttpengine/qobjecthandler.h>
 
 #include "apihandler.h"
 

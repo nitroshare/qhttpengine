@@ -25,9 +25,9 @@
 #include <QFileInfoList>
 #include <QUrl>
 
-#include <QHttpEngine/QFilesystemHandler>
-#include <QHttpEngine/QHttpRange>
-#include <QHttpEngine/QIODeviceCopier>
+#include <qhttpengine/qfilesystemhandler.h>
+#include <qhttpengine/qhttprange.h>
+#include <qhttpengine/qiodevicecopier.h>
 
 #include "qfilesystemhandler_p.h"
 

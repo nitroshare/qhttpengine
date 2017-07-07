@@ -23,7 +23,7 @@
 #ifndef QHTTPENGINE_QOBJECTHANDLER_H
 #define QHTTPENGINE_QOBJECTHANDLER_H
 
-#include <QHttpEngine/QHttpHandler>
+#include <qhttpengine/qhttphandler.h>
 
 #include "qhttpengine_global.h"
 
@@ -32,7 +32,6 @@ class QHTTPENGINE_EXPORT QObjectHandlerPrivate;
 
 /**
  * @brief Handler for invoking slots
- * @headerfile qobjecthandler.h QHttpEngine/QObjectHandler
  *
  * This handler enables incoming requests to be processed by slots in a
  * QObject-derived class or functor. Methods are registered by providing a

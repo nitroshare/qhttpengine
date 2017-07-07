@@ -23,7 +23,7 @@
 #ifndef QHTTPENGINE_QHTTPSOCKETPRIVATE_H
 #define QHTTPENGINE_QHTTPSOCKETPRIVATE_H
 
-#include <QHttpEngine/QHttpSocket>
+#include <qhttpengine/qhttpsocket.h>
 
 class QTcpSocket;
 
