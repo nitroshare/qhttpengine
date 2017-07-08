@@ -33,12 +33,12 @@ ProxyHandlerPrivate::ProxyHandlerPrivate(QObject *parent, const QHostAddress &ad
 }
 
 ProxyHandler::ProxyHandler(const QHostAddress &address, quint16 port, QObject *parent)
-    : HttpHandler(parent),
+    : Handler(parent),
       d(new ProxyHandlerPrivate(this, address, port))
 {
 }
 
-void ProxyHandler::process(HttpSocket *socket, const QString &path)
+void ProxyHandler::process(Socket *socket, const QString &path)
 {
     // Parent the socket to the proxy
     socket->setParent(this);

@@ -20,17 +20,18 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPHANDLER_H
-#define QHTTPENGINE_QHTTPHANDLER_H
+#ifndef QHTTPENGINE_HANDLER_H
+#define QHTTPENGINE_HANDLER_H
 
 #include <QObject>
 
 #include "qhttpengine_global.h"
 
 class QRegExp;
-class HttpMiddleware;
-class HttpSocket;
-class QHTTPENGINE_EXPORT HttpHandlerPrivate;
+class Middleware;
+class Socket;
+
+class QHTTPENGINE_EXPORT HandlerPrivate;
 
 /**
  * @brief Base class for HTTP handlers
@@ -68,7 +69,7 @@ class QHTTPENGINE_EXPORT HttpHandlerPrivate;
  * the request or write an error to the socket. The default implementation of
  * process() simply returns an HTTP 404 error.
  */
-class QHTTPENGINE_EXPORT HttpHandler : public QObject
+class QHTTPENGINE_EXPORT Handler : public QObject
 {
     Q_OBJECT
 
@@ -77,12 +78,12 @@ public:
     /**
      * @brief Base constructor for a handler
      */
-    explicit HttpHandler(QObject *parent = 0);
+    explicit Handler(QObject *parent = 0);
 
     /**
      * @brief Add middleware to the handler
      */
-    void addMiddleware(HttpMiddleware *middleware);
+    void addMiddleware(Middleware *middleware);
 
     /**
      * @brief Add a redirect for a specific pattern
@@ -103,12 +104,12 @@ public:
      * used when the route() method is invoked to determine whether the
      * request matches any patterns. The order of the list is preserved.
      */
-    void addSubHandler(const QRegExp &pattern, HttpHandler *handler);
+    void addSubHandler(const QRegExp &pattern, Handler *handler);
 
     /**
      * @brief Route an incoming request
      */
-    void route(HttpSocket *socket, const QString &path);
+    void route(Socket *socket, const QString &path);
 
 protected:
 
@@ -119,12 +120,12 @@ protected:
      * a redirect with QHttpSocket::writeRedirect(), or writing an error to
      * the socket using QHttpSocket::writeError().
      */
-    virtual void process(HttpSocket *socket, const QString &path);
+    virtual void process(Socket *socket, const QString &path);
 
 private:
 
-    HttpHandlerPrivate *const d;
-    friend class HttpHandlerPrivate;
+    HandlerPrivate *const d;
+    friend class HandlerPrivate;
 };
 
-#endif // QHTTPENGINE_QHTTPHANDLER_H
+#endif // QHTTPENGINE_HANDLER_H

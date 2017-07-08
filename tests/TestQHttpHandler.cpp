@@ -29,13 +29,13 @@
 #include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"
 
-class DummyHandler : public HttpHandler
+class DummyHandler : public Handler
 {
     Q_OBJECT
 
 public:
 
-    virtual void process(HttpSocket *socket, const QString &path) {
+    virtual void process(Socket *socket, const QString &path) {
         mPathRemainder = path;
         socket->writeHeaders();
         socket->close();
@@ -69,20 +69,20 @@ void TestQHttpHandler::testRedirect_data()
             << QRegExp("\\w+")
             << QString("/two")
             << QByteArray("one")
-            << static_cast<int>(HttpSocket::Found)
+            << static_cast<int>(Socket::Found)
             << QByteArray("/two");
 
     QTest::newRow("no match")
             << QRegExp("\\d+")
             << QString("")
             << QByteArray("test")
-            << static_cast<int>(HttpSocket::NotFound);
+            << static_cast<int>(Socket::NotFound);
 
     QTest::newRow("captured texts")
             << QRegExp("(\\d+)")
             << QString("/path/%1")
             << QByteArray("123")
-            << static_cast<int>(HttpSocket::Found)
+            << static_cast<int>(Socket::Found)
             << QByteArray("/path/123");
 }
 
@@ -97,18 +97,18 @@ void TestQHttpHandler::testRedirect()
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    HttpSocket socket(pair.server(), &pair);
+    Socket socket(pair.server(), &pair);
 
     client.sendHeaders("GET", path);
     QTRY_VERIFY(socket.isHeadersParsed());
 
-    HttpHandler handler;
+    Handler handler;
     handler.addRedirect(pattern, destination);
     handler.route(&socket, socket.path());
 
     QTRY_COMPARE(client.statusCode(), statusCode);
 
-    if (statusCode == HttpSocket::Found) {
+    if (statusCode == Socket::Found) {
         QFETCH(QByteArray, location);
         QCOMPARE(client.headers().value("Location"), location);
     }
@@ -125,19 +125,19 @@ void TestQHttpHandler::testSubHandler_data()
             << QRegExp("\\w+")
             << QByteArray("test")
             << QString("")
-            << static_cast<int>(HttpSocket::OK);
+            << static_cast<int>(Socket::OK);
 
     QTest::newRow("no match")
             << QRegExp("\\d+")
             << QByteArray("test")
             << QString("")
-            << static_cast<int>(HttpSocket::NotFound);
+            << static_cast<int>(Socket::NotFound);
 
     QTest::newRow("path")
             << QRegExp("one/")
             << QByteArray("one/two")
             << QString("two")
-            << static_cast<int>(HttpSocket::OK);
+            << static_cast<int>(Socket::OK);
 }
 
 void TestQHttpHandler::testSubHandler()
@@ -151,13 +151,13 @@ void TestQHttpHandler::testSubHandler()
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    HttpSocket socket(pair.server(), &pair);
+    Socket socket(pair.server(), &pair);
 
     client.sendHeaders("GET", path);
     QTRY_VERIFY(socket.isHeadersParsed());
 
     DummyHandler subHandler;
-    HttpHandler handler;
+    Handler handler;
     handler.addSubHandler(pattern, &subHandler);
 
     handler.route(&socket, socket.path());

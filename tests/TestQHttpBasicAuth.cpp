@@ -49,7 +49,7 @@ private Q_SLOTS:
 
 private:
 
-    HttpBasicAuth auth;
+    BasicAuthMiddleware auth;
 };
 
 void TestQHttpBasicAuth::initTestCase()
@@ -68,19 +68,19 @@ void TestQHttpBasicAuth::testProcess_data()
             << false
             << QString()
             << QString()
-            << static_cast<int>(HttpSocket::Unauthorized);
+            << static_cast<int>(Socket::Unauthorized);
 
     QTest::newRow("invalid credentials")
             << true
             << Username
             << QString()
-            << static_cast<int>(HttpSocket::Unauthorized);
+            << static_cast<int>(Socket::Unauthorized);
 
     QTest::newRow("valid credentials")
             << true
             << Username
             << Password
-            << static_cast<int>(HttpSocket::NotFound);
+            << static_cast<int>(Socket::NotFound);
 }
 
 void TestQHttpBasicAuth::testProcess()
@@ -94,9 +94,9 @@ void TestQHttpBasicAuth::testProcess()
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    HttpSocket socket(pair.server(), &pair);
+    Socket socket(pair.server(), &pair);
 
-    HttpSocket::HeaderMap headers;
+    Socket::HeaderMap headers;
 
     if (header) {
         headers.insert(
@@ -108,7 +108,7 @@ void TestQHttpBasicAuth::testProcess()
     client.sendHeaders("GET", "/", headers);
     QTRY_VERIFY(socket.isHeadersParsed());
 
-    HttpHandler handler;
+    Handler handler;
     handler.addMiddleware(&auth);
     handler.route(&socket, "/");
 

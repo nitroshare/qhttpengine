@@ -20,8 +20,8 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPSOCKET_H
-#define QHTTPENGINE_QHTTPSOCKET_H
+#ifndef QHTTPENGINE_SOCKET_H
+#define QHTTPENGINE_SOCKET_H
 
 #include <QHostAddress>
 #include <QMultiMap>
@@ -33,7 +33,7 @@
 
 class QJsonDocument;
 class QTcpSocket;
-class QHTTPENGINE_EXPORT HttpSocketPrivate;
+class QHTTPENGINE_EXPORT SocketPrivate;
 
 /**
  * @brief Implementation of the HTTP protocol
@@ -89,7 +89,7 @@ class QHTTPENGINE_EXPORT HttpSocketPrivate;
  * status code to the writeError() method. Both methods will close the socket
  * once the response is written.
  */
-class QHTTPENGINE_EXPORT HttpSocket : public QIODevice
+class QHTTPENGINE_EXPORT Socket : public QIODevice
 {
     Q_OBJECT
 
@@ -177,7 +177,7 @@ public:
      * This instance will assume ownership of the socket. That is, it will
      * make itself the parent of the socket.
      */
-    HttpSocket(QTcpSocket *socket, QObject *parent = 0);
+    Socket(QTcpSocket *socket, QObject *parent = 0);
 
     /**
      * @brief Retrieve the number of bytes available for reading
@@ -354,8 +354,8 @@ protected:
 
 private:
 
-    HttpSocketPrivate *const d;
-    friend class HttpSocketPrivate;
+    SocketPrivate *const d;
+    friend class SocketPrivate;
 };
 
-#endif // QHTTPENGINE_QHTTPSOCKET_H
+#endif // QHTTPENGINE_SOCKET_H

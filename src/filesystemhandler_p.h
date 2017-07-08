@@ -20,15 +20,15 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QFILESYSTEMHANDLERPRIVATE_H
-#define QHTTPENGINE_QFILESYSTEMHANDLERPRIVATE_H
+#ifndef QHTTPENGINE_FILESYSTEMHANDLER_P_H
+#define QHTTPENGINE_FILESYSTEMHANDLER_P_H
 
 #include <QDir>
 #include <QMimeDatabase>
 #include <QObject>
 
-#include <qhttpengine/filesystemhandler.h>
-#include <qhttpengine/socket.h>
+class FilesystemHandler;
+class Socket;
 
 class FilesystemHandlerPrivate : public QObject
 {
@@ -41,11 +41,11 @@ public:
     bool absolutePath(const QString &path, QString &absolutePath);
     QByteArray mimeType(const QString &path);
 
-    void processFile(HttpSocket*socket, const QString &absolutePath);
-    void processDirectory(HttpSocket*socket, const QString &path, const QString &absolutePath);
+    void processFile(Socket* socket, const QString &absolutePath);
+    void processDirectory(Socket* socket, const QString &path, const QString &absolutePath);
 
     QDir documentRoot;
     QMimeDatabase database;
 };
 
-#endif // QHTTPENGINE_QFILESYSTEMHANDLERPRIVATE_H
+#endif // QHTTPENGINE_FILESYSTEMHANDLER_P_H

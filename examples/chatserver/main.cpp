@@ -73,7 +73,7 @@ int main(int argc, char * argv[])
     apiHandler.registerMethod("messages/new", &renameMe, &ApiHandler::messagesNew);
     handler.addSubHandler(QRegExp("api/"), &apiHandler);
 
-    HttpServer server(&handler);
+    Server server(&handler);
 
     // Attempt to listen on the specified port
     if (!server.listen(address, port)) {

@@ -29,56 +29,56 @@
 
 #include "server_p.h"
 
-HttpServerPrivate::HttpServerPrivate(HttpServer *httpServer)
+ServerPrivate::ServerPrivate(Server *httpServer)
     : QObject(httpServer),
       q(httpServer),
       handler(0)
 {
 }
 
-void HttpServerPrivate::process(QTcpSocket *socket)
+void ServerPrivate::process(QTcpSocket *socket)
 {
-    HttpSocket *httpSocket = new HttpSocket(socket, this);
+    Socket *httpSocket = new Socket(socket, this);
 
     // Wait until the socket finishes reading the HTTP headers before routing
-    connect(httpSocket, &HttpSocket::headersParsed, [this, httpSocket]() {
+    connect(httpSocket, &Socket::headersParsed, [this, httpSocket]() {
         if (handler) {
             handler->route(httpSocket, QString(httpSocket->path().mid(1)));
         } else {
-            httpSocket->writeError(HttpSocket::InternalServerError);
+            httpSocket->writeError(Socket::InternalServerError);
         }
     });
 
     // Destroy the socket once the client is disconnected
-    connect(socket, &QTcpSocket::disconnected, httpSocket, &HttpSocket::deleteLater);
+    connect(socket, &QTcpSocket::disconnected, httpSocket, &Socket::deleteLater);
 }
 
-HttpServer::HttpServer(QObject *parent)
+Server::Server(QObject *parent)
     : QTcpServer(parent),
-      d(new HttpServerPrivate(this))
+      d(new ServerPrivate(this))
 {
 }
 
-HttpServer::HttpServer(HttpHandler *handler, QObject *parent)
+Server::Server(Handler *handler, QObject *parent)
     : QTcpServer(parent),
-      d(new HttpServerPrivate(this))
+      d(new ServerPrivate(this))
 {
     setHandler(handler);
 }
 
-void HttpServer::setHandler(HttpHandler *handler)
+void Server::setHandler(Handler *handler)
 {
     d->handler = handler;
 }
 
 #if !defined(QT_NO_SSL)
-void HttpServer::setSslConfiguration(const QSslConfiguration &configuration)
+void Server::setSslConfiguration(const QSslConfiguration &configuration)
 {
     d->configuration = configuration;
 }
 #endif
 
-void HttpServer::incomingConnection(qintptr socketDescriptor)
+void Server::incomingConnection(qintptr socketDescriptor)
 {
 #if !defined(QT_NO_SSL)
     if (!d->configuration.isNull()) {

@@ -20,8 +20,8 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QFILESYSTEMHANDLER_H
-#define QHTTPENGINE_QFILESYSTEMHANDLER_H
+#ifndef QHTTPENGINE_FILESYSTEMHANDLER_H
+#define QHTTPENGINE_FILESYSTEMHANDLER_H
 
 #include <qhttpengine/handler.h>
 
@@ -45,7 +45,7 @@ class QHTTPENGINE_EXPORT FilesystemHandlerPrivate;
  * can be modified after initialization. It is possible to use a resource
  * directory for the document root.
  */
-class QHTTPENGINE_EXPORT FilesystemHandler : public HttpHandler
+class QHTTPENGINE_EXPORT FilesystemHandler : public Handler
 {
     Q_OBJECT
 
@@ -74,7 +74,7 @@ protected:
     /**
      * @brief Reimplementation of QHttpHandler::process()
      */
-    virtual void process(HttpSocket *socket, const QString &path);
+    virtual void process(Socket *socket, const QString &path);
 
 private:
 
@@ -82,4 +82,4 @@ private:
     friend class FilesystemHandlerPrivate;
 };
 
-#endif // QHTTPENGINE_QFILESYSTEMHANDLER_H
+#endif // QHTTPENGINE_FILESYSTEMHANDLER_H

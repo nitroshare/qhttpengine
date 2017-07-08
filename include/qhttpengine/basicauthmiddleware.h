@@ -20,14 +20,14 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPBASICAUTH_H
-#define QHTTPENGINE_QHTTPBASICAUTH_H
+#ifndef QHTTPENGINE_BASICAUTHMIDDLEWARE_H
+#define QHTTPENGINE_BASICAUTHMIDDLEWARE_H
 
 #include <qhttpengine/middleware.h>
 
 #include "qhttpengine_global.h"
 
-class QHTTPENGINE_EXPORT HttpBasicAuthPrivate;
+class QHTTPENGINE_EXPORT BasicAuthMiddlewarePrivate;
 
 /**
  * @brief Middleware for HTTP basic authentication
@@ -38,18 +38,18 @@ class QHTTPENGINE_EXPORT HttpBasicAuthPrivate;
  * different method of authentication, override the verify() method in a
  * derived class.
  */
-class QHTTPENGINE_EXPORT HttpBasicAuth : public HttpMiddleware
+class QHTTPENGINE_EXPORT BasicAuthMiddleware : public Middleware
 {
     Q_OBJECT
 
 public:
 
     /**
-     * @brief Base constructor for the handler
+     * @brief Base constructor for the middleware
      *
      * The realm string is shown to a client when credentials are requested.
      */
-    HttpBasicAuth(const QString &realm, QObject *parent = Q_NULLPTR);
+    BasicAuthMiddleware(const QString &realm, QObject *parent = Q_NULLPTR);
 
     /**
      * @brief Add credentials to the list
@@ -65,7 +65,7 @@ public:
      * If the verify() method returns true, the client will be granted access
      * to the resources. Otherwise, 401 Unauthorized will be returned.
      */
-    virtual bool process(HttpSocket *socket);
+    virtual bool process(Socket *socket);
 
 protected:
 
@@ -76,7 +76,7 @@ protected:
 
 private:
 
-    HttpBasicAuthPrivate *const d;
+    BasicAuthMiddlewarePrivate *const d;
 };
 
-#endif // QHTTPENGINE_QHTTPBASICAUTH_H
+#endif // QHTTPENGINE_BASICAUTHMIDDLEWARE_H

@@ -48,13 +48,13 @@ void TestQProxyHandler::testDataPassthrough()
 {
     // Create the upstream handler (simple echo)
     QObjectHandler upstreamHandler;
-    upstreamHandler.registerMethod(Path, [](HttpSocket *socket) {
+    upstreamHandler.registerMethod(Path, [](Socket *socket) {
         socket->write(socket->readAll());
         socket->close();
     }, true);
 
     // Create the upstream server and begin listening
-    HttpServer upstreamServer(&upstreamHandler);
+    Server upstreamServer(&upstreamHandler);
     QVERIFY(upstreamServer.listen(QHostAddress::LocalHost));
 
     // Create the proxy handler
@@ -64,10 +64,10 @@ void TestQProxyHandler::testDataPassthrough()
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    HttpSocket socket(pair.server());
+    Socket socket(pair.server());
 
     // Send the headers and wait for them to be parsed
-    HttpSocket::HeaderMap headers{
+    Socket::HeaderMap headers{
         {"Content-Length", QByteArray::number(Data.length())}
     };
     client.sendHeaders("POST", QString("/%1").arg(Path).toUtf8(), headers);

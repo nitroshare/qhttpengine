@@ -20,8 +20,8 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QPROXYHANDLER_H
-#define QHTTPENGINE_QPROXYHANDLER_H
+#ifndef QHTTPENGINE_PROXYHANDLER_H
+#define QHTTPENGINE_PROXYHANDLER_H
 
 #include <QHostAddress>
 
@@ -34,7 +34,7 @@ class QHTTPENGINE_EXPORT ProxyHandlerPrivate;
 /**
  * @brief Handler that routes HTTP requests to an upstream server
  */
-class QHTTPENGINE_EXPORT ProxyHandler : public HttpHandler
+class QHTTPENGINE_EXPORT ProxyHandler : public Handler
 {
     Q_OBJECT
 
@@ -50,11 +50,11 @@ protected:
     /**
      * @brief Reimplementation of QHttpHandler::process()
      */
-    virtual void process(HttpSocket *socket, const QString &path);
+    virtual void process(Socket *socket, const QString &path);
 
 private:
 
     ProxyHandlerPrivate *const d;
 };
 
-#endif // QHTTPENGINE_QPROXYHANDLER_H
+#endif // QHTTPENGINE_PROXYHANDLER_H

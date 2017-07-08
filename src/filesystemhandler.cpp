@@ -27,6 +27,7 @@
 
 #include <qhttpengine/filesystemhandler.h>
 #include <qhttpengine/range.h>
+#include <qhttpengine/socket.h>
 #include <qhttpengine/qiodevicecopier.h>
 
 #include "filesystemhandler_p.h"
@@ -70,14 +71,14 @@ QByteArray FilesystemHandlerPrivate::mimeType(const QString &absolutePath)
     return database.mimeTypeForFile(absolutePath).name().toUtf8();
 }
 
-void FilesystemHandlerPrivate::processFile(HttpSocket *socket, const QString &absolutePath)
+void FilesystemHandlerPrivate::processFile(Socket *socket, const QString &absolutePath)
 {
     // Attempt to open the file for reading
     QFile *file = new QFile(absolutePath);
     if (!file->open(QIODevice::ReadOnly)) {
         delete file;
 
-        socket->writeError(HttpSocket::Forbidden);
+        socket->writeError(Socket::Forbidden);
         return;
     }
 
@@ -93,7 +94,7 @@ void FilesystemHandlerPrivate::processFile(HttpSocket *socket, const QString &ab
 
     // Checking for partial content request
     QByteArray rangeHeader = socket->headers().value("Range");
-    HttpRange range;
+    Range range;
 
     if (!rangeHeader.isEmpty() && rangeHeader.startsWith("bytes=")) {
         // Skiping 'bytes=' - first 6 chars and spliting ranges by comma
@@ -101,12 +102,12 @@ void FilesystemHandlerPrivate::processFile(HttpSocket *socket, const QString &ab
 
         // Taking only first range, as multiple ranges require multipart
         // reply support
-        range = HttpRange(QString(rangeList.at(0)), fileSize);
+        range = Range(QString(rangeList.at(0)), fileSize);
     }
 
     // If range is valid, send partial content
     if (range.isValid()) {
-        socket->setStatusCode(HttpSocket::PartialContent);
+        socket->setStatusCode(Socket::PartialContent);
         socket->setHeader("Content-Length", QByteArray::number(range.length()));
         socket->setHeader("Content-Range", QByteArray("bytes ") + range.contentRange().toLatin1());
         copier->setRange(range.from(), range.to());
@@ -124,7 +125,7 @@ void FilesystemHandlerPrivate::processFile(HttpSocket *socket, const QString &ab
     copier->start();
 }
 
-void FilesystemHandlerPrivate::processDirectory(HttpSocket *socket, const QString &path, const QString &absolutePath)
+void FilesystemHandlerPrivate::processDirectory(Socket *socket, const QString &path, const QString &absolutePath)
 {
     // Add entries for each of the files
     QString listing;
@@ -149,13 +150,13 @@ void FilesystemHandlerPrivate::processDirectory(HttpSocket *socket, const QStrin
 }
 
 FilesystemHandler::FilesystemHandler(QObject *parent)
-    : HttpHandler(parent),
+    : Handler(parent),
       d(new FilesystemHandlerPrivate(this))
 {
 }
 
 FilesystemHandler::FilesystemHandler(const QString &documentRoot, QObject *parent)
-    : HttpHandler(parent),
+    : Handler(parent),
       d(new FilesystemHandlerPrivate(this))
 {
     setDocumentRoot(documentRoot);
@@ -166,11 +167,11 @@ void FilesystemHandler::setDocumentRoot(const QString &documentRoot)
     d->documentRoot.setPath(documentRoot);
 }
 
-void FilesystemHandler::process(HttpSocket *socket, const QString &path)
+void FilesystemHandler::process(Socket *socket, const QString &path)
 {
     // If a document root is not set, an error has occurred
     if (d->documentRoot.path().isNull()) {
-        socket->writeError(HttpSocket::InternalServerError);
+        socket->writeError(Socket::InternalServerError);
         return;
     }
 
@@ -180,7 +181,7 @@ void FilesystemHandler::process(HttpSocket *socket, const QString &path)
     // Attempt to retrieve the absolute path
     QString absolutePath;
     if (!d->absolutePath(decodedPath, absolutePath)) {
-        socket->writeError(HttpSocket::NotFound);
+        socket->writeError(Socket::NotFound);
         return;
     }
 

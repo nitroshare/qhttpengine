@@ -20,20 +20,20 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPSOCKETPRIVATE_H
-#define QHTTPENGINE_QHTTPSOCKETPRIVATE_H
+#ifndef QHTTPENGINE_SOCKET_P_H
+#define QHTTPENGINE_SOCKET_P_H
 
 #include <qhttpengine/socket.h>
 
 class QTcpSocket;
 
-class HttpSocketPrivate : public QObject
+class SocketPrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    HttpSocketPrivate(HttpSocket *httpSocket, QTcpSocket *tcpSocket);
+    SocketPrivate(Socket *httpSocket, QTcpSocket *tcpSocket);
 
     QByteArray statusReason(int statusCode) const;
 
@@ -46,11 +46,11 @@ public:
         ReadFinished
     } readState;
 
-    HttpSocket::Method requestMethod;
+    Socket::Method requestMethod;
     QByteArray requestRawPath;
     QString requestPath;
-    HttpSocket::QueryStringMap requestQueryString;
-    HttpSocket::HeaderMap requestHeaders;
+    Socket::QueryStringMap requestQueryString;
+    Socket::HeaderMap requestHeaders;
     qint64 requestDataRead;
     qint64 requestDataTotal;
 
@@ -63,7 +63,7 @@ public:
 
     int responseStatusCode;
     QByteArray responseStatusReason;
-    HttpSocket::HeaderMap responseHeaders;
+    Socket::HeaderMap responseHeaders;
     qint64 responseHeaderRemaining;
 
 private Q_SLOTS:
@@ -76,7 +76,7 @@ private:
     bool readHeaders();
     void readData();
 
-    HttpSocket*const q;
+    Socket*const q;
 };
 
-#endif // QHTTPENGINE_QHTTPSOCKETPRIVATE_H
+#endif // QHTTPENGINE_SOCKET_P_H

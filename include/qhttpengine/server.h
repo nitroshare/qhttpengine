@@ -20,8 +20,8 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPSERVER_H
-#define QHTTPENGINE_QHTTPSERVER_H
+#ifndef QHTTPENGINE_SERVER_H
+#define QHTTPENGINE_SERVER_H
 
 #include <QHostAddress>
 #include <QObject>
@@ -33,8 +33,8 @@
 class QSslConfiguration;
 #endif
 
-class HttpHandler;
-class QHTTPENGINE_EXPORT HttpServerPrivate;
+class Handler;
+class QHTTPENGINE_EXPORT ServerPrivate;
 
 /**
  * @brief TCP server for HTTP requests
@@ -60,7 +60,7 @@ class QHTTPENGINE_EXPORT HttpServerPrivate;
  * signal is connected to the QHttpSocket's deleteLater() slot to ensure that
  * the socket is deleted when the client disconnects.
  */
-class QHTTPENGINE_EXPORT HttpServer : public QTcpServer
+class QHTTPENGINE_EXPORT Server : public QTcpServer
 {
     Q_OBJECT
 
@@ -69,17 +69,17 @@ public:
     /**
      * @brief Create an HTTP server
      */
-    explicit HttpServer(QObject *parent = 0);
+    explicit Server(QObject *parent = 0);
 
     /**
      * @brief Create an HTTP server with the specified handler
      */
-    HttpServer(HttpHandler *handler, QObject *parent = 0);
+    Server(Handler *handler, QObject *parent = 0);
 
     /**
      * @brief Set the root handler for all new requests
      */
-    void setHandler(HttpHandler *handler);
+    void setHandler(Handler *handler);
 
 #if !defined(QT_NO_SSL)
     /**
@@ -100,8 +100,8 @@ protected:
 
 private:
 
-    HttpServerPrivate *const d;
-    friend class HttpServerPrivate;
+    ServerPrivate *const d;
+    friend class ServerPrivate;
 };
 
-#endif // QHTTPENGINE_QHTTPSERVER_H
+#endif // QHTTPENGINE_SERVER_H

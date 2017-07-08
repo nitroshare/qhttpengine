@@ -20,8 +20,8 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QLOCALFILE_H
-#define QHTTPENGINE_QLOCALFILE_H
+#ifndef QHTTPENGINE_LOCALFILE_H
+#define QHTTPENGINE_LOCALFILE_H
 
 #include <QFile>
 
@@ -32,12 +32,12 @@ class QHTTPENGINE_EXPORT LocalFilePrivate;
 /**
  * @brief Locally accessible file
  *
- * QLocalFile uses platform-specific functions to create a file containing
+ * LocalFile uses platform-specific functions to create a file containing
  * information that will be accessible only to the local user. This is
  * typically used for storing authentication tokens:
  *
  * @code
- * QLocalFile file;
+ * LocalFile file;
  * if (file.open()) {
  *     file.write("private data");
  *     file.close();
@@ -75,4 +75,4 @@ private:
     friend class LocalFilePrivate;
 };
 
-#endif // QHTTPENGINE_QLOCALFILE_H
+#endif // QHTTPENGINE_LOCALFILE_H

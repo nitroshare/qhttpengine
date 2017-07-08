@@ -20,14 +20,14 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPRANGE_H
-#define QHTTPENGINE_QHTTPRANGE_H
+#ifndef QHTTPENGINE_RANGE_H
+#define QHTTPENGINE_RANGE_H
 
 #include <QString>
 
 #include "qhttpengine_global.h"
 
-class QHTTPENGINE_EXPORT HttpRangePrivate;
+class QHTTPENGINE_EXPORT RangePrivate;
 
 /**
  * @brief HTTP range representation
@@ -61,53 +61,53 @@ class QHTTPENGINE_EXPORT HttpRangePrivate;
  * @endcode
  *
  */
-class QHTTPENGINE_EXPORT HttpRange
+class QHTTPENGINE_EXPORT Range
 {
 public:
 
     /**
-     * @brief Default QHttpRange constructor
+     * @brief Create a new range
      *
-     * An empty QHttpRange is considered invalid.
+     * An empty Range is considered invalid.
      */
-    HttpRange();
+    Range();
 
     /**
-     * @brief Construct QHttpRange by parsing range
+     * @brief Construct a range from the provided string
      *
-     * Parses string representation range and constructs new QHttpRange.
+     * Parses string representation range and constructs new Range.
      * For raw header "Range: bytes=0-100" only "0-100" should be passed to
      * constructor. dataSize may be supplied so that relative ranges could be
      * represented as absolute values.
      */
-    HttpRange(const QString &range, qint64 dataSize = -1);
+    Range(const QString &range, qint64 dataSize = -1);
 
     /**
-     * @brief Construct QHttpRange, using from and to values
+     * @brief Construct a range from the provided offsets
      *
-     * Initialises a new QHttpRange with from and to values. dataSize may be
+     * Initialises a new Range with from and to values. dataSize may be
      * supplied so that relative ranges could be represented as
      * absolute values.
      */
-    HttpRange(qint64 from, qint64 to, qint64 dataSize = -1);
+    Range(qint64 from, qint64 to, qint64 dataSize = -1);
 
     /**
-     * @brief Construct QHttpRange from other QHttpRange and dataSize
+     * @brief Construct a range from the another range's offsets
      *
-     * Initialises a new QHttpRange with from and to values of other
+     * Initialises a new  Range with from and to values of other
      * QHttpRequest. Supplied dataSize is used instead of other dataSize.
      */
-    HttpRange(const HttpRange &other, qint64 dataSize);
+    Range(const Range &other, qint64 dataSize);
 
     /**
      * @brief Destroy the range
      */
-    ~HttpRange();
+    ~Range();
 
     /**
      * @brief Assignment operator
      */
-    HttpRange& operator=(const HttpRange &other);
+    Range& operator=(const Range &other);
 
     /**
      * @brief Return starting position of range
@@ -263,7 +263,7 @@ public:
 
 private:
 
-    HttpRangePrivate *const d;
+    RangePrivate *const d;
 };
 
-#endif // QHTTPENGINE_QHTTPRANGE_H
+#endif // QHTTPENGINE_RANGE_H

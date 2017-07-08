@@ -20,21 +20,21 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QLOCALAUTHPRIVATE_H
-#define QHTTPENGINE_QLOCALAUTHPRIVATE_H
+#ifndef QHTTPENGINE_LOCALAUTHMIDDLEWARE_P_H
+#define QHTTPENGINE_LOCALAUTHMIDDLEWARE_P_H
 
 #include <QObject>
 #include <QVariantMap>
 
 #include <qhttpengine/localfile.h>
 
-class LocalAuthPrivate : public QObject
+class LocalAuthMiddlewarePrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    explicit LocalAuthPrivate(QObject *parent);
+    explicit LocalAuthMiddlewarePrivate(QObject *parent);
 
     void updateFile();
 
@@ -44,4 +44,4 @@ public:
     QString token;
 };
 
-#endif // QHTTPENGINE_QLOCALAUTHPRIVATE_H
+#endif // QHTTPENGINE_LOCALAUTHMIDDLEWARE_P_H

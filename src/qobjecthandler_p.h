@@ -20,13 +20,13 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QOBJECTHANDLERPRIVATE_H
-#define QHTTPENGINE_QOBJECTHANDLERPRIVATE_H
+#ifndef QHTTPENGINE_QOBJECTHANDLER_P_H
+#define QHTTPENGINE_QOBJECTHANDLER_P_H
 
 #include <QMap>
 #include <QObject>
 
-class HttpSocket;
+class Socket;
 class QObjectHandler;
 
 class QObjectHandlerPrivate : public QObject
@@ -60,7 +60,7 @@ public:
         bool readAll;
     };
 
-    void invokeSlot(HttpSocket*socket, Method m);
+    void invokeSlot(Socket*socket, Method m);
 
     QMap<QString, Method> map;
 
@@ -69,4 +69,4 @@ private:
     QObjectHandler *const q;
 };
 
-#endif // QHTTPENGINE_QOBJECTHANDLERPRIVATE_H
+#endif // QHTTPENGINE_QOBJECTHANDLER_P_H

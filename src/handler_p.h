@@ -20,8 +20,8 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPHANDLERPRIVATE_H
-#define QHTTPENGINE_QHTTPHANDLERPRIVATE_H
+#ifndef QHTTPENGINE_HANDLER_P_H
+#define QHTTPENGINE_HANDLER_P_H
 
 #include <QList>
 #include <QObject>
@@ -31,23 +31,23 @@
 #include <qhttpengine/handler.h>
 
 typedef QPair<QRegExp, QString> Redirect;
-typedef QPair<QRegExp, HttpHandler*> SubHandler;
+typedef QPair<QRegExp, Handler*> SubHandler;
 
-class HttpHandlerPrivate : public QObject
+class HandlerPrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    explicit HttpHandlerPrivate(HttpHandler *handler);
+    explicit HandlerPrivate(Handler *handler);
 
     QList<Redirect> redirects;
     QList<SubHandler> subHandlers;
-    QList<HttpMiddleware*> middleware;
+    QList<Middleware*> middleware;
 
 private:
 
-    HttpHandler*const q;
+    Handler *const q;
 };
 
-#endif // QHTTPENGINE_QHTTPHANDLERPRIVATE_H
+#endif // QHTTPENGINE_HANDLER_P_H

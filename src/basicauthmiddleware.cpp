@@ -27,29 +27,29 @@
 
 #include "basicauthmiddleware_p.h"
 
-HttpBasicAuthPrivate::HttpBasicAuthPrivate(QObject *parent, const QString &realm)
+BasicAuthMiddlewarePrivate::BasicAuthMiddlewarePrivate(QObject *parent, const QString &realm)
     : QObject(parent),
       realm(realm)
 {
 }
 
-HttpBasicAuth::HttpBasicAuth(const QString &realm, QObject *parent)
-    : HttpMiddleware(parent),
-      d(new HttpBasicAuthPrivate(this, realm))
+BasicAuthMiddleware::BasicAuthMiddleware(const QString &realm, QObject *parent)
+    : Middleware(parent),
+      d(new BasicAuthMiddlewarePrivate(this, realm))
 {
 }
 
-void HttpBasicAuth::add(const QString &username, const QString &password)
+void BasicAuthMiddleware::add(const QString &username, const QString &password)
 {
     d->map.insert(username, password);
 }
 
-bool HttpBasicAuth::verify(const QString &username, const QString &password)
+bool BasicAuthMiddleware::verify(const QString &username, const QString &password)
 {
     return d->map.contains(username) && d->map.value(username) == password;
 }
 
-bool HttpBasicAuth::process(HttpSocket *socket)
+bool BasicAuthMiddleware::process(Socket *socket)
 {
     // Attempt to extract credentials from the header
     QByteArrayList headerParts = socket->headers().value("Authorization").split(' ');
@@ -57,7 +57,7 @@ bool HttpBasicAuth::process(HttpSocket *socket)
 
         // Decode the credentials and split into username/password
         QByteArrayList parts;
-        HttpParser::split(
+        Parser::split(
             QByteArray::fromBase64(headerParts.at(1)),
             ":", 1, parts
         );
@@ -70,6 +70,6 @@ bool HttpBasicAuth::process(HttpSocket *socket)
 
     // Otherwise, inform the client that valid credentials are required
     socket->setHeader("WWW-Authenticate", QString("Basic realm=\"%1\"").arg(d->realm).toUtf8());
-    socket->writeError(HttpSocket::Unauthorized);
+    socket->writeError(Socket::Unauthorized);
     return false;
 }

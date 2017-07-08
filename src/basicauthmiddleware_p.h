@@ -20,22 +20,22 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPBASICAUTHPRIVATE_H
-#define QHTTPENGINE_QHTTPBASICAUTHPRIVATE_H
+#ifndef QHTTPENGINE_BASICAUTHMIDDLEWARE_P_H
+#define QHTTPENGINE_BASICAUTHMIDDLEWARE_P_H
 
 #include <QMap>
 #include <QObject>
 
-class HttpBasicAuthPrivate : public QObject
+class BasicAuthMiddlewarePrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    explicit HttpBasicAuthPrivate(QObject *parent, const QString &realm);
+    explicit BasicAuthMiddlewarePrivate(QObject *parent, const QString &realm);
 
     const QString realm;
     QMap<QString, QString> map;
 };
 
-#endif // QHTTPENGINE_QHTTPBASICAUTHPRIVATE_H
+#endif // QHTTPENGINE_BASICAUTHMIDDLEWARE_P_H

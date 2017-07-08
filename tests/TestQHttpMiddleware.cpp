@@ -29,15 +29,15 @@
 #include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"
 
-class DummyMiddleware : public HttpMiddleware
+class DummyMiddleware : public Middleware
 {
     Q_OBJECT
 
 public:
 
-    virtual bool process(HttpSocket *socket)
+    virtual bool process(Socket *socket)
     {
-        socket->writeError(HttpSocket::Forbidden);
+        socket->writeError(Socket::Forbidden);
         return false;
     }
 };
@@ -57,17 +57,17 @@ void TestQHttpMiddleware::testProcess()
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    HttpSocket socket(pair.server(), &pair);
+    Socket socket(pair.server(), &pair);
 
     client.sendHeaders("GET", "/");
     QTRY_VERIFY(socket.isHeadersParsed());
 
     DummyMiddleware middleware;
-    HttpHandler handler;
+    Handler handler;
     handler.addMiddleware(&middleware);
     handler.route(&socket, "/");
 
-    QTRY_COMPARE(client.statusCode(), static_cast<int>(HttpSocket::Forbidden));
+    QTRY_COMPARE(client.statusCode(), static_cast<int>(Socket::Forbidden));
 }
 
 QTEST_MAIN(TestQHttpMiddleware)

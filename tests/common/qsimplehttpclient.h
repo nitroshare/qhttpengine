@@ -45,7 +45,7 @@ public:
 
     QSimpleHttpClient(QTcpSocket *socket);
 
-    void sendHeaders(const QByteArray &method, const QByteArray &path, const HttpSocket::HeaderMap &headers=HttpSocket::HeaderMap());
+    void sendHeaders(const QByteArray &method, const QByteArray &path, const Socket::HeaderMap &headers=Socket::HeaderMap());
     void sendData(const QByteArray &data);
 
     int statusCode() const {
@@ -56,7 +56,7 @@ public:
         return mStatusReason;
     }
 
-    HttpSocket::HeaderMap headers() const {
+    Socket::HeaderMap headers() const {
         return mHeaders;
     }
 
@@ -79,7 +79,7 @@ private:
 
     int mStatusCode;
     QByteArray mStatusReason;
-    HttpSocket::HeaderMap mHeaders;
+    Socket::HeaderMap mHeaders;
     QByteArray mData;
 };
 

@@ -69,7 +69,7 @@ int main(int argc, char * argv[])
 
     // Create the filesystem handler and server
     FilesystemHandler handler(dir);
-    HttpServer server(&handler);
+    Server server(&handler);
 
     // Attempt to listen on the specified port
     if (!server.listen(address, port)) {

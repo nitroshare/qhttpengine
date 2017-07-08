@@ -20,16 +20,16 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPRANGEPRIVATE_H
-#define QHTTPENGINE_QHTTPRANGEPRIVATE_H
+#ifndef QHTTPENGINE_RANGE_P_H
+#define QHTTPENGINE_RANGE_P_H
 
 #include <qhttpengine/range.h>
 
-class HttpRangePrivate
+class RangePrivate
 {
 public:
 
-    explicit HttpRangePrivate(HttpRange *range);
+    explicit RangePrivate(Range *range);
 
     qint64 from;
     qint64 to;
@@ -37,7 +37,7 @@ public:
 
 private:
 
-    HttpRange *const q;
+    Range *const q;
 };
 
-#endif // QHTTPENGINE_QHTTPRANGEPRIVATE_H
+#endif // QHTTPENGINE_RANGE_P_H

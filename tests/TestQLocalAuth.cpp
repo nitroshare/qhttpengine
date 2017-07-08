@@ -51,9 +51,9 @@ void TestQLocalAuth::testAuth()
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    HttpSocket socket(pair.server(), &pair);
+    Socket socket(pair.server(), &pair);
 
-    LocalAuth localAuth;
+    LocalAuthMiddleware localAuth;
     localAuth.setData(QVariantMap{
         {CustomName, CustomData}
     });
@@ -67,7 +67,7 @@ void TestQLocalAuth::testAuth()
     QVERIFY(data.contains("token"));
     QCOMPARE(data.value(CustomName).toByteArray(), CustomData);
 
-    client.sendHeaders("GET", "/", HttpSocket::HeaderMap{
+    client.sendHeaders("GET", "/", Socket::HeaderMap{
         {HeaderName, data.value("token").toByteArray()}
     });
     QTRY_VERIFY(socket.isHeadersParsed());

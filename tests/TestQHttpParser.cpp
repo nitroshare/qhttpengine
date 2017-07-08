@@ -30,9 +30,9 @@
 
 typedef QList<QByteArray> QByteArrayList;
 
-Q_DECLARE_METATYPE(HttpSocket::Method)
-Q_DECLARE_METATYPE(HttpSocket::QueryStringMap)
-Q_DECLARE_METATYPE(HttpSocket::HeaderMap)
+Q_DECLARE_METATYPE(Socket::Method)
+Q_DECLARE_METATYPE(Socket::QueryStringMap)
+Q_DECLARE_METATYPE(Socket::HeaderMap)
 
 const IByteArray Key1 = "a";
 const QByteArray Value1 = "b";
@@ -72,7 +72,7 @@ private Q_SLOTS:
 
 private:
 
-    HttpSocket::HeaderMap headers;
+    Socket::HeaderMap headers;
 };
 
 TestQHttpParser::TestQHttpParser()
@@ -127,7 +127,7 @@ void TestQHttpParser::testSplit()
     QFETCH(QByteArrayList, parts);
 
     QByteArrayList outParts;
-    HttpParser::split(data, delim, maxSplit, outParts);
+    Parser::split(data, delim, maxSplit, outParts);
 
     QCOMPARE(outParts, parts);
 }
@@ -136,29 +136,29 @@ void TestQHttpParser::testParsePath_data()
 {
     QTest::addColumn<QByteArray>("rawPath");
     QTest::addColumn<QString>("path");
-    QTest::addColumn<HttpSocket::QueryStringMap>("map");
+    QTest::addColumn<Socket::QueryStringMap>("map");
 
     QTest::newRow("no query string")
             << QByteArray("/path")
             << QString("/path")
-            << HttpSocket::QueryStringMap();
+            << Socket::QueryStringMap();
 
     QTest::newRow("single parameter")
             << QByteArray("/path?a=b")
             << QString("/path")
-            << HttpSocket::QueryStringMap{{"a", "b"}};
+            << Socket::QueryStringMap{{"a", "b"}};
 }
 
 void TestQHttpParser::testParsePath()
 {
     QFETCH(QByteArray, rawPath);
     QFETCH(QString, path);
-    QFETCH(HttpSocket::QueryStringMap, map);
+    QFETCH(Socket::QueryStringMap, map);
 
     QString outPath;
-    HttpSocket::QueryStringMap outMap;
+    Socket::QueryStringMap outMap;
 
-    QVERIFY(HttpParser::parsePath(rawPath, outPath, outMap));
+    QVERIFY(Parser::parsePath(rawPath, outPath, outMap));
 
     QCOMPARE(path, outPath);
     QCOMPARE(map, outMap);
@@ -168,7 +168,7 @@ void TestQHttpParser::testParseHeaderList_data()
 {
     QTest::addColumn<bool>("success");
     QTest::addColumn<QByteArrayList>("lines");
-    QTest::addColumn<HttpSocket::HeaderMap>("headers");
+    QTest::addColumn<Socket::HeaderMap>("headers");
 
     QTest::newRow("empty line")
             << false
@@ -185,11 +185,11 @@ void TestQHttpParser::testParseHeaderList()
     QFETCH(bool, success);
     QFETCH(QByteArrayList, lines);
 
-    HttpSocket::HeaderMap outHeaders;
-    QCOMPARE(HttpParser::parseHeaderList(lines, outHeaders), success);
+    Socket::HeaderMap outHeaders;
+    QCOMPARE(Parser::parseHeaderList(lines, outHeaders), success);
 
     if (success) {
-        QFETCH(HttpSocket::HeaderMap, headers);
+        QFETCH(Socket::HeaderMap, headers);
         QCOMPARE(outHeaders, headers);
     }
 }
@@ -216,9 +216,9 @@ void TestQHttpParser::testParseHeaders()
     QFETCH(QByteArray, data);
 
     QByteArrayList outParts;
-    HttpSocket::HeaderMap outHeaders;
+    Socket::HeaderMap outHeaders;
 
-    QCOMPARE(HttpParser::parseHeaders(data, outParts, outHeaders), success);
+    QCOMPARE(Parser::parseHeaders(data, outParts, outHeaders), success);
 
     if (success) {
         QFETCH(QByteArrayList, parts);
@@ -230,7 +230,7 @@ void TestQHttpParser::testParseRequestHeaders_data()
 {
     QTest::addColumn<bool>("success");
     QTest::addColumn<QByteArray>("data");
-    QTest::addColumn<HttpSocket::Method>("method");
+    QTest::addColumn<Socket::Method>("method");
     QTest::addColumn<QByteArray>("path");
 
     QTest::newRow("bad HTTP version")
@@ -240,7 +240,7 @@ void TestQHttpParser::testParseRequestHeaders_data()
     QTest::newRow("GET request")
             << true
             << QByteArray("GET / HTTP/1.0")
-            << HttpSocket::GET
+            << Socket::GET
             << QByteArray("/");
 }
 
@@ -249,14 +249,14 @@ void TestQHttpParser::testParseRequestHeaders()
     QFETCH(bool, success);
     QFETCH(QByteArray, data);
 
-    HttpSocket::Method outMethod;
+    Socket::Method outMethod;
     QByteArray outPath;
-    HttpSocket::HeaderMap outHeaders;
+    Socket::HeaderMap outHeaders;
 
-    QCOMPARE(HttpParser::parseRequestHeaders(data, outMethod, outPath, outHeaders), success);
+    QCOMPARE(Parser::parseRequestHeaders(data, outMethod, outPath, outHeaders), success);
 
     if (success) {
-        QFETCH(HttpSocket::Method, method);
+        QFETCH(Socket::Method, method);
         QFETCH(QByteArray, path);
 
         QCOMPARE(method, outMethod);
@@ -289,9 +289,9 @@ void TestQHttpParser::testParseResponseHeaders()
 
     int outStatusCode;
     QByteArray outStatusReason;
-    HttpSocket::HeaderMap outHeaders;
+    Socket::HeaderMap outHeaders;
 
-    QCOMPARE(HttpParser::parseResponseHeaders(data, outStatusCode, outStatusReason, outHeaders), success);
+    QCOMPARE(Parser::parseResponseHeaders(data, outStatusCode, outStatusReason, outHeaders), success);
 
     if (success) {
         QFETCH(int, statusCode);

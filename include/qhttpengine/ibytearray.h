@@ -20,8 +20,8 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QIBYTEARRAY_H
-#define QHTTPENGINE_QIBYTEARRAY_H
+#ifndef QHTTPENGINE_IBYTEARRAY_H
+#define QHTTPENGINE_IBYTEARRAY_H
 
 #include <cctype>
 
@@ -32,7 +32,7 @@
 /**
  * @brief Case-insensitive subclass of QByteArray
  *
- * The QIByteArray is identical to the QByteArray class in all aspects except
+ * The IByteArray is identical to the QByteArray class in all aspects except
  * that it performs comparisons in a case-insensitive manner.
  */
 class QHTTPENGINE_EXPORT IByteArray : public QByteArray
@@ -94,4 +94,4 @@ inline bool operator>=(const IByteArray &a1, const QByteArray &a2) { return a1.t
 inline bool operator>=(const QByteArray &a1, const IByteArray &a2) { return a1.toLower() >= a2.toLower(); }
 inline bool operator>=(const IByteArray &a1, const IByteArray &a2) { return a1.toLower() >= a2.toLower(); }
 
-#endif // QHTTPENGINE_QIBYTEARRAY_H
+#endif // QHTTPENGINE_IBYTEARRAY_H

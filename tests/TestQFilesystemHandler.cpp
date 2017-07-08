@@ -72,22 +72,22 @@ void TestQFilesystemHandler::testRequests_data()
 
     QTest::newRow("nonexistent resource")
             << "nonexistent"
-            << static_cast<int>(HttpSocket::NotFound)
+            << static_cast<int>(Socket::NotFound)
             << QByteArray();
 
     QTest::newRow("outside document root")
             << "../outside"
-            << static_cast<int>(HttpSocket::NotFound)
+            << static_cast<int>(Socket::NotFound)
             << QByteArray();
 
     QTest::newRow("inside document root")
             << "inside"
-            << static_cast<int>(HttpSocket::OK)
+            << static_cast<int>(Socket::OK)
             << Data;
 
     QTest::newRow("directory listing")
             << ""
-            << static_cast<int>(HttpSocket::OK)
+            << static_cast<int>(Socket::OK)
             << QByteArray();
 }
 
@@ -103,7 +103,7 @@ void TestQFilesystemHandler::testRequests()
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    HttpSocket socket(pair.server(), &pair);
+    Socket socket(pair.server(), &pair);
 
     handler.route(&socket, path);
 
@@ -124,37 +124,37 @@ void TestQFilesystemHandler::testRangeRequests_data()
 
     QTest::newRow("full file")
             << "inside" << ""
-            << static_cast<int>(HttpSocket::OK)
+            << static_cast<int>(Socket::OK)
             << ""
             << Data;
 
     QTest::newRow("range 0-2")
             << "inside" << "0-2"
-            << static_cast<int>(HttpSocket::PartialContent)
+            << static_cast<int>(Socket::PartialContent)
             << "bytes 0-2/4"
             << Data.mid(0, 3);
 
     QTest::newRow("range 1-2")
             << "inside" << "1-2"
-            << static_cast<int>(HttpSocket::PartialContent)
+            << static_cast<int>(Socket::PartialContent)
             << "bytes 1-2/4"
             << Data.mid(1, 2);
 
     QTest::newRow("skip first 1 byte")
             << "inside" << "1-"
-            << static_cast<int>(HttpSocket::PartialContent)
+            << static_cast<int>(Socket::PartialContent)
             << "bytes 1-3/4"
             << Data.mid(1);
 
     QTest::newRow("last 2 bytes")
             << "inside" << "-2"
-            << static_cast<int>(HttpSocket::PartialContent)
+            << static_cast<int>(Socket::PartialContent)
             << "bytes 2-3/4"
             << Data.mid(2);
 
     QTest::newRow("bad range request")
             << "inside" << "abcd"
-            << static_cast<int>(HttpSocket::OK)
+            << static_cast<int>(Socket::OK)
             << ""
             << Data;
 }
@@ -173,10 +173,10 @@ void TestQFilesystemHandler::testRangeRequests()
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    HttpSocket socket(pair.server(), &pair);
+    Socket socket(pair.server(), &pair);
 
     if (!range.isEmpty()) {
-        HttpSocket::HeaderMap inHeaders;
+        Socket::HeaderMap inHeaders;
         inHeaders.insert("Range", QByteArray("bytes=") + range.toUtf8());
         client.sendHeaders("GET", path.toUtf8(), inHeaders);
         QTRY_VERIFY(socket.isHeadersParsed());

@@ -20,8 +20,8 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPSERVERPRIVATE_H
-#define QHTTPENGINE_QHTTPSERVERPRIVATE_H
+#ifndef QHTTPENGINE_SERVER_P_H
+#define QHTTPENGINE_SERVER_P_H
 
 #include <QObject>
 #include <QTcpSocket>
@@ -32,19 +32,19 @@
 
 #include <qhttpengine/server.h>
 
-class HttpHandler;
+class Handler;
 
-class HttpServerPrivate : public QObject
+class ServerPrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    explicit HttpServerPrivate(HttpServer *httpServer);
+    explicit ServerPrivate(Server *httpServer);
 
     void process(QTcpSocket *socket);
 
-    HttpHandler*handler;
+    Handler *handler;
 
 #if !defined(QT_NO_SSL)
     QSslConfiguration configuration;
@@ -52,7 +52,7 @@ public:
 
 private:
 
-    HttpServer*const q;
+    Server *const q;
 };
 
-#endif // QHTTPENGINE_QHTTPSERVERPRIVATE_H
+#endif // QHTTPENGINE_SERVER_P_H
