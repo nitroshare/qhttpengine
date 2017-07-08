@@ -32,19 +32,19 @@
 
 #include <qhttpengine/qhttpserver.h>
 
-class QHttpHandler;
+class HttpHandler;
 
-class QHttpServerPrivate : public QObject
+class HttpServerPrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    explicit QHttpServerPrivate(QHttpServer *httpServer);
+    explicit HttpServerPrivate(HttpServer *httpServer);
 
     void process(QTcpSocket *socket);
 
-    QHttpHandler *handler;
+    HttpHandler*handler;
 
 #if !defined(QT_NO_SSL)
     QSslConfiguration configuration;
@@ -52,7 +52,7 @@ public:
 
 private:
 
-    QHttpServer *const q;
+    HttpServer*const q;
 };
 
 #endif // QHTTPENGINE_QHTTPSERVERPRIVATE_H

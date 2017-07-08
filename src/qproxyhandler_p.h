@@ -28,13 +28,13 @@
 
 #include <qhttpengine/qhttpsocket.h>
 
-class QProxyHandlerPrivate : public QObject
+class ProxyHandlerPrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    QProxyHandlerPrivate(QObject *parent, const QHostAddress &address, quint16 port);
+    ProxyHandlerPrivate(QObject *parent, const QHostAddress &address, quint16 port);
 
     QHostAddress address;
     quint16 port;

@@ -34,7 +34,7 @@
 
 #include "qlocalfile_p.h"
 
-QLocalFilePrivate::QLocalFilePrivate(QLocalFile *localFile)
+LocalFilePrivate::LocalFilePrivate(LocalFile *localFile)
     : QObject(localFile),
       q(localFile)
 {
@@ -43,7 +43,7 @@ QLocalFilePrivate::QLocalFilePrivate(QLocalFile *localFile)
     q->setFileName(QDir::home().absoluteFilePath("." + QCoreApplication::applicationName()));
 }
 
-bool QLocalFilePrivate::setPermission()
+bool LocalFilePrivate::setPermission()
 {
 #if defined(Q_OS_UNIX)
     return chmod(q->fileName().toUtf8().constData(), S_IRUSR | S_IWUSR) == 0;
@@ -87,7 +87,7 @@ bool QLocalFilePrivate::setPermission()
 #endif
 }
 
-bool QLocalFilePrivate::setHidden()
+bool LocalFilePrivate::setHidden()
 {
 #if defined(Q_OS_UNIX)
     // On Unix, anything beginning with a "." is hidden
@@ -100,13 +100,13 @@ bool QLocalFilePrivate::setHidden()
 #endif
 }
 
-QLocalFile::QLocalFile(QObject *parent)
+LocalFile::LocalFile(QObject *parent)
     : QFile(parent),
-      d(new QLocalFilePrivate(this))
+      d(new LocalFilePrivate(this))
 {
 }
 
-bool QLocalFile::open()
+bool LocalFile::open()
 {
     return QFile::open(QIODevice::WriteOnly) && d->setPermission() && d->setHidden();
 }

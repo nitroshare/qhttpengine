@@ -28,9 +28,9 @@
 #include "qhttpengine_global.h"
 
 class QRegExp;
-class QHttpMiddleware;
-class QHttpSocket;
-class QHTTPENGINE_EXPORT QHttpHandlerPrivate;
+class HttpMiddleware;
+class HttpSocket;
+class QHTTPENGINE_EXPORT HttpHandlerPrivate;
 
 /**
  * @brief Base class for HTTP handlers
@@ -68,7 +68,7 @@ class QHTTPENGINE_EXPORT QHttpHandlerPrivate;
  * the request or write an error to the socket. The default implementation of
  * process() simply returns an HTTP 404 error.
  */
-class QHTTPENGINE_EXPORT QHttpHandler : public QObject
+class QHTTPENGINE_EXPORT HttpHandler : public QObject
 {
     Q_OBJECT
 
@@ -77,12 +77,12 @@ public:
     /**
      * @brief Base constructor for a handler
      */
-    explicit QHttpHandler(QObject *parent = 0);
+    explicit HttpHandler(QObject *parent = 0);
 
     /**
      * @brief Add middleware to the handler
      */
-    void addMiddleware(QHttpMiddleware *middleware);
+    void addMiddleware(HttpMiddleware *middleware);
 
     /**
      * @brief Add a redirect for a specific pattern
@@ -103,12 +103,12 @@ public:
      * used when the route() method is invoked to determine whether the
      * request matches any patterns. The order of the list is preserved.
      */
-    void addSubHandler(const QRegExp &pattern, QHttpHandler *handler);
+    void addSubHandler(const QRegExp &pattern, HttpHandler *handler);
 
     /**
      * @brief Route an incoming request
      */
-    void route(QHttpSocket *socket, const QString &path);
+    void route(HttpSocket *socket, const QString &path);
 
 protected:
 
@@ -119,12 +119,12 @@ protected:
      * a redirect with QHttpSocket::writeRedirect(), or writing an error to
      * the socket using QHttpSocket::writeError().
      */
-    virtual void process(QHttpSocket *socket, const QString &path);
+    virtual void process(HttpSocket *socket, const QString &path);
 
 private:
 
-    QHttpHandlerPrivate *const d;
-    friend class QHttpHandlerPrivate;
+    HttpHandlerPrivate *const d;
+    friend class HttpHandlerPrivate;
 };
 
 #endif // QHTTPENGINE_QHTTPHANDLER_H

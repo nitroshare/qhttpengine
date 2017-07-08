@@ -68,8 +68,8 @@ int main(int argc, char * argv[])
     QString dir = parser.value(dirOption);
 
     // Create the filesystem handler and server
-    QFilesystemHandler handler(dir);
-    QHttpServer server(&handler);
+    FilesystemHandler handler(dir);
+    HttpServer server(&handler);
 
     // Attempt to listen on the specified port
     if (!server.listen(address, port)) {

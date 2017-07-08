@@ -27,37 +27,37 @@
 
 #include "qhttpbasicauth_p.h"
 
-QHttpBasicAuthPrivate::QHttpBasicAuthPrivate(QObject *parent, const QString &realm)
+HttpBasicAuthPrivate::HttpBasicAuthPrivate(QObject *parent, const QString &realm)
     : QObject(parent),
       realm(realm)
 {
 }
 
-QHttpBasicAuth::QHttpBasicAuth(const QString &realm, QObject *parent)
-    : QHttpMiddleware(parent),
-      d(new QHttpBasicAuthPrivate(this, realm))
+HttpBasicAuth::HttpBasicAuth(const QString &realm, QObject *parent)
+    : HttpMiddleware(parent),
+      d(new HttpBasicAuthPrivate(this, realm))
 {
 }
 
-void QHttpBasicAuth::add(const QString &username, const QString &password)
+void HttpBasicAuth::add(const QString &username, const QString &password)
 {
     d->map.insert(username, password);
 }
 
-bool QHttpBasicAuth::verify(const QString &username, const QString &password)
+bool HttpBasicAuth::verify(const QString &username, const QString &password)
 {
     return d->map.contains(username) && d->map.value(username) == password;
 }
 
-bool QHttpBasicAuth::process(QHttpSocket *socket)
+bool HttpBasicAuth::process(HttpSocket *socket)
 {
     // Attempt to extract credentials from the header
     QByteArrayList headerParts = socket->headers().value("Authorization").split(' ');
-    if (headerParts.count() == 2 && headerParts.at(0) == QIByteArray("Basic")) {
+    if (headerParts.count() == 2 && headerParts.at(0) == IByteArray("Basic")) {
 
         // Decode the credentials and split into username/password
         QByteArrayList parts;
-        QHttpParser::split(
+        HttpParser::split(
             QByteArray::fromBase64(headerParts.at(1)),
             ":", 1, parts
         );
@@ -70,6 +70,6 @@ bool QHttpBasicAuth::process(QHttpSocket *socket)
 
     // Otherwise, inform the client that valid credentials are required
     socket->setHeader("WWW-Authenticate", QString("Basic realm=\"%1\"").arg(d->realm).toUtf8());
-    socket->writeError(QHttpSocket::Unauthorized);
+    socket->writeError(HttpSocket::Unauthorized);
     return false;
 }

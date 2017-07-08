@@ -46,7 +46,7 @@ void TestQLocalFile::initTestCase()
 
 void TestQLocalFile::testOpen()
 {
-    QLocalFile file;
+    LocalFile file;
     QVERIFY(file.open());
     QVERIFY(file.remove());
 }

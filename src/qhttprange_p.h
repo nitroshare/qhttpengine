@@ -25,11 +25,11 @@
 
 #include <qhttpengine/qhttprange.h>
 
-class QHttpRangePrivate
+class HttpRangePrivate
 {
 public:
 
-    explicit QHttpRangePrivate(QHttpRange *range);
+    explicit HttpRangePrivate(HttpRange *range);
 
     qint64 from;
     qint64 to;
@@ -37,7 +37,7 @@ public:
 
 private:
 
-    QHttpRange *const q;
+    HttpRange *const q;
 };
 
 #endif // QHTTPENGINE_QHTTPRANGEPRIVATE_H

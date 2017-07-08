@@ -31,23 +31,23 @@
 #include <qhttpengine/qhttphandler.h>
 
 typedef QPair<QRegExp, QString> Redirect;
-typedef QPair<QRegExp, QHttpHandler*> SubHandler;
+typedef QPair<QRegExp, HttpHandler*> SubHandler;
 
-class QHttpHandlerPrivate : public QObject
+class HttpHandlerPrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    explicit QHttpHandlerPrivate(QHttpHandler *handler);
+    explicit HttpHandlerPrivate(HttpHandler *handler);
 
     QList<Redirect> redirects;
     QList<SubHandler> subHandlers;
-    QList<QHttpMiddleware*> middleware;
+    QList<HttpMiddleware*> middleware;
 
 private:
 
-    QHttpHandler *const q;
+    HttpHandler*const q;
 };
 
 #endif // QHTTPENGINE_QHTTPHANDLERPRIVATE_H

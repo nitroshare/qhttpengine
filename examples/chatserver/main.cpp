@@ -64,7 +64,7 @@ int main(int argc, char * argv[])
     quint16 port = parser.value(portOption).toInt();
 
     // Build the hierarchy of handlers
-    QFilesystemHandler handler(":/static");
+    FilesystemHandler handler(":/static");
     handler.addRedirect(QRegExp("^$"), "/index.html");
 
     ApiHandler renameMe;
@@ -73,7 +73,7 @@ int main(int argc, char * argv[])
     apiHandler.registerMethod("messages/new", &renameMe, &ApiHandler::messagesNew);
     handler.addSubHandler(QRegExp("api/"), &apiHandler);
 
-    QHttpServer server(&handler);
+    HttpServer server(&handler);
 
     // Attempt to listen on the specified port
     if (!server.listen(address, port)) {

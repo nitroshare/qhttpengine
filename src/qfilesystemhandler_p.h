@@ -30,19 +30,19 @@
 #include <qhttpengine/qfilesystemhandler.h>
 #include <qhttpengine/qhttpsocket.h>
 
-class QFilesystemHandlerPrivate : public QObject
+class FilesystemHandlerPrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    QFilesystemHandlerPrivate(QFilesystemHandler *handler);
+    FilesystemHandlerPrivate(FilesystemHandler *handler);
 
     bool absolutePath(const QString &path, QString &absolutePath);
     QByteArray mimeType(const QString &path);
 
-    void processFile(QHttpSocket *socket, const QString &absolutePath);
-    void processDirectory(QHttpSocket *socket, const QString &path, const QString &absolutePath);
+    void processFile(HttpSocket*socket, const QString &absolutePath);
+    void processDirectory(HttpSocket*socket, const QString &path, const QString &absolutePath);
 
     QDir documentRoot;
     QMimeDatabase database;

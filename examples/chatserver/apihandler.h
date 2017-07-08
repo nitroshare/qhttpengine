@@ -34,8 +34,8 @@ class ApiHandler : public QObject
 
 public Q_SLOTS:
 
-    void messages(QHttpSocket *socket);
-    void messagesNew(QHttpSocket *socket);
+    void messages(HttpSocket *socket);
+    void messagesNew(HttpSocket *socket);
 
 private:
 

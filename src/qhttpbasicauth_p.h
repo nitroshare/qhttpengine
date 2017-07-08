@@ -26,13 +26,13 @@
 #include <QMap>
 #include <QObject>
 
-class QHttpBasicAuthPrivate : public QObject
+class HttpBasicAuthPrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    explicit QHttpBasicAuthPrivate(QObject *parent, const QString &realm);
+    explicit HttpBasicAuthPrivate(QObject *parent, const QString &realm);
 
     const QString realm;
     QMap<QString, QString> map;

@@ -25,22 +25,22 @@
 
 #include <QObject>
 
-class QLocalFile;
+class LocalFile;
 
-class QLocalFilePrivate : public QObject
+class LocalFilePrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    explicit QLocalFilePrivate(QLocalFile *localFile);
+    explicit LocalFilePrivate(LocalFile *localFile);
 
     bool setPermission();
     bool setHidden();
 
 private:
 
-    QLocalFile *const q;
+    LocalFile*const q;
 };
 
 #endif // QHTTPENGINE_QLOCALFILEPRIVATE_H

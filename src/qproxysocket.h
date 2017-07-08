@@ -38,7 +38,7 @@ class QProxySocket : public QObject
 
 public:
 
-    explicit QProxySocket(QHttpSocket *socket, const QString &path, const QHostAddress &address, quint16 port);
+    explicit QProxySocket(HttpSocket *socket, const QString &path, const QHostAddress &address, quint16 port);
 
 private Q_SLOTS:
 
@@ -50,9 +50,9 @@ private Q_SLOTS:
 
 private:
 
-    QString methodToString(QHttpSocket::Method method) const;
+    QString methodToString(HttpSocket::Method method) const;
 
-    QHttpSocket *mDownstreamSocket;
+    HttpSocket *mDownstreamSocket;
     QTcpSocket mUpstreamSocket;
 
     QString mPath;

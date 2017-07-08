@@ -27,7 +27,7 @@
 
 #include "qhttpengine_global.h"
 
-class QHTTPENGINE_EXPORT QFilesystemHandlerPrivate;
+class QHTTPENGINE_EXPORT FilesystemHandlerPrivate;
 
 /**
  * @brief Handler for filesystem requests
@@ -45,7 +45,7 @@ class QHTTPENGINE_EXPORT QFilesystemHandlerPrivate;
  * can be modified after initialization. It is possible to use a resource
  * directory for the document root.
  */
-class QHTTPENGINE_EXPORT QFilesystemHandler : public QHttpHandler
+class QHTTPENGINE_EXPORT FilesystemHandler : public HttpHandler
 {
     Q_OBJECT
 
@@ -54,12 +54,12 @@ public:
     /**
      * @brief Create a new filesystem handler
      */
-    explicit QFilesystemHandler(QObject *parent = 0);
+    explicit FilesystemHandler(QObject *parent = 0);
 
     /**
      * @brief Create a new filesystem handler from the specified directory
      */
-    QFilesystemHandler(const QString &documentRoot, QObject *parent = 0);
+    FilesystemHandler(const QString &documentRoot, QObject *parent = 0);
 
     /**
      * @brief Set the document root
@@ -74,12 +74,12 @@ protected:
     /**
      * @brief Reimplementation of QHttpHandler::process()
      */
-    virtual void process(QHttpSocket *socket, const QString &path);
+    virtual void process(HttpSocket *socket, const QString &path);
 
 private:
 
-    QFilesystemHandlerPrivate *const d;
-    friend class QFilesystemHandlerPrivate;
+    FilesystemHandlerPrivate *const d;
+    friend class FilesystemHandlerPrivate;
 };
 
 #endif // QHTTPENGINE_QFILESYSTEMHANDLER_H

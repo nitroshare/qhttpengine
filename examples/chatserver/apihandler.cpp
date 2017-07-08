@@ -27,7 +27,7 @@
 
 #include "apihandler.h"
 
-void ApiHandler::messages(QHttpSocket *socket)
+void ApiHandler::messages(HttpSocket *socket)
 {
     QJsonObject object;
     object.insert("messages", QJsonArray::fromStringList(mMessages));
@@ -35,7 +35,7 @@ void ApiHandler::messages(QHttpSocket *socket)
 }
 
 
-void ApiHandler::messagesNew(QHttpSocket *socket)
+void ApiHandler::messagesNew(HttpSocket *socket)
 {
     QJsonDocument document;
     if (socket->readJson(document)) {
@@ -49,5 +49,5 @@ void ApiHandler::messagesNew(QHttpSocket *socket)
     }
 
     // If execution reaches this point, malformed data was supplied
-    socket->writeError(QHttpSocket::BadRequest);
+    socket->writeError(HttpSocket::BadRequest);
 }

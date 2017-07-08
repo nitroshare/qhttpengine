@@ -37,8 +37,8 @@ public Q_SLOTS:
 
     void wrongArgumentCount() {}
     void wrongArgumentType(int) {}
-    void valid(QHttpSocket *socket) {
-        socket->writeError(QHttpSocket::OK);
+    void valid(HttpSocket *socket) {
+        socket->writeError(HttpSocket::OK);
     }
 };
 
@@ -60,19 +60,19 @@ void TestQObjectHandler::testOldConnection_data()
 
     QTest::newRow("invalid slot")
             << QByteArray(SLOT(invalid()))
-            << static_cast<int>(QHttpSocket::InternalServerError);
+            << static_cast<int>(HttpSocket::InternalServerError);
 
     QTest::newRow("wrong argument count")
             << QByteArray(SLOT(wrongArgumentCount()))
-            << static_cast<int>(QHttpSocket::InternalServerError);
+            << static_cast<int>(HttpSocket::InternalServerError);
 
     QTest::newRow("wrong argument type")
             << QByteArray(SLOT(wrongArgumentType(int)))
-            << static_cast<int>(QHttpSocket::InternalServerError);
+            << static_cast<int>(HttpSocket::InternalServerError);
 
     QTest::newRow("valid")
-            << QByteArray(SLOT(valid(QHttpSocket*)))
-            << static_cast<int>(QHttpSocket::OK);
+            << QByteArray(SLOT(valid(HttpSocket*)))
+            << static_cast<int>(HttpSocket::OK);
 }
 
 void TestQObjectHandler::testOldConnection()
@@ -89,7 +89,7 @@ void TestQObjectHandler::testOldConnection()
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    QHttpSocket socket(pair.server(), &pair);
+    HttpSocket socket(pair.server(), &pair);
 
     client.sendHeaders("GET", "test");
     QTRY_VERIFY(socket.isHeadersParsed());
@@ -107,11 +107,11 @@ void TestQObjectHandler::testNewConnection()
     handler.registerMethod("0", &api, &DummyAPI::valid);
 
     // Connect to functor
-    handler.registerMethod("1", [](QHttpSocket *socket) {
-        socket->writeError(QHttpSocket::OK);
+    handler.registerMethod("1", [](HttpSocket *socket) {
+        socket->writeError(HttpSocket::OK);
     });
-    handler.registerMethod("2", &api, [](QHttpSocket *socket) {
-        socket->writeError(QHttpSocket::OK);
+    handler.registerMethod("2", &api, [](HttpSocket *socket) {
+        socket->writeError(HttpSocket::OK);
     });
 
     for (int i = 0; i < 3; ++i) {
@@ -119,13 +119,13 @@ void TestQObjectHandler::testNewConnection()
         QTRY_VERIFY(pair.isConnected());
 
         QSimpleHttpClient client(pair.client());
-        QHttpSocket socket(pair.server(), &pair);
+        HttpSocket socket(pair.server(), &pair);
 
         client.sendHeaders("GET", QByteArray::number(i));
         QTRY_VERIFY(socket.isHeadersParsed());
 
         handler.route(&socket, socket.path());
-        QTRY_COMPARE(client.statusCode(), static_cast<int>(QHttpSocket::OK));
+        QTRY_COMPARE(client.statusCode(), static_cast<int>(HttpSocket::OK));
     }
 }
 

@@ -35,12 +35,12 @@ QObjectHandlerPrivate::QObjectHandlerPrivate(QObjectHandler *handler)
 }
 
 QObjectHandler::QObjectHandler(QObject *parent)
-    : QHttpHandler(parent),
+    : HttpHandler(parent),
       d(new QObjectHandlerPrivate(this))
 {
 }
 
-void QObjectHandlerPrivate::invokeSlot(QHttpSocket *socket, Method m)
+void QObjectHandlerPrivate::invokeSlot(HttpSocket *socket, Method m)
 {
     // Invoke the slot
     if (m.oldSlot) {
@@ -48,7 +48,7 @@ void QObjectHandlerPrivate::invokeSlot(QHttpSocket *socket, Method m)
         // Obtain the slot index
         int index = m.receiver->metaObject()->indexOfSlot(m.slot.method + 1);
         if (index == -1) {
-            socket->writeError(QHttpSocket::InternalServerError);
+            socket->writeError(HttpSocket::InternalServerError);
             return;
         }
 
@@ -57,14 +57,14 @@ void QObjectHandlerPrivate::invokeSlot(QHttpSocket *socket, Method m)
         // Ensure the parameter is correct
         QList<QByteArray> params = method.parameterTypes();
         if (params.count() != 1 || params.at(0) != "QHttpSocket*") {
-            socket->writeError(QHttpSocket::InternalServerError);
+            socket->writeError(HttpSocket::InternalServerError);
             return;
         }
 
         // Invoke the method
         if (!m.receiver->metaObject()->method(index).invoke(
-                    m.receiver, Q_ARG(QHttpSocket*, socket))) {
-            socket->writeError(QHttpSocket::InternalServerError);
+                    m.receiver, Q_ARG(HttpSocket*, socket))) {
+            socket->writeError(HttpSocket::InternalServerError);
             return;
         }
     } else {
@@ -76,11 +76,11 @@ void QObjectHandlerPrivate::invokeSlot(QHttpSocket *socket, Method m)
     }
 }
 
-void QObjectHandler::process(QHttpSocket *socket, const QString &path)
+void QObjectHandler::process(HttpSocket *socket, const QString &path)
 {
     // Ensure the method has been registered
     if (!d->map.contains(path)) {
-        socket->writeError(QHttpSocket::NotFound);
+        socket->writeError(HttpSocket::NotFound);
         return;
     }
 
@@ -92,7 +92,7 @@ void QObjectHandler::process(QHttpSocket *socket, const QString &path)
         d->invokeSlot(socket, m);
         socket->close();
     } else {
-        connect(socket, &QHttpSocket::readChannelFinished, [this, socket, m]() {
+        connect(socket, &HttpSocket::readChannelFinished, [this, socket, m]() {
             d->invokeSlot(socket, m);
             socket->close();
         });

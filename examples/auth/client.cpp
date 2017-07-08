@@ -37,7 +37,7 @@ int main(int argc, char * argv[])
     QCoreApplication a(argc, argv);
 
     // Attempt to open the local file and read from it
-    QLocalFile file;
+    LocalFile file;
     if (!file.open()) {
         qCritical("Unable to open local file - is server running?");
         return 1;

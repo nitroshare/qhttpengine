@@ -29,12 +29,12 @@
 
 #include "qhttpengine_global.h"
 
-class QHTTPENGINE_EXPORT QProxyHandlerPrivate;
+class QHTTPENGINE_EXPORT ProxyHandlerPrivate;
 
 /**
  * @brief Handler that routes HTTP requests to an upstream server
  */
-class QHTTPENGINE_EXPORT QProxyHandler : public QHttpHandler
+class QHTTPENGINE_EXPORT ProxyHandler : public HttpHandler
 {
     Q_OBJECT
 
@@ -43,18 +43,18 @@ public:
     /**
      * @brief Create a new proxy handler
      */
-    QProxyHandler(const QHostAddress &address, quint16 port, QObject *parent = 0);
+    ProxyHandler(const QHostAddress &address, quint16 port, QObject *parent = 0);
 
 protected:
 
     /**
      * @brief Reimplementation of QHttpHandler::process()
      */
-    virtual void process(QHttpSocket *socket, const QString &path);
+    virtual void process(HttpSocket *socket, const QString &path);
 
 private:
 
-    QProxyHandlerPrivate *const d;
+    ProxyHandlerPrivate *const d;
 };
 
 #endif // QHTTPENGINE_QPROXYHANDLER_H

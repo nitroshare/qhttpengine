@@ -26,7 +26,7 @@
 #include <QMap>
 #include <QObject>
 
-class QHttpSocket;
+class HttpSocket;
 class QObjectHandler;
 
 class QObjectHandlerPrivate : public QObject
@@ -60,7 +60,7 @@ public:
         bool readAll;
     };
 
-    void invokeSlot(QHttpSocket *socket, Method m);
+    void invokeSlot(HttpSocket*socket, Method m);
 
     QMap<QString, Method> map;
 

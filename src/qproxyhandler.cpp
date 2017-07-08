@@ -25,20 +25,20 @@
 #include "qproxyhandler_p.h"
 #include "qproxysocket.h"
 
-QProxyHandlerPrivate::QProxyHandlerPrivate(QObject *parent, const QHostAddress &address, quint16 port)
+ProxyHandlerPrivate::ProxyHandlerPrivate(QObject *parent, const QHostAddress &address, quint16 port)
     : QObject(parent),
       address(address),
       port(port)
 {
 }
 
-QProxyHandler::QProxyHandler(const QHostAddress &address, quint16 port, QObject *parent)
-    : QHttpHandler(parent),
-      d(new QProxyHandlerPrivate(this, address, port))
+ProxyHandler::ProxyHandler(const QHostAddress &address, quint16 port, QObject *parent)
+    : HttpHandler(parent),
+      d(new ProxyHandlerPrivate(this, address, port))
 {
 }
 
-void QProxyHandler::process(QHttpSocket *socket, const QString &path)
+void ProxyHandler::process(HttpSocket *socket, const QString &path)
 {
     // Parent the socket to the proxy
     socket->setParent(this);

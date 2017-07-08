@@ -26,37 +26,37 @@
 
 #include "qhttphandler_p.h"
 
-QHttpHandlerPrivate::QHttpHandlerPrivate(QHttpHandler *handler)
+HttpHandlerPrivate::HttpHandlerPrivate(HttpHandler *handler)
     : QObject(handler),
       q(handler)
 {
 }
 
-QHttpHandler::QHttpHandler(QObject *parent)
+HttpHandler::HttpHandler(QObject *parent)
     : QObject(parent),
-      d(new QHttpHandlerPrivate(this))
+      d(new HttpHandlerPrivate(this))
 {
 }
 
-void QHttpHandler::addMiddleware(QHttpMiddleware *middleware)
+void HttpHandler::addMiddleware(HttpMiddleware *middleware)
 {
     d->middleware.append(middleware);
 }
 
-void QHttpHandler::addRedirect(const QRegExp &pattern, const QString &path)
+void HttpHandler::addRedirect(const QRegExp &pattern, const QString &path)
 {
     d->redirects.append(Redirect(pattern, path));
 }
 
-void QHttpHandler::addSubHandler(const QRegExp &pattern, QHttpHandler *handler)
+void HttpHandler::addSubHandler(const QRegExp &pattern, HttpHandler *handler)
 {
     d->subHandlers.append(SubHandler(pattern, handler));
 }
 
-void QHttpHandler::route(QHttpSocket *socket, const QString &path)
+void HttpHandler::route(HttpSocket *socket, const QString &path)
 {
     // Run through each of the middleware
-    foreach (QHttpMiddleware *middleware, d->middleware) {
+    foreach (HttpMiddleware *middleware, d->middleware) {
         if (!middleware->process(socket)) {
             return;
         }
@@ -86,9 +86,9 @@ void QHttpHandler::route(QHttpSocket *socket, const QString &path)
     process(socket, path);
 }
 
-void QHttpHandler::process(QHttpSocket *socket, const QString &)
+void HttpHandler::process(HttpSocket *socket, const QString &)
 {
     // The default response is simply a 404 error
-    socket->writeError(QHttpSocket::NotFound);
+    socket->writeError(HttpSocket::NotFound);
     socket->close();
 }

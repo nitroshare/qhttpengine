@@ -31,8 +31,8 @@ const char *Value2 = "TEST";
 // Helpful macros to cut down on the amount of duplicated code
 #define TEST_OPERATOR(tn,t,on,o,v) void test##tn##on() \
     { \
-        QCOMPARE(QIByteArray(Value1) o static_cast<t>(Value2), v); \
-        QCOMPARE(static_cast<t>(Value1) o QIByteArray(Value1), v); \
+        QCOMPARE(IByteArray(Value1) o static_cast<t>(Value2), v); \
+        QCOMPARE(static_cast<t>(Value1) o IByteArray(Value1), v); \
     }
 #define TEST_TYPE(tn,t) \
     TEST_OPERATOR(tn, t, Equals, ==, true) \
@@ -50,7 +50,7 @@ private Q_SLOTS:
 
     TEST_TYPE(ConstChar, const char *)
     TEST_TYPE(QByteArray, QByteArray)
-    TEST_TYPE(QIByteArray, QIByteArray)
+    TEST_TYPE(IByteArray, IByteArray)
     TEST_TYPE(QString, QString)
 
     void testContains();
@@ -58,7 +58,7 @@ private Q_SLOTS:
 
 void TestQIByteArray::testContains()
 {
-    QIByteArray v(Value1);
+    IByteArray v(Value1);
 
     QVERIFY(v.contains('t'));
     QVERIFY(v.contains(Value2));

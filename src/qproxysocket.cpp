@@ -24,13 +24,13 @@
 
 #include "qproxysocket.h"
 
-QProxySocket::QProxySocket(QHttpSocket *socket, const QString &path, const QHostAddress &address, quint16 port)
+QProxySocket::QProxySocket(HttpSocket *socket, const QString &path, const QHostAddress &address, quint16 port)
     : QObject(socket),
       mDownstreamSocket(socket),
       mPath(path),
       mHeadersParsed(false)
 {
-    connect(mDownstreamSocket, &QHttpSocket::readyRead, this, &QProxySocket::onDownstreamReadyRead);
+    connect(mDownstreamSocket, &HttpSocket::readyRead, this, &QProxySocket::onDownstreamReadyRead);
 
     connect(&mUpstreamSocket, &QTcpSocket::connected, this, &QProxySocket::onUpstreamConnected);
     connect(&mUpstreamSocket, &QTcpSocket::readyRead, this, &QProxySocket::onUpstreamReadyRead);
@@ -60,7 +60,7 @@ void QProxySocket::onUpstreamConnected()
     );
 
     // Use the existing headers but insert proxy-related ones
-    QHttpSocket::HeaderMap headers = mDownstreamSocket->headers();
+    HttpSocket::HeaderMap headers = mDownstreamSocket->headers();
     QByteArray peerIP = mDownstreamSocket->peerAddress().toString().toUtf8();
     QByteArray origFwd = headers.value("X-Forwarded-For");
     if (origFwd.isNull()) {
@@ -94,9 +94,9 @@ void QProxySocket::onUpstreamReadyRead()
             // Parse the headers
             int statusCode;
             QByteArray statusReason;
-            QHttpSocket::HeaderMap headers;
-            if (!QHttpParser::parseResponseHeaders(mBuffer.left(index), statusCode, statusReason, headers)) {
-                mDownstreamSocket->writeError(QHttpSocket::BadGateway);
+            HttpSocket::HeaderMap headers;
+            if (!HttpParser::parseResponseHeaders(mBuffer.left(index), statusCode, statusReason, headers)) {
+                mDownstreamSocket->writeError(HttpSocket::BadGateway);
                 return;
             }
 
@@ -120,20 +120,20 @@ void QProxySocket::onUpstreamError(QAbstractSocket::SocketError socketError)
     if (mHeadersParsed) {
         mDownstreamSocket->close();
     } else {
-        mDownstreamSocket->writeError(QHttpSocket::BadGateway);
+        mDownstreamSocket->writeError(HttpSocket::BadGateway);
     }
 }
 
-QString QProxySocket::methodToString(QHttpSocket::Method method) const
+QString QProxySocket::methodToString(HttpSocket::Method method) const
 {
     switch (method) {
-    case QHttpSocket::OPTIONS: return "OPTIONS";
-    case QHttpSocket::GET: return "GET";
-    case QHttpSocket::HEAD: return "HEAD";
-    case QHttpSocket::POST: return "POST";
-    case QHttpSocket::PUT: return "PUT";
-    case QHttpSocket::DELETE: return "DELETE";
-    case QHttpSocket::TRACE: return "TRACE";
-    case QHttpSocket::CONNECT: return "CONNECT";
+    case HttpSocket::OPTIONS: return "OPTIONS";
+    case HttpSocket::GET: return "GET";
+    case HttpSocket::HEAD: return "HEAD";
+    case HttpSocket::POST: return "POST";
+    case HttpSocket::PUT: return "PUT";
+    case HttpSocket::DELETE: return "DELETE";
+    case HttpSocket::TRACE: return "TRACE";
+    case HttpSocket::CONNECT: return "CONNECT";
     }
 }

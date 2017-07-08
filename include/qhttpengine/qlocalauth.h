@@ -29,7 +29,7 @@
 
 #include "qhttpengine_global.h"
 
-class QHTTPENGINE_EXPORT QLocalAuthPrivate;
+class QHTTPENGINE_EXPORT LocalAuthPrivate;
 
 /**
  * @brief Middleware for local file-based authentication
@@ -49,7 +49,7 @@ class QHTTPENGINE_EXPORT QLocalAuthPrivate;
  *
  * Additional data can be added to the object using the setData() method.
  */
-class QHTTPENGINE_EXPORT QLocalAuth : public QHttpMiddleware
+class QHTTPENGINE_EXPORT LocalAuth : public HttpMiddleware
 {
     Q_OBJECT
 
@@ -61,7 +61,7 @@ public:
      * To determine whether the local file was created successfully, call the
      * exists() method.
      */
-    explicit QLocalAuth(QObject *parent = Q_NULLPTR);
+    explicit LocalAuth(QObject *parent = Q_NULLPTR);
 
     /**
      * @brief Determine whether the file exists
@@ -91,11 +91,11 @@ public:
      * If the token supplied by the client matches, the request is allowed.
      * Otherwise, an HTTP 403 error is returned.
      */
-    virtual bool process(QHttpSocket *socket);
+    virtual bool process(HttpSocket *socket);
 
 private:
 
-    QLocalAuthPrivate *const d;
+    LocalAuthPrivate *const d;
 };
 
 #endif // QHTTPENGINE_QLOCALAUTH_H

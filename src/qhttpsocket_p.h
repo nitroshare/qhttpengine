@@ -27,13 +27,13 @@
 
 class QTcpSocket;
 
-class QHttpSocketPrivate : public QObject
+class HttpSocketPrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    QHttpSocketPrivate(QHttpSocket *httpSocket, QTcpSocket *tcpSocket);
+    HttpSocketPrivate(HttpSocket *httpSocket, QTcpSocket *tcpSocket);
 
     QByteArray statusReason(int statusCode) const;
 
@@ -46,11 +46,11 @@ public:
         ReadFinished
     } readState;
 
-    QHttpSocket::Method requestMethod;
+    HttpSocket::Method requestMethod;
     QByteArray requestRawPath;
     QString requestPath;
-    QHttpSocket::QueryStringMap requestQueryString;
-    QHttpSocket::HeaderMap requestHeaders;
+    HttpSocket::QueryStringMap requestQueryString;
+    HttpSocket::HeaderMap requestHeaders;
     qint64 requestDataRead;
     qint64 requestDataTotal;
 
@@ -63,7 +63,7 @@ public:
 
     int responseStatusCode;
     QByteArray responseStatusReason;
-    QHttpSocket::HeaderMap responseHeaders;
+    HttpSocket::HeaderMap responseHeaders;
     qint64 responseHeaderRemaining;
 
 private Q_SLOTS:
@@ -76,7 +76,7 @@ private:
     bool readHeaders();
     void readData();
 
-    QHttpSocket *const q;
+    HttpSocket*const q;
 };
 
 #endif // QHTTPENGINE_QHTTPSOCKETPRIVATE_H

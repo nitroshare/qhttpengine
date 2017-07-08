@@ -29,7 +29,7 @@
 
 #include "qlocalauth_p.h"
 
-QLocalAuthPrivate::QLocalAuthPrivate(QObject *parent)
+LocalAuthPrivate::LocalAuthPrivate(QObject *parent)
     : QObject(parent),
       tokenHeader("X-Auth-Token"),
       token(QUuid::createUuid().toString())
@@ -37,7 +37,7 @@ QLocalAuthPrivate::QLocalAuthPrivate(QObject *parent)
     updateFile();
 }
 
-void QLocalAuthPrivate::updateFile()
+void LocalAuthPrivate::updateFile()
 {
     if (file.open()) {
         file.write(QJsonDocument(QJsonObject::fromVariantMap(data)).toJson());
@@ -45,38 +45,38 @@ void QLocalAuthPrivate::updateFile()
     }
 }
 
-QLocalAuth::QLocalAuth(QObject *parent)
-    : QHttpMiddleware(parent),
-      d(new QLocalAuthPrivate(this))
+LocalAuth::LocalAuth(QObject *parent)
+    : HttpMiddleware(parent),
+      d(new LocalAuthPrivate(this))
 {
 }
 
-bool QLocalAuth::exists() const
+bool LocalAuth::exists() const
 {
     return d->file.exists();
 }
 
-QString QLocalAuth::filename() const
+QString LocalAuth::filename() const
 {
     return d->file.fileName();
 }
 
-void QLocalAuth::setData(const QVariantMap &data)
+void LocalAuth::setData(const QVariantMap &data)
 {
     d->data = data;
     d->data.insert("token", d->token);
     d->updateFile();
 }
 
-void QLocalAuth::setHeaderName(const QByteArray &name)
+void LocalAuth::setHeaderName(const QByteArray &name)
 {
     d->tokenHeader = name;
 }
 
-bool QLocalAuth::process(QHttpSocket *socket)
+bool LocalAuth::process(HttpSocket *socket)
 {
     if (socket->headers().value(d->tokenHeader) != d->token) {
-        socket->writeError(QHttpSocket::Forbidden);
+        socket->writeError(HttpSocket::Forbidden);
         return false;
     }
 

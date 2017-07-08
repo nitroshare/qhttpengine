@@ -27,7 +27,7 @@
 
 #include "qhttpengine_global.h"
 
-class QHTTPENGINE_EXPORT QLocalFilePrivate;
+class QHTTPENGINE_EXPORT LocalFilePrivate;
 
 /**
  * @brief Locally accessible file
@@ -49,7 +49,7 @@ class QHTTPENGINE_EXPORT QLocalFilePrivate;
  * For example, if the application name was "test" and the user's home
  * directory was `/home/bob`, the absolute path would be `/home/bob/.test`.
  */
-class QHTTPENGINE_EXPORT QLocalFile : public QFile
+class QHTTPENGINE_EXPORT LocalFile : public QFile
 {
     Q_OBJECT
 
@@ -58,7 +58,7 @@ public:
     /**
      * @brief Create a new local file
      */
-    explicit QLocalFile(QObject *parent = 0);
+    explicit LocalFile(QObject *parent = 0);
 
     /**
      * @brief Attempt to open the file
@@ -71,8 +71,8 @@ public:
 
 private:
 
-    QLocalFilePrivate *const d;
-    friend class QLocalFilePrivate;
+    LocalFilePrivate *const d;
+    friend class LocalFilePrivate;
 };
 
 #endif // QHTTPENGINE_QLOCALFILE_H

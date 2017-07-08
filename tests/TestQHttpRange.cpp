@@ -58,15 +58,15 @@ TestQHttpRange::TestQHttpRange()
 
 void TestQHttpRange::testDefaultConstructor()
 {
-    QHttpRange range;
+    HttpRange range;
 
     QCOMPARE(range.isValid(), false);
 }
 
 void TestQHttpRange::testAssignmentOperator()
 {
-    QHttpRange range;
-    QHttpRange otherRange(100, 200, -1);
+    HttpRange range;
+    HttpRange otherRange(100, 200, -1);
 
     range = otherRange;
 
@@ -110,7 +110,7 @@ void TestQHttpRange::testFromToLength()
     QFETCH(int, to);
     QFETCH(int, length);
 
-    QHttpRange range(inFrom, inTo, inDataSize);
+    HttpRange range(inFrom, inTo, inDataSize);
 
     QCOMPARE(range.from(), from);
     QCOMPARE(range.to(), to);
@@ -162,7 +162,7 @@ void TestQHttpRange::testIsValid()
     QFETCH(int, dataSize);
     QFETCH(bool, valid);
 
-    QHttpRange range(from, to, dataSize);
+    HttpRange range(from, to, dataSize);
 
     QCOMPARE(range.isValid(), valid);
 }
@@ -235,7 +235,7 @@ void TestQHttpRange::testParseFromString()
     QFETCH(int, dataSize);
     QFETCH(bool, valid);
 
-    QHttpRange range(data, dataSize);
+    HttpRange range(data, dataSize);
 
     QCOMPARE(range.isValid(), valid);
 
@@ -281,7 +281,7 @@ void TestQHttpRange::testContentRange()
     QFETCH(int, dataSize);
     QFETCH(QString, contentRange);
 
-    QHttpRange range(from, to, dataSize);
+    HttpRange range(from, to, dataSize);
 
     QCOMPARE(range.contentRange(), contentRange);
 }

@@ -36,7 +36,7 @@
  * response headers. Functionality is broken up into smaller methods in order
  * to make the unit tests simpler.
  */
-class QHTTPENGINE_EXPORT QHttpParser
+class QHTTPENGINE_EXPORT HttpParser
 {
 public:
 
@@ -56,7 +56,7 @@ public:
     /**
      * @brief Parse and remove the query string from a path
      */
-    static bool parsePath(const QByteArray &rawPath, QString &path, QHttpSocket::QueryStringMap &queryString);
+    static bool parsePath(const QByteArray &rawPath, QString &path, HttpSocket::QueryStringMap &queryString);
 
     /**
      * @brief Parse a list of lines containing HTTP headers
@@ -64,7 +64,7 @@ public:
      * Each line is expected to be in the format "name: value". Parsing is
      * immediately aborted if an invalid line is encountered.
      */
-    static bool parseHeaderList(const QList<QByteArray> &lines, QHttpSocket::HeaderMap &headers);
+    static bool parseHeaderList(const QList<QByteArray> &lines, HttpSocket::HeaderMap &headers);
 
     /**
      * @brief Parse HTTP headers
@@ -73,17 +73,17 @@ public:
      * into a status line and HTTP headers. The parts list will contain the
      * parts from the status line.
      */
-    static bool parseHeaders(const QByteArray &data, QList<QByteArray> &parts, QHttpSocket::HeaderMap &headers);
+    static bool parseHeaders(const QByteArray &data, QList<QByteArray> &parts, HttpSocket::HeaderMap &headers);
 
     /**
      * @brief Parse HTTP request headers
      */
-    static bool parseRequestHeaders(const QByteArray &data, QHttpSocket::Method &method, QByteArray &path, QHttpSocket::HeaderMap &headers);
+    static bool parseRequestHeaders(const QByteArray &data, HttpSocket::Method &method, QByteArray &path, HttpSocket::HeaderMap &headers);
 
     /**
      * @brief Parse HTTP response headers
      */
-    static bool parseResponseHeaders(const QByteArray &data, int &statusCode, QByteArray &statusReason, QHttpSocket::HeaderMap &headers);
+    static bool parseResponseHeaders(const QByteArray &data, int &statusCode, QByteArray &statusReason, HttpSocket::HeaderMap &headers);
 };
 
 #endif // QHTTPENGINE_QHTTPPARSER_H

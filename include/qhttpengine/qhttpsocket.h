@@ -33,7 +33,7 @@
 
 class QJsonDocument;
 class QTcpSocket;
-class QHTTPENGINE_EXPORT QHttpSocketPrivate;
+class QHTTPENGINE_EXPORT HttpSocketPrivate;
 
 /**
  * @brief Implementation of the HTTP protocol
@@ -89,7 +89,7 @@ class QHTTPENGINE_EXPORT QHttpSocketPrivate;
  * status code to the writeError() method. Both methods will close the socket
  * once the response is written.
  */
-class QHTTPENGINE_EXPORT QHttpSocket : public QIODevice
+class QHTTPENGINE_EXPORT HttpSocket : public QIODevice
 {
     Q_OBJECT
 
@@ -106,7 +106,7 @@ public:
      * The key used for the map is the QIByteArray class, which allows for
      * case-insensitive comparison.
      */
-    typedef QMultiMap<QIByteArray, QByteArray> HeaderMap;
+    typedef QMultiMap<IByteArray, QByteArray> HeaderMap;
 
     /**
      * HTTP methods
@@ -177,7 +177,7 @@ public:
      * This instance will assume ownership of the socket. That is, it will
      * make itself the parent of the socket.
      */
-    QHttpSocket(QTcpSocket *socket, QObject *parent = 0);
+    HttpSocket(QTcpSocket *socket, QObject *parent = 0);
 
     /**
      * @brief Retrieve the number of bytes available for reading
@@ -354,8 +354,8 @@ protected:
 
 private:
 
-    QHttpSocketPrivate *const d;
-    friend class QHttpSocketPrivate;
+    HttpSocketPrivate *const d;
+    friend class HttpSocketPrivate;
 };
 
 #endif // QHTTPENGINE_QHTTPSOCKET_H

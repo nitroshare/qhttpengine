@@ -32,7 +32,7 @@
 #include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"
 
-Q_DECLARE_METATYPE(QHttpSocket::QueryStringMap)
+Q_DECLARE_METATYPE(HttpSocket::QueryStringMap)
 
 // Utility macro (avoids duplication) that creates a pair of connected
 // sockets, a QSimpleHttpClient for the client and a QHttpSocket for the
@@ -41,7 +41,7 @@ Q_DECLARE_METATYPE(QHttpSocket::QueryStringMap)
     QSocketPair pair; \
     QTRY_VERIFY(pair.isConnected()); \
     QSimpleHttpClient client(pair.client()); \
-    QHttpSocket server(pair.server())
+    HttpSocket server(pair.server())
 
 const QByteArray Method = "POST";
 const QByteArray Path = "/test";
@@ -67,7 +67,7 @@ private Q_SLOTS:
 
 private:
 
-    QHttpSocket::HeaderMap headers;
+    HttpSocket::HeaderMap headers;
 };
 
 TestQHttpSocket::TestQHttpSocket()
@@ -82,7 +82,7 @@ void TestQHttpSocket::testProperties()
 
     client.sendHeaders(Method, Path, headers);
 
-    QTRY_COMPARE(server.method(), QHttpSocket::POST);
+    QTRY_COMPARE(server.method(), HttpSocket::POST);
     QCOMPARE(server.rawPath(), Path);
     QCOMPARE(server.headers(), headers);
 
@@ -120,7 +120,7 @@ void TestQHttpSocket::testRedirect()
 
     server.writeRedirect(Path, true);
 
-    QTRY_COMPARE(client.statusCode(), static_cast<int>(QHttpSocket::MovedPermanently));
+    QTRY_COMPARE(client.statusCode(), static_cast<int>(HttpSocket::MovedPermanently));
     QCOMPARE(client.headers().value("Location"), Path);
     QTRY_COMPARE(disconnectedSpy.count(), 1);
 }
@@ -170,7 +170,7 @@ void TestQHttpSocket::testJson()
     QJsonObject object{{"a", "b"}, {"c", 123}};
     QByteArray data = QJsonDocument(object).toJson();
 
-    client.sendHeaders(Method, Path, QHttpSocket::HeaderMap{
+    client.sendHeaders(Method, Path, HttpSocket::HeaderMap{
         {"Content-Length", QByteArray::number(data.length())},
         {"Content-Type", "application/json"}
     });

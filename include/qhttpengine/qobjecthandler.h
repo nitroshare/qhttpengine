@@ -27,7 +27,7 @@
 
 #include "qhttpengine_global.h"
 
-class QHttpSocket;
+class HttpSocket;
 class QHTTPENGINE_EXPORT QObjectHandlerPrivate;
 
 /**
@@ -67,7 +67,7 @@ class QHTTPENGINE_EXPORT QObjectHandlerPrivate;
  * });
  * @endcode
  */
-class QHTTPENGINE_EXPORT QObjectHandler : public QHttpHandler
+class QHTTPENGINE_EXPORT QObjectHandler : public HttpHandler
 {
     Q_OBJECT
 
@@ -123,7 +123,7 @@ public:
                           "The slot must have exactly one argument.");
 
         // Ensure the argument is of the correct type
-        Q_STATIC_ASSERT_X((QtPrivate::AreArgumentsCompatible<QHttpSocket*, typename QtPrivate::List_Select<typename SlotType::Arguments, 0>::Value>::value),
+        Q_STATIC_ASSERT_X((QtPrivate::AreArgumentsCompatible<HttpSocket*, typename QtPrivate::List_Select<typename SlotType::Arguments, 0>::Value>::value),
                           "The slot parameters do not match");
 
         // Invoke the implementation
@@ -157,7 +157,7 @@ protected:
     /**
      * @brief Reimplementation of QHttpHandler::process()
      */
-    virtual void process(QHttpSocket *socket, const QString &path);
+    virtual void process(HttpSocket *socket, const QString &path);
 
 private:
 
@@ -171,7 +171,7 @@ private:
                           "The slot must have exactly one argument.");
 
         // Ensure the argument is of the correct type
-        Q_STATIC_ASSERT_X((QtPrivate::AreArgumentsCompatible<QHttpSocket*, typename QtPrivate::List_Select<typename SlotType::Arguments, 0>::Value>::value),
+        Q_STATIC_ASSERT_X((QtPrivate::AreArgumentsCompatible<HttpSocket*, typename QtPrivate::List_Select<typename SlotType::Arguments, 0>::Value>::value),
                           "The slot parameters do not match");
 
         registerMethodImpl(name, context,

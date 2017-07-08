@@ -28,17 +28,17 @@
 
 #include <qhttpengine/qlocalfile.h>
 
-class QLocalAuthPrivate : public QObject
+class LocalAuthPrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    explicit QLocalAuthPrivate(QObject *parent);
+    explicit LocalAuthPrivate(QObject *parent);
 
     void updateFile();
 
-    QLocalFile file;
+    LocalFile file;
     QVariantMap data;
     QByteArray tokenHeader;
     QString token;

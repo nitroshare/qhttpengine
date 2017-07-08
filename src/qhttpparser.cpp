@@ -26,7 +26,7 @@
 
 #include <qhttpengine/qhttpparser.h>
 
-void QHttpParser::split(const QByteArray &data, const QByteArray &delim, int maxSplit, QByteArrayList &parts)
+void HttpParser::split(const QByteArray &data, const QByteArray &delim, int maxSplit, QByteArrayList &parts)
 {
     int index = 0;
 
@@ -45,7 +45,7 @@ void QHttpParser::split(const QByteArray &data, const QByteArray &delim, int max
     parts.append(data.mid(index));
 }
 
-bool QHttpParser::parsePath(const QByteArray &rawPath, QString &path, QHttpSocket::QueryStringMap &queryString)
+bool HttpParser::parsePath(const QByteArray &rawPath, QString &path, HttpSocket::QueryStringMap &queryString)
 {
     QUrl url(rawPath);
     if (!url.isValid()) {
@@ -61,7 +61,7 @@ bool QHttpParser::parsePath(const QByteArray &rawPath, QString &path, QHttpSocke
     return true;
 }
 
-bool QHttpParser::parseHeaderList(const QList<QByteArray> &lines, QHttpSocket::HeaderMap &headers)
+bool HttpParser::parseHeaderList(const QList<QByteArray> &lines, HttpSocket::HeaderMap &headers)
 {
     foreach (const QByteArray &line, lines) {
 
@@ -80,7 +80,7 @@ bool QHttpParser::parseHeaderList(const QList<QByteArray> &lines, QHttpSocket::H
     return true;
 }
 
-bool QHttpParser::parseHeaders(const QByteArray &data, QList<QByteArray> &parts, QHttpSocket::HeaderMap &headers)
+bool HttpParser::parseHeaders(const QByteArray &data, QList<QByteArray> &parts, HttpSocket::HeaderMap &headers)
 {
     // Split the data into individual lines
     QList<QByteArray> lines;
@@ -95,7 +95,7 @@ bool QHttpParser::parseHeaders(const QByteArray &data, QList<QByteArray> &parts,
     return parseHeaderList(lines, headers);
 }
 
-bool QHttpParser::parseRequestHeaders(const QByteArray &data, QHttpSocket::Method &method, QByteArray &path, QHttpSocket::HeaderMap &headers)
+bool HttpParser::parseRequestHeaders(const QByteArray &data, HttpSocket::Method &method, QByteArray &path, HttpSocket::HeaderMap &headers)
 {
     QList<QByteArray> parts;
     if (!parseHeaders(data, parts, headers)) {
@@ -108,21 +108,21 @@ bool QHttpParser::parseRequestHeaders(const QByteArray &data, QHttpSocket::Metho
     }
 
     if (parts[0] == "OPTIONS") {
-        method = QHttpSocket::OPTIONS;
+        method = HttpSocket::OPTIONS;
     } else if (parts[0] == "GET") {
-        method = QHttpSocket::GET;
+        method = HttpSocket::GET;
     } else if (parts[0] == "HEAD") {
-        method = QHttpSocket::HEAD;
+        method = HttpSocket::HEAD;
     } else if (parts[0] == "POST") {
-        method = QHttpSocket::POST;
+        method = HttpSocket::POST;
     } else if (parts[0] == "PUT") {
-        method = QHttpSocket::PUT;
+        method = HttpSocket::PUT;
     } else if (parts[0] == "DELETE") {
-        method = QHttpSocket::DELETE;
+        method = HttpSocket::DELETE;
     } else if (parts[0] == "TRACE") {
-        method = QHttpSocket::TRACE;
+        method = HttpSocket::TRACE;
     } else if (parts[0] == "CONNECT") {
-        method = QHttpSocket::CONNECT;
+        method = HttpSocket::CONNECT;
     } else {
         return false;
     }
@@ -132,7 +132,7 @@ bool QHttpParser::parseRequestHeaders(const QByteArray &data, QHttpSocket::Metho
     return true;
 }
 
-bool QHttpParser::parseResponseHeaders(const QByteArray &data, int &statusCode, QByteArray &statusReason, QHttpSocket::HeaderMap &headers)
+bool HttpParser::parseResponseHeaders(const QByteArray &data, int &statusCode, QByteArray &statusReason, HttpSocket::HeaderMap &headers)
 {
     QList<QByteArray> parts;
     if (!parseHeaders(data, parts, headers)) {

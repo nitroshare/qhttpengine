@@ -27,7 +27,7 @@
 
 #include "qhttpengine_global.h"
 
-class QHTTPENGINE_EXPORT QHttpRangePrivate;
+class QHTTPENGINE_EXPORT HttpRangePrivate;
 
 /**
  * @brief HTTP range representation
@@ -61,7 +61,7 @@ class QHTTPENGINE_EXPORT QHttpRangePrivate;
  * @endcode
  *
  */
-class QHTTPENGINE_EXPORT QHttpRange
+class QHTTPENGINE_EXPORT HttpRange
 {
 public:
 
@@ -70,7 +70,7 @@ public:
      *
      * An empty QHttpRange is considered invalid.
      */
-    QHttpRange();
+    HttpRange();
 
     /**
      * @brief Construct QHttpRange by parsing range
@@ -80,7 +80,7 @@ public:
      * constructor. dataSize may be supplied so that relative ranges could be
      * represented as absolute values.
      */
-    QHttpRange(const QString &range, qint64 dataSize = -1);
+    HttpRange(const QString &range, qint64 dataSize = -1);
 
     /**
      * @brief Construct QHttpRange, using from and to values
@@ -89,7 +89,7 @@ public:
      * supplied so that relative ranges could be represented as
      * absolute values.
      */
-    QHttpRange(qint64 from, qint64 to, qint64 dataSize = -1);
+    HttpRange(qint64 from, qint64 to, qint64 dataSize = -1);
 
     /**
      * @brief Construct QHttpRange from other QHttpRange and dataSize
@@ -97,17 +97,17 @@ public:
      * Initialises a new QHttpRange with from and to values of other
      * QHttpRequest. Supplied dataSize is used instead of other dataSize.
      */
-    QHttpRange(const QHttpRange &other, qint64 dataSize);
+    HttpRange(const HttpRange &other, qint64 dataSize);
 
     /**
      * @brief Destroy the range
      */
-    ~QHttpRange();
+    ~HttpRange();
 
     /**
      * @brief Assignment operator
      */
-    QHttpRange& operator=(const QHttpRange &other);
+    HttpRange& operator=(const HttpRange &other);
 
     /**
      * @brief Return starting position of range
@@ -263,7 +263,7 @@ public:
 
 private:
 
-    QHttpRangePrivate *const d;
+    HttpRangePrivate *const d;
 };
 
 #endif // QHTTPENGINE_QHTTPRANGE_H

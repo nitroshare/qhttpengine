@@ -27,7 +27,7 @@
 
 #include "qhttpengine_global.h"
 
-class QHttpSocket;
+class HttpSocket;
 
 /**
  * @brief Pre-handler request processor
@@ -35,7 +35,7 @@ class QHttpSocket;
  * Middleware sits between the server and the final request handler,
  * determining whether the request should be passed on to the handler.
  */
-class QHTTPENGINE_EXPORT QHttpMiddleware : public QObject
+class QHTTPENGINE_EXPORT HttpMiddleware : public QObject
 {
     Q_OBJECT
 
@@ -44,7 +44,7 @@ public:
     /**
      * @brief Base constructor for middleware
      */
-    explicit QHttpMiddleware(QObject *parent = Q_NULLPTR) : QObject(parent) {}
+    explicit HttpMiddleware(QObject *parent = Q_NULLPTR) : QObject(parent) {}
 
     /**
      * @brief Determine if request processing should continue
@@ -53,7 +53,7 @@ public:
      * returned, processing continues. Otherwise, it is assumed that an
      * appropriate error was written to the socket.
      */
-    virtual bool process(QHttpSocket *socket) = 0;
+    virtual bool process(HttpSocket *socket) = 0;
 };
 
 #endif // QHTTPENGINE_QHTTPMIDDLEWARE_H
