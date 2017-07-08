@@ -71,7 +71,7 @@ void TestQObjectHandler::testOldConnection_data()
             << static_cast<int>(QHttpEngine::Socket::InternalServerError);
 
     QTest::newRow("valid")
-            << QByteArray(SLOT(valid(Socket*)))
+            << QByteArray(SLOT(valid(QHttpEngine::Socket*)))
             << static_cast<int>(QHttpEngine::Socket::OK);
 }
 

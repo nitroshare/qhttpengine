@@ -58,7 +58,7 @@ void QObjectHandlerPrivate::invokeSlot(Socket *socket, Method m)
 
         // Ensure the parameter is correct
         QList<QByteArray> params = method.parameterTypes();
-        if (params.count() != 1 || params.at(0) != "QHttpSocket*") {
+        if (params.count() != 1 || params.at(0) != "QHttpEngine::Socket*") {
             socket->writeError(Socket::InternalServerError);
             return;
         }
