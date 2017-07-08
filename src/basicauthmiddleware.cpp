@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Nathan Osman
+ * Copyright (c) 2017 Nathan Osman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -21,9 +21,9 @@
  */
 
 #include <qhttpengine/basicauthmiddleware.h>
+#include <qhttpengine/ibytearray.h>
 #include <qhttpengine/parser.h>
 #include <qhttpengine/socket.h>
-#include <qhttpengine/ibytearray.h>
 
 #include "basicauthmiddleware_p.h"
 
