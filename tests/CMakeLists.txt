@@ -35,8 +35,8 @@ endforeach()
 # On Windows, the library's DLL must exist in the same directory as the test
 # executables which link against it - create a custom command to copy it
 if(WIN32 AND NOT BUILD_STATIC)
-    add_custom_target(QHttpEngine-copy ALL
-        "${CMAKE_COMMAND}" -E copy_if_different \"$<TARGET_FILE:QHttpEngine>\" \"${CMAKE_CURRENT_BINARY_DIR}\"
-        DEPENDS QHttpEngine
+    add_custom_target(qhttpengine-copy ALL
+        "${CMAKE_COMMAND}" -E copy_if_different \"$<TARGET_FILE:qhttpengine>\" \"${CMAKE_CURRENT_BINARY_DIR}\"
+        DEPENDS qhttpengine
     )
 endif()
