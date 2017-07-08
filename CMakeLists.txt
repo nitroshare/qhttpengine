@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.2.0)
-project(qmdnsengine)
+project(qhttpengine)
 
 set(PROJECT_NAME "QHttpEngine")
 set(PROJECT_DESCRIPTION "Simple and secure HTTP server for Qt applications")

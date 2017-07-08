@@ -68,7 +68,7 @@ install(TARGETS qhttpengine EXPORT qhttpengine-export
 
 install(EXPORT qhttpengine-export
     FILE        qhttpengineConfig.cmake
-    DESTINATION "${LIB_INSTALL_DIR}/cmake/qmdnsengine"
+    DESTINATION "${LIB_INSTALL_DIR}/cmake/qhttpengine"
 )
 
 include(CMakePackageConfigHelpers)
@@ -79,7 +79,7 @@ write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/qhttpengineConfigV
 )
 
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/qhttpengineConfigVersion.cmake"
-    DESTINATION "${LIB_INSTALL_DIR}/cmake/qmdnsengine"
+    DESTINATION "${LIB_INSTALL_DIR}/cmake/qhttpengine"
 )
 
 configure_file(qhttpengine.pc.in "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.pc" @ONLY)
