@@ -29,7 +29,7 @@
 
 #include <qhttpengine/ibytearray.h>
 
-#include "qhttpengine_global.h"
+#include "qhttpengine_export.h"
 
 class QJsonDocument;
 class QTcpSocket;

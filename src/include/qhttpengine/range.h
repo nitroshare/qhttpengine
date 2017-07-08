@@ -25,7 +25,7 @@
 
 #include <QString>
 
-#include "qhttpengine_global.h"
+#include "qhttpengine_export.h"
 
 namespace QHttpEngine
 {

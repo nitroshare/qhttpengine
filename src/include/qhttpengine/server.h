@@ -27,7 +27,7 @@
 #include <QObject>
 #include <QTcpServer>
 
-#include "qhttpengine_global.h"
+#include "qhttpengine_export.h"
 
 #if !defined(QT_NO_SSL)
 class QSslConfiguration;

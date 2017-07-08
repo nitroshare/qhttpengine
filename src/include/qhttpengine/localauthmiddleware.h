@@ -27,7 +27,7 @@
 
 #include <qhttpengine/middleware.h>
 
-#include "qhttpengine_global.h"
+#include "qhttpengine_export.h"
 
 namespace QHttpEngine
 {

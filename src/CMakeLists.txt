@@ -1,4 +1,4 @@
-configure_file(qhttpengine_global.h.in "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine_global.h")
+configure_file(qhttpengine_export.h.in "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine_export.h")
 
 set(HEADERS
     include/qhttpengine/basicauthmiddleware.h
@@ -15,7 +15,7 @@ set(HEADERS
     include/qhttpengine/range.h
     include/qhttpengine/server.h
     include/qhttpengine/socket.h
-    "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine_global.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine_export.h"
 )
 
 set(SRC
