@@ -33,7 +33,7 @@ namespace QHttpEngine
 class QHTTPENGINE_EXPORT BasicAuthMiddlewarePrivate;
 
 /**
- * @brief Middleware for HTTP basic authentication
+ * @brief %Middleware for HTTP basic authentication
  *
  * HTTP Basic authentication allows access to specific resources to be
  * restricted. This class uses a map to store accepted username/password

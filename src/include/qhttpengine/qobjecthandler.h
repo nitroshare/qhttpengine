@@ -35,12 +35,12 @@ class Socket;
 class QHTTPENGINE_EXPORT QObjectHandlerPrivate;
 
 /**
- * @brief Handler for invoking slots
+ * @brief %Handler for invoking slots
  *
  * This handler enables incoming requests to be processed by slots in a
  * QObject-derived class or functor. Methods are registered by providing a
- * name and slot to invoke. The slot may take a pointer to the QHttpSocket for
- * the request as an argument.
+ * name and slot to invoke. The slot may take a pointer to the
+ * [Socket](@ref QHttpEngine::Socket) for the request as an argument.
  *
  * To use this class, simply create an instance and call the appropriate
  * registerMethod() overload. For example:
@@ -50,13 +50,13 @@ class QHTTPENGINE_EXPORT QObjectHandlerPrivate;
  * {
  *     Q_OBJECT
  * public slots:
- *     void something(QHttpSocket *socket);
+ *     void something(QHttpEngine::Socket *socket);
  * };
  *
- * QObjectHandler handler;
+ * QHttpEngine::QObjectHandler handler;
  * Object object;
  * // Old connection syntax
- * handler.registerMethod("something", &object, SLOT(something(QHttpSocket*)));
+ * handler.registerMethod("something", &object, SLOT(something(QHttpEngine::Socket*)));
  * // New connection syntax
  * handler.registerMethod("something", &object, &Object::something);
  * @endcode
@@ -65,8 +65,8 @@ class QHTTPENGINE_EXPORT QObjectHandlerPrivate;
  * to create a class and slot:
  *
  * @code
- * QObjectHandler handler;
- * handler.registerMethod("something", [](QHttpSocket *socket) {
+ * QHttpEngine::QObjectHandler handler;
+ * handler.registerMethod("something", [](QHttpEngine::Socket *socket) {
  *     // do something
  * });
  * @endcode
@@ -159,7 +159,7 @@ public:
 protected:
 
     /**
-     * @brief Reimplementation of QHttpHandler::process()
+     * @brief Reimplementation of [Handler::process()](QHttpEngine::Handler::process)
      */
     virtual void process(Socket *socket, const QString &path);
 

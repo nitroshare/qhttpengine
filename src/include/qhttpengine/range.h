@@ -40,24 +40,23 @@ class QHTTPENGINE_EXPORT RangePrivate;
  * created, optional dataSize can be specified, so that relative ranges can
  * be represented as absolute.
  *
- * Example:
  * @code
- * QHttpRange range(10, -1, 90);
+ * QHttpEngine::Range range(10, -1, 90);
  * range.from();   //  10
  * range.to();     //  89
  * range.length(); //  80
  *
- * range = QHttpRange("-500", 1000);
+ * range = QHttpEngine::Range("-500", 1000);
  * range.from();   // 500
  * range.to();     // 999
  * range.length(); // 500
  *
- * range = QHttpRange(0, -1);
+ * range = QHttpEngine::Range(0, -1);
  * range.from();   //   0
  * range.to();     //  -1
  * range.length(); //  -1
  *
- * range = QHttpRange(range, 100);
+ * range = QHttpEngine::Range(range, 100);
  * range.from();   //   0
  * range.to();     //  99
  * range.length(); // 100
@@ -78,8 +77,8 @@ public:
     /**
      * @brief Construct a range from the provided string
      *
-     * Parses string representation range and constructs new Range.
-     * For raw header "Range: bytes=0-100" only "0-100" should be passed to
+     * Parses string representation range and constructs new Range. For raw
+     * header "Range: bytes=0-100" only "0-100" should be passed to
      * constructor. dataSize may be supplied so that relative ranges could be
      * represented as absolute values.
      */
@@ -89,16 +88,16 @@ public:
      * @brief Construct a range from the provided offsets
      *
      * Initialises a new Range with from and to values. dataSize may be
-     * supplied so that relative ranges could be represented as
-     * absolute values.
+     * supplied so that relative ranges could be represented as absolute
+     * values.
      */
     Range(qint64 from, qint64 to, qint64 dataSize = -1);
 
     /**
      * @brief Construct a range from the another range's offsets
      *
-     * Initialises a new  Range with from and to values of other
-     * QHttpRequest. Supplied dataSize is used instead of other dataSize.
+     * Initialises a new  Range with from and to values of other Range.
+     * Supplied dataSize is used instead of other dataSize.
      */
     Range(const Range &other, qint64 dataSize);
 
@@ -113,104 +112,32 @@ public:
     Range& operator=(const Range &other);
 
     /**
-     * @brief Return starting position of range
+     * @brief Retrieve starting position of range
      *
      * If range is set as 'last N bytes' and dataSize is not set, returns -N.
-     *
-     * Example:
-     * @code
-     * QHttpRange range("-500");
-     * range.from();   // -500
-     * range.to();     //   -1
-     * range.length(); //  500
-     *
-     * range = QHttpRange(range, 800);
-     * range.from();   //  300
-     * range.to();     //  799
-     * range.length(); //  500
-     *
-     * range = QHttpRange("10-");
-     * range.from();   //   10
-     * range.to();     //   -1
-     * range.length(); //   -1
-     *
-     * range = QHttpRange(range, 100);
-     * range.from();   //   10
-     * range.to();     //   99
-     * range.length(); //   90
-     * @endcode
-     *
      */
     qint64 from() const;
 
     /**
-     * @brief Returns ending position of range.
+     * @brief Retrieve ending position of range
      *
      * If range is set as 'last N bytes' and dataSize is not set, returns -1.
      * If ending position is not set, and dataSize is not set, returns -1.
-     *
-     * Example:
-     * @code
-     * QHttpRange range("-500");
-     * range.from();   // -500
-     * range.to();     //   -1
-     * range.length(); //  500
-     *
-     * range = QHttpRange(range, 800);
-     * range.from();   //  300
-     * range.to();     //  799
-     * range.length(); //  500
-     *
-     * range = QHttpRange("10-");
-     * range.from();   //   10
-     * range.to();     //   -1
-     * range.length(); //   -1
-     *
-     * range = QHttpRange(range, 100);
-     * range.from();   //   10
-     * range.to();     //   99
-     * range.length(); //   90
-     * @endcode
-     *
      */
     qint64 to() const;
 
     /**
-     * @brief Returns length of range.
+     * @brief Retrieve length of range
      *
      * If ending position is not set, and dataSize is not set, and range is
      * not set as 'last N bytes', returns -1. If range is invalid, returns -1.
-     *
-     * Example:
-     * @code
-     * QHttpRange range("-500");
-     * range.from();   // -500
-     * range.to();     //   -1
-     * range.length(); //  500
-     *
-     * range = QHttpRange(range, 800);
-     * range.from();   //  300
-     * range.to();     //  799
-     * range.length(); //  500
-     *
-     * range = QHttpRange("10-");
-     * range.from();   //   10
-     * range.to();     //   -1
-     * range.length(); //   -1
-     *
-     * range = QHttpRange(range, 100);
-     * range.from();   //   10
-     * range.to();     //   99
-     * range.length(); //   90
-     * @endcode
-     *
      */
     qint64 length() const;
 
     /**
-     * @brief Returns dataSize of range.
+     * @brief Retrieve dataSize of range
      *
-     * If dataSize is not set, returns -1.
+     * If dataSize is not set, this method returns -1.
      */
     qint64 dataSize() const;
 
@@ -219,46 +146,45 @@ public:
      *
      * Range is considered invalid if it is out of bounds, that is when this
      * inequality is false - (from <= to < dataSize).
+     *
      * When QHttpRange(const QString&) fails to parse range string, resulting
      * range is also considered invalid.
      *
-     * Example:
      * @code
-     * QHttpRange range(1, 0, -1);
+     * QHttpEngine::Range range(1, 0, -1);
      * range.isValid(); // false
      *
-     * range = QHttpRange(512, 1024);
+     * range = QHttpEngine::Range(512, 1024);
      * range.isValid(); // true
      *
-     * range = QHttpRange("-");
+     * range = QHttpEngine::Range("-");
      * range.isValid(); // false
      *
-     * range = QHttpRange("abccbf");
+     * range = QHttpEngine::Range("abccbf");
      * range.isValid(); // false
      *
-     * range = QHttpRange(0, 512, 128);
+     * range = QHttpEngine::Range(0, 512, 128);
      * range.isValid(); // false
      *
-     * range = QHttpRange(128, 64, 512);
+     * range = QHttpEngine::Range(128, 64, 512);
      * range.isValid(); // false
      * @endcode
      */
     bool isValid() const;
 
     /**
-     * @brief Returns representation suitable for Content-Range header.
+     * @brief Retrieve representation suitable for Content-Range header
      *
-     * Example:
      * @code
-     * QHttpRange range(0, 100, 1000);
+     * QHttpEngine::Range range(0, 100, 1000);
      * range.contentRange(); // "0-100/1000"
      *
      * // When resource size is unknown
-     * range = QHttpRange(512, 1024);
+     * range = QHttpEngine::Range(512, 1024);
      * range.contentRange(); // "512-1024/*"
      *
      * // if range request was bad, return resource size
-     * range = QHttpRange(1, 0, 1200);
+     * range = QHttpEngine::Range(1, 0, 1200);
      * range.contentRange(); // "*\/1200"
      * @endcode
      */

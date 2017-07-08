@@ -35,12 +35,12 @@ namespace QHttpEngine
 class QHTTPENGINE_EXPORT LocalAuthMiddlewarePrivate;
 
 /**
- * @brief Middleware for local file-based authentication
+ * @brief %Middleware for local file-based authentication
  *
  * This class is intended for authenticating applications running under the
- * same user account as the server. QLocalFile is used to expose a token to
- * connecting applications. The client passes the token in a special header
- * and the request is permitted.
+ * same user account as the server. [LocalFile](@ref QHttpEngine::LocalFile)
+ * is used to expose a token to connecting applications. The client passes the
+ * token in a special header and the request is permitted.
  *
  * The file consists of a JSON object in the following format:
  *

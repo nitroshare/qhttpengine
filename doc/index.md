@@ -23,7 +23,6 @@ QHttpEngine is designed in a portable way, so it may run on other compilers and 
 
 QHttpEngine uses CMake for building the library. The library recognizes four options during configuration, all of which are disabled by default (the library is built as a shared library):
 
-- `BUILD_STATIC` - build and link a static library instead of a shared library
 - `BUILD_DOC` - (requires Doxygen) generates documentation from the comments in the source code
 - `BUILD_EXAMPLES` - builds the sample applications that demonstrate how to use QHttpEngine
 - `BUILD_TESTS` - build the test suite
@@ -36,18 +35,18 @@ QHttpEngine includes all of the classes you will need to build your HTTP server 
 
 ### Socket
 
-In order to create an HTTP socket, create an instance of QHttpSocket and pass a QTcpSocket* in the constructor:
+In order to create an HTTP socket, create an instance of [Socket](@ref QHttpEngine::Socket) and pass a QTcpSocket* in the constructor:
 
 @code
 QTcpSocket *tcpSocket = ...
-QHttpSocket httpSocket(tcpSocket);
+QHttpEngine::Socket httpSocket(tcpSocket);
 @endcode
 
-Once the QHttpSocket::headersParsed() signal is emitted (and QHttpSocket::isHeadersParsed() returns true), information about the request can easily be retrieved:
+Once the [headersParsed()](@ref QHttpEngine::Socket::headersParsed) signal is emitted (and [isHeadersParsed()](@ref QHttpEngine::Socket::isHeadersParsed) returns true), information about the request can easily be retrieved:
 
 @code
 // Check if the method is GET
-bool isGet = httpSocket.method() == QHttpSocket::GET;
+bool isGet = httpSocket.method() == QHttpEngine::Socket::GET;
 
 // Retrieve the path
 QString path = httpSocket.path();
@@ -56,40 +55,40 @@ QString path = httpSocket.path();
 QByteArray userAgent = httpSocket.headers().value("User-Agent");
 @endcode
 
-Because QHttpSocket derives from QIODevice, writing a response to the client is very simple:
+Because [Socket](@ref QHttpEngine::Socket) derives from QIODevice, writing a response to the client is very simple:
 
 @code
-httpSocket.setStatusCode(QHttpSocket::OK);
+httpSocket.setStatusCode(QHttpEngine::Socket::OK);
 httpSocket.setHeader("Content-Type", "text/plain");
 httpSocket.writeHeaders();
 httpSocket.write("This is a sample message.");
 @endcode
 
-Writing a local file to the socket can be done with little effort by using the QIODeviceCopier class:
+Writing a local file to the socket can be done with little effort by using the [QIODeviceCopier](@ref QHttpEngine::QIODeviceCopier) class:
 
 @code
 QFile file("somefile.txt");
 file.open(QIODevice::ReadOnly);
 
-QIODeviceCopier copier(&file, &httpSocket);
+QHttpEngine::QIODeviceCopier copier(&file, &httpSocket);
 copier.start();
 
-// Wait for QIODeviceCopier::finished() signal
+// Wait for the finished() signal from copier
 @endcode
 
 ### Server
 
-To create an HTTP server, simply create an instance of the QHttpServer class:
+To create an HTTP server, simply create an instance of the [Server](@ref QHttpEngine::Server) class:
 
 @code
-QHttpServer server;
+QHttpEngine::Server server;
 server.listen();
 @endcode
 
-In order to route requests based on their path, a handler must be used. Handlers derive from the QHttpHandler class. The simplest of these is the QFilesystemHandler class:
+In order to route requests based on their path, a handler must be used. Handlers derive from the [Handler](@ref QHttpEngine::Handler) class. The simplest of these is the [FilesystemHandler](@ref QHttpEngine::FilesystemHandler) class:
 
 @code
-QFilesystemHandler handler("/var/www");
+QHttpEngine::FilesystemHandler handler("/var/www");
 server.setHandler(&handler);
 @endcode
 
@@ -97,20 +96,20 @@ A request to `/path` will cause the server to respond with the contents of `/var
 
 ### Slot Methods
 
-Although it is possible to create a handler that manually routes requests, it is far easier to use the QObjectHandler class and register slots for each path - you can even use the new connection syntax:
+Although it is possible to create a handler that manually routes requests, it is far easier to use the [QObjectHandler](@ref QHttpEngine::QObjectHandler) class and register slots for each path - you can even use the new connection syntax:
 
 @code
 class Api : public QObject
 {
     Q_OBJECT
 public slots:
-    void doSomething(QHttpSocket *socket);
-    void doSomethingElse(QHttpSocket *socket);
+    void doSomething(QHttpEngine::Socket *socket);
+    void doSomethingElse(QHttpEngine::Socket *socket);
 };
 
 Api api;
 
-QObjectHandler handler;
+QHttpEngine::QObjectHandler handler;
 handler.registerMethod("something", &api, &Api::doSomething);
 @endcode
 
@@ -118,5 +117,5 @@ A request to `/something` will cause the `doSomething()` slot to be invoked.
 
 ## Where to Go From Here
 
-- Middleware can be used to process requests before final routing: QHttpMiddleware
-- Authentication middleware can be used to restrict access: QHttpBasicAuth, QLocalAuth
+- Middleware can be used to process requests before final routing: [Middleware](@ref QHttpEngine::Middleware)
+- Authentication middleware can be used to restrict access: [BasicAuthMiddleware](@ref QHttpEngine::BasicAuthMiddleware), [LocalAuthMiddleware](@ref QHttpEngine::LocalAuthMiddleware)

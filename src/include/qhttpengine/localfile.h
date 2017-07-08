@@ -40,7 +40,7 @@ class QHTTPENGINE_EXPORT LocalFilePrivate;
  * typically used for storing authentication tokens:
  *
  * @code
- * LocalFile file;
+ * QHttpEngine::LocalFile file;
  * if (file.open()) {
  *     file.write("private data");
  *     file.close();

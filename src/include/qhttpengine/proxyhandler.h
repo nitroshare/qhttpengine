@@ -35,7 +35,7 @@ namespace QHttpEngine
 class QHTTPENGINE_EXPORT ProxyHandlerPrivate;
 
 /**
- * @brief Handler that routes HTTP requests to an upstream server
+ * @brief %Handler that routes HTTP requests to an upstream server
  */
 class QHTTPENGINE_EXPORT ProxyHandler : public Handler
 {
@@ -51,7 +51,7 @@ public:
 protected:
 
     /**
-     * @brief Reimplementation of QHttpHandler::process()
+     * @brief Reimplementation of [Handler::process()](QHttpEngine::Handler::process)
      */
     virtual void process(Socket *socket, const QString &path);
 

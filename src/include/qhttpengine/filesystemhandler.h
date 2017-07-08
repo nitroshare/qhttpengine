@@ -33,7 +33,7 @@ namespace QHttpEngine
 class QHTTPENGINE_EXPORT FilesystemHandlerPrivate;
 
 /**
- * @brief Handler for filesystem requests
+ * @brief %Handler for filesystem requests
  *
  * This handler responds to requests for resources on a local filesystem. The
  * constructor is provided with a path to the root directory, which will be
@@ -41,7 +41,7 @@ class QHTTPENGINE_EXPORT FilesystemHandlerPrivate;
  * serves files from the /var/www directory:
  *
  * @code
- * QFilesystemHandler handler("/var/www");
+ * QHttpEngine::FilesystemHandler handler("/var/www");
  * @endcode
  *
  * Requests for resources outside the root will be ignored. The document root
@@ -75,7 +75,7 @@ public:
 protected:
 
     /**
-     * @brief Reimplementation of QHttpHandler::process()
+     * @brief Reimplementation of [Handler::process()](QHttpEngine::Handler::process)
      */
     virtual void process(Socket *socket, const QString &path);
 

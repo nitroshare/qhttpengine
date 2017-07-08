@@ -46,7 +46,7 @@ class QHTTPENGINE_EXPORT QIODeviceCopierPrivate;
  * QFile srcFile("src.txt");
  * QFile destFile("dest.txt");
  *
- * QIODeviceCopier copier(&srcFile, &destFile);
+ * QHttpEngine::QIODeviceCopier copier(&srcFile, &destFile);
  * copier.start()
  * @endcode
  *

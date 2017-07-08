@@ -40,12 +40,13 @@ class QHTTPENGINE_EXPORT HandlerPrivate;
 /**
  * @brief Base class for HTTP handlers
  *
- * When a request is received by a QHttpServer, it invokes the route() method
- * of the root handler which is used to determine what happens to the request.
- * All HTTP handlers derive from this class and should override the protected
- * process() method in order to process the request. Each handler also
- * maintains a list of redirects and sub-handlers which are used in place of
- * invoking process() when one of the patterns match.
+ * When a request is received by a [Server](@ref QHttpEngine::Server), it
+ * invokes the route() method of the root handler which is used to determine
+ * what happens to the request. All HTTP handlers derive from this class and
+ * should override the protected process() method in order to process the
+ * request. Each handler also maintains a list of redirects and sub-handlers
+ * which are used in place of invoking process() when one of the patterns
+ * match.
  *
  * To add a redirect, use the addRedirect() method. The first parameter is a
  * QRegExp pattern that the request path will be tested against. If it
@@ -53,7 +54,7 @@ class QHTTPENGINE_EXPORT HandlerPrivate;
  * closed. For example, to have the root path "/" redirect to "/index.html":
  *
  * @code
- * QHttpHandler handler;
+ * QHttpEngine::Handler handler;
  * handler.addRedirect(QRegExp("^$"), "/index.html");
  * @endcode
  *
@@ -64,7 +65,7 @@ class QHTTPENGINE_EXPORT HandlerPrivate;
  * invoked when the path begins with "/api/":
  *
  * @code
- * QHttpHandler handler, subHandler;
+ * QHttpEngine::Handler handler, subHandler;
  * handler.addSubHandler(QRegExp("^api/"), &subHandler);
  * @endcode
  *
@@ -121,8 +122,10 @@ protected:
      * @brief Process a request
      *
      * This method should process the request either by fulfilling it, sending
-     * a redirect with QHttpSocket::writeRedirect(), or writing an error to
-     * the socket using QHttpSocket::writeError().
+     * a redirect with
+     * [Socket::writeRedirect()](@ref QHttpEngine::Socket::writeRedirect), or
+     * writing an error to the socket using
+     * [Socket::writeError()](@ref QHttpEngine::Socket::writeError).
      */
     virtual void process(Socket *socket, const QString &path);
 

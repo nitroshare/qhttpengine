@@ -42,18 +42,18 @@ class QHTTPENGINE_EXPORT SocketPrivate;
 /**
  * @brief Implementation of the HTTP protocol
  *
- * QHttpSocket provides a class derived from QIODevice that can be used to
- * read data from and write data to an HTTP client through a QTcpSocket
- * provided in the constructor. The QHttpSocket will assume ownership of the
- * socket and ensure it is properly deleted. Consequently, the QTcpSocket must
- * have been allocated on the heap:
+ * This class provides a class derived from QIODevice that can be used to read
+ * data from and write data to an HTTP client through a QTcpSocket provided in
+ * the constructor. The socket will assume ownership of the QTcpSocket and
+ * ensure it is properly deleted. Consequently, the QTcpSocket must have been
+ * allocated on the heap:
  *
  * @code
  * QTcpSocket *tcpSock = new QTcpSocket;
  * tcpSock->connectToHost(...);
  * tcpSock->waitForConnected();
  *
- * QHttpSocket *httpSock = new QHttpSocket(tcpSock);
+ * QHttpEngine::Socket *httpSock = new QHttpEngine::Socket(tcpSock);
  * @endcode
  *
  * Once the headersParsed() signal is emitted, information about the request
@@ -107,7 +107,8 @@ public:
     /**
      * @brief Map consisting of HTTP headers
      *
-     * The key used for the map is the QIByteArray class, which allows for
+     * The key used for the map is the
+     * [IByteArray](@ref QHttpEngine::IByteArray) class, which allows for
      * case-insensitive comparison.
      */
     typedef QMultiMap<IByteArray, QByteArray> HeaderMap;
@@ -147,7 +148,7 @@ public:
         Created = 201,
         /// Request was accepted for processing, not completed yet.
         Accepted = 202,
-        /// Range request was successful
+        /// %Range request was successful
         PartialContent = 206,
         /// Resource has moved permanently
         MovedPermanently = 301,
@@ -169,16 +170,16 @@ public:
         InternalServerError = 500,
         /// Invalid response from server while acting as a gateway
         BadGateway = 502,
-        /// Server unable to handle request due to overload
+        /// %Server unable to handle request due to overload
         ServiceUnavailable = 503,
-        /// Server does not supports the HTTP version in the request
+        /// %Server does not supports the HTTP version in the request
         HttpVersionNotSupported = 505
     };
 
     /**
-     * @brief Create a new QHttpSocket from a QTcpSocket
+     * @brief Create a new socket from a QTcpSocket
      *
-     * This instance will assume ownership of the socket. That is, it will
+     * This instance will assume ownership of the QTcpSocket. That is, it will
      * make itself the parent of the socket.
      */
     Socket(QTcpSocket *socket, QObject *parent = 0);

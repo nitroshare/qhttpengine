@@ -44,25 +44,27 @@ class QHTTPENGINE_EXPORT ServerPrivate;
  * @brief TCP server for HTTP requests
  *
  * This class provides a TCP server that listens for HTTP requests on the
- * specified address and port. When a new request is received, a QHttpSocket
- * is created for the QTcpSocket which abstracts a TCP server socket. Once the
- * request headers are received, the root handler is invoked and the request
- * processed. The QHttpSocket assumes ownership of the QTcpSocket.
+ * specified address and port. When a new request is received, a
+ * [Socket](@ref QHttpEngine::Socket) is created for the QTcpSocket which
+ * abstracts a TCP server socket. Once the request headers are received, the
+ * root handler is invoked and the request processed. The server assumes
+ * ownership of the QTcpSocket.
  *
- * Because QHttpServer derives from QTcpServer, instructing the server to
- * listen on an available port is as simple as invoking listen() with no
- * parameters:
+ * Because [Server](@ref QHttpEngine::Server) derives from QTcpServer,
+ * instructing the server to listen on an available port is as simple as
+ * invoking listen() with no parameters:
  *
  * @code
- * QHttpServer server;
+ * QHttpEngine::Server server;
  * if (!server.listen()) {
  *     // error handling
  * }
  * @endcode
  *
  * Before passing the socket to the handler, the QTcpSocket's disconnected()
- * signal is connected to the QHttpSocket's deleteLater() slot to ensure that
- * the socket is deleted when the client disconnects.
+ * signal is connected to the [Socket](@ref QHttpEngine::Socket)'s
+ * deleteLater() slot to ensure that the socket is deleted when the client
+ * disconnects.
  */
 class QHTTPENGINE_EXPORT Server : public QTcpServer
 {
