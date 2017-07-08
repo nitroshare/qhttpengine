@@ -24,7 +24,7 @@
 #include <QUrl>
 #include <QUrlQuery>
 
-#include <qhttpengine/qhttpparser.h>
+#include <qhttpengine/parser.h>
 
 void HttpParser::split(const QByteArray &data, const QByteArray &delim, int maxSplit, QByteArrayList &parts)
 {

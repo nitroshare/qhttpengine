@@ -25,7 +25,7 @@
 
 #include <QList>
 
-#include <qhttpengine/qhttpsocket.h>
+#include <qhttpengine/socket.h>
 
 #include "qhttpengine_global.h"
 

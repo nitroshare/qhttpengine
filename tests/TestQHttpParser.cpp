@@ -24,9 +24,9 @@
 #include <QObject>
 #include <QTest>
 
-#include <qhttpengine/qhttpparser.h>
-#include <qhttpengine/qhttpsocket.h>
-#include <qhttpengine/qibytearray.h>
+#include <qhttpengine/parser.h>
+#include <qhttpengine/socket.h>
+#include <qhttpengine/ibytearray.h>
 
 typedef QList<QByteArray> QByteArrayList;
 

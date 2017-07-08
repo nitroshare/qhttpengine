@@ -24,10 +24,10 @@
 #include <QJsonObject>
 #include <QUuid>
 
-#include <qhttpengine/qhttpsocket.h>
-#include <qhttpengine/qlocalauth.h>
+#include <qhttpengine/socket.h>
+#include <qhttpengine/localauthmiddleware.h>
 
-#include "qlocalauth_p.h"
+#include "localauthmiddleware_p.h"
 
 LocalAuthPrivate::LocalAuthPrivate(QObject *parent)
     : QObject(parent),

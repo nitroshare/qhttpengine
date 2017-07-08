@@ -26,7 +26,7 @@
 #include <QObject>
 #include <QStringList>
 
-#include <qhttpengine/qhttpsocket.h>
+#include <qhttpengine/socket.h>
 
 class ApiHandler : public QObject
 {

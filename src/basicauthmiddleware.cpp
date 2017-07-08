@@ -20,12 +20,12 @@
  * IN THE SOFTWARE.
  */
 
-#include <qhttpengine/qhttpbasicauth.h>
-#include <qhttpengine/qhttpparser.h>
-#include <qhttpengine/qhttpsocket.h>
-#include <qhttpengine/qibytearray.h>
+#include <qhttpengine/basicauthmiddleware.h>
+#include <qhttpengine/parser.h>
+#include <qhttpengine/socket.h>
+#include <qhttpengine/ibytearray.h>
 
-#include "qhttpbasicauth_p.h"
+#include "basicauthmiddleware_p.h"
 
 HttpBasicAuthPrivate::HttpBasicAuthPrivate(QObject *parent, const QString &realm)
     : QObject(parent),

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Nathan Osman
+ * Copyright (c) 2015 Nathan Osman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -20,29 +20,39 @@
  * IN THE SOFTWARE.
  */
 
-#include <qhttpengine/qproxyhandler.h>
+#ifndef QHTTPENGINE_QHTTPSERVERPRIVATE_H
+#define QHTTPENGINE_QHTTPSERVERPRIVATE_H
 
-#include "qproxyhandler_p.h"
-#include "qproxysocket.h"
+#include <QObject>
+#include <QTcpSocket>
 
-ProxyHandlerPrivate::ProxyHandlerPrivate(QObject *parent, const QHostAddress &address, quint16 port)
-    : QObject(parent),
-      address(address),
-      port(port)
+#if !defined(QT_NO_SSL)
+#  include <QSslConfiguration>
+#endif
+
+#include <qhttpengine/server.h>
+
+class HttpHandler;
+
+class HttpServerPrivate : public QObject
 {
-}
+    Q_OBJECT
 
-ProxyHandler::ProxyHandler(const QHostAddress &address, quint16 port, QObject *parent)
-    : HttpHandler(parent),
-      d(new ProxyHandlerPrivate(this, address, port))
-{
-}
+public:
 
-void ProxyHandler::process(HttpSocket *socket, const QString &path)
-{
-    // Parent the socket to the proxy
-    socket->setParent(this);
+    explicit HttpServerPrivate(HttpServer *httpServer);
 
-    // Create a new proxy socket
-    new QProxySocket(socket, path, d->address, d->port);
-}
+    void process(QTcpSocket *socket);
+
+    HttpHandler*handler;
+
+#if !defined(QT_NO_SSL)
+    QSslConfiguration configuration;
+#endif
+
+private:
+
+    HttpServer*const q;
+};
+
+#endif // QHTTPENGINE_QHTTPSERVERPRIVATE_H

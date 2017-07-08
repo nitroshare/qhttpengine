@@ -4,19 +4,19 @@ file(GLOB HEADERS "${CMAKE_SOURCE_DIR}/include/qhttpengine/*")
 set(HEADERS "${HEADERS}" "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine_global.h")
 
 set(SRC
-    qfilesystemhandler.cpp
-    qhttpbasicauth.cpp
-    qhttphandler.cpp
-    qhttpparser.cpp
-    qhttprange.cpp
-    qhttpserver.cpp
-    qhttpsocket.cpp
+    filesystemhandler.cpp
+    basicauthmiddleware.cpp
+    handler.cpp
+    parser.cpp
+    range.cpp
+    server.cpp
+    socket.cpp
     qiodevicecopier.cpp
-    qlocalauth.cpp
-    qlocalfile.cpp
+    localauthmiddleware.cpp
+    localfile.cpp
     qobjecthandler.cpp
-    qproxyhandler.cpp
-    qproxysocket.cpp
+    proxyhandler.cpp
+    proxysocket.cpp
 )
 
 if(WIN32)

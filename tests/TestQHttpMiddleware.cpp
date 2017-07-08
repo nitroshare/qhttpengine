@@ -22,9 +22,9 @@
 
 #include <QTest>
 
-#include <qhttpengine/qhttphandler.h>
-#include <qhttpengine/qhttpmiddleware.h>
-#include <qhttpengine/qhttpsocket.h>
+#include <qhttpengine/handler.h>
+#include <qhttpengine/middleware.h>
+#include <qhttpengine/socket.h>
 
 #include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"

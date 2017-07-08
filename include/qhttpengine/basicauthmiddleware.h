@@ -23,7 +23,7 @@
 #ifndef QHTTPENGINE_QHTTPBASICAUTH_H
 #define QHTTPENGINE_QHTTPBASICAUTH_H
 
-#include <qhttpengine/qhttpmiddleware.h>
+#include <qhttpengine/middleware.h>
 
 #include "qhttpengine_global.h"
 

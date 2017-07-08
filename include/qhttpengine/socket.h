@@ -27,7 +27,7 @@
 #include <QMultiMap>
 #include <QIODevice>
 
-#include <qhttpengine/qibytearray.h>
+#include <qhttpengine/ibytearray.h>
 
 #include "qhttpengine_global.h"
 

@@ -23,7 +23,7 @@
 #ifndef QHTTPENGINE_QOBJECTHANDLER_H
 #define QHTTPENGINE_QOBJECTHANDLER_H
 
-#include <qhttpengine/qhttphandler.h>
+#include <qhttpengine/handler.h>
 
 #include "qhttpengine_global.h"
 

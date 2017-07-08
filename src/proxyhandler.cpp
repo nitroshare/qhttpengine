@@ -20,24 +20,29 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QPROXYHANDLERPRIVATE_H
-#define QHTTPENGINE_QPROXYHANDLERPRIVATE_H
+#include <qhttpengine/proxyhandler.h>
 
-#include <QHostAddress>
-#include <QObject>
+#include "proxyhandler_p.h"
+#include "proxysocket.h"
 
-#include <qhttpengine/qhttpsocket.h>
-
-class ProxyHandlerPrivate : public QObject
+ProxyHandlerPrivate::ProxyHandlerPrivate(QObject *parent, const QHostAddress &address, quint16 port)
+    : QObject(parent),
+      address(address),
+      port(port)
 {
-    Q_OBJECT
+}
 
-public:
+ProxyHandler::ProxyHandler(const QHostAddress &address, quint16 port, QObject *parent)
+    : HttpHandler(parent),
+      d(new ProxyHandlerPrivate(this, address, port))
+{
+}
 
-    ProxyHandlerPrivate(QObject *parent, const QHostAddress &address, quint16 port);
+void ProxyHandler::process(HttpSocket *socket, const QString &path)
+{
+    // Parent the socket to the proxy
+    socket->setParent(this);
 
-    QHostAddress address;
-    quint16 port;
-};
-
-#endif // QHTTPENGINE_QPROXYHANDLERPRIVATE_H
+    // Create a new proxy socket
+    new QProxySocket(socket, path, d->address, d->port);
+}

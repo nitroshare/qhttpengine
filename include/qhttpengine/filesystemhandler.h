@@ -23,7 +23,7 @@
 #ifndef QHTTPENGINE_QFILESYSTEMHANDLER_H
 #define QHTTPENGINE_QFILESYSTEMHANDLER_H
 
-#include <qhttpengine/qhttphandler.h>
+#include <qhttpengine/handler.h>
 
 #include "qhttpengine_global.h"
 

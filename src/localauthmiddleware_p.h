@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Nathan Osman
+ * Copyright (c) 2015 Nathan Osman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -20,41 +20,28 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QPROXYHANDLER_H
-#define QHTTPENGINE_QPROXYHANDLER_H
+#ifndef QHTTPENGINE_QLOCALAUTHPRIVATE_H
+#define QHTTPENGINE_QLOCALAUTHPRIVATE_H
 
-#include <QHostAddress>
+#include <QObject>
+#include <QVariantMap>
 
-#include <qhttpengine/qhttphandler.h>
+#include <qhttpengine/localfile.h>
 
-#include "qhttpengine_global.h"
-
-class QHTTPENGINE_EXPORT ProxyHandlerPrivate;
-
-/**
- * @brief Handler that routes HTTP requests to an upstream server
- */
-class QHTTPENGINE_EXPORT ProxyHandler : public HttpHandler
+class LocalAuthPrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    /**
-     * @brief Create a new proxy handler
-     */
-    ProxyHandler(const QHostAddress &address, quint16 port, QObject *parent = 0);
+    explicit LocalAuthPrivate(QObject *parent);
 
-protected:
+    void updateFile();
 
-    /**
-     * @brief Reimplementation of QHttpHandler::process()
-     */
-    virtual void process(HttpSocket *socket, const QString &path);
-
-private:
-
-    ProxyHandlerPrivate *const d;
+    LocalFile file;
+    QVariantMap data;
+    QByteArray tokenHeader;
+    QString token;
 };
 
-#endif // QHTTPENGINE_QPROXYHANDLER_H
+#endif // QHTTPENGINE_QLOCALAUTHPRIVATE_H

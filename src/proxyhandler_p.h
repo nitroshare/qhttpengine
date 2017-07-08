@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Nathan Osman
+ * Copyright (c) 2016 Nathan Osman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -20,39 +20,24 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPSERVERPRIVATE_H
-#define QHTTPENGINE_QHTTPSERVERPRIVATE_H
+#ifndef QHTTPENGINE_QPROXYHANDLERPRIVATE_H
+#define QHTTPENGINE_QPROXYHANDLERPRIVATE_H
 
+#include <QHostAddress>
 #include <QObject>
-#include <QTcpSocket>
 
-#if !defined(QT_NO_SSL)
-#  include <QSslConfiguration>
-#endif
+#include <qhttpengine/socket.h>
 
-#include <qhttpengine/qhttpserver.h>
-
-class HttpHandler;
-
-class HttpServerPrivate : public QObject
+class ProxyHandlerPrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    explicit HttpServerPrivate(HttpServer *httpServer);
+    ProxyHandlerPrivate(QObject *parent, const QHostAddress &address, quint16 port);
 
-    void process(QTcpSocket *socket);
-
-    HttpHandler*handler;
-
-#if !defined(QT_NO_SSL)
-    QSslConfiguration configuration;
-#endif
-
-private:
-
-    HttpServer*const q;
+    QHostAddress address;
+    quint16 port;
 };
 
-#endif // QHTTPENGINE_QHTTPSERVERPRIVATE_H
+#endif // QHTTPENGINE_QPROXYHANDLERPRIVATE_H

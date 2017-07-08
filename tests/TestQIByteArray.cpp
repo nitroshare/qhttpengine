@@ -23,7 +23,7 @@
 #include <QObject>
 #include <QTest>
 
-#include <qhttpengine/qibytearray.h>
+#include <qhttpengine/ibytearray.h>
 
 const char *Value1 = "test";
 const char *Value2 = "TEST";

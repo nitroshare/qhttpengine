@@ -20,34 +20,63 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPHANDLERPRIVATE_H
-#define QHTTPENGINE_QHTTPHANDLERPRIVATE_H
+#ifndef QHTTPENGINE_QHTTPSOCKETPRIVATE_H
+#define QHTTPENGINE_QHTTPSOCKETPRIVATE_H
 
-#include <QList>
-#include <QObject>
-#include <QPair>
-#include <QRegExp>
+#include <qhttpengine/socket.h>
 
-#include <qhttpengine/qhttphandler.h>
+class QTcpSocket;
 
-typedef QPair<QRegExp, QString> Redirect;
-typedef QPair<QRegExp, HttpHandler*> SubHandler;
-
-class HttpHandlerPrivate : public QObject
+class HttpSocketPrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    explicit HttpHandlerPrivate(HttpHandler *handler);
+    HttpSocketPrivate(HttpSocket *httpSocket, QTcpSocket *tcpSocket);
 
-    QList<Redirect> redirects;
-    QList<SubHandler> subHandlers;
-    QList<HttpMiddleware*> middleware;
+    QByteArray statusReason(int statusCode) const;
+
+    QTcpSocket *socket;
+    QByteArray readBuffer;
+
+    enum {
+        ReadHeaders,
+        ReadData,
+        ReadFinished
+    } readState;
+
+    HttpSocket::Method requestMethod;
+    QByteArray requestRawPath;
+    QString requestPath;
+    HttpSocket::QueryStringMap requestQueryString;
+    HttpSocket::HeaderMap requestHeaders;
+    qint64 requestDataRead;
+    qint64 requestDataTotal;
+
+    enum {
+        WriteNone,
+        WriteHeaders,
+        WriteData,
+        WriteFinished
+    } writeState;
+
+    int responseStatusCode;
+    QByteArray responseStatusReason;
+    HttpSocket::HeaderMap responseHeaders;
+    qint64 responseHeaderRemaining;
+
+private Q_SLOTS:
+
+    void onReadyRead();
+    void onBytesWritten(qint64 bytes);
 
 private:
 
-    HttpHandler*const q;
+    bool readHeaders();
+    void readData();
+
+    HttpSocket*const q;
 };
 
-#endif // QHTTPENGINE_QHTTPHANDLERPRIVATE_H
+#endif // QHTTPENGINE_QHTTPSOCKETPRIVATE_H

@@ -23,7 +23,7 @@
 #include <QGenericArgument>
 #include <QMetaMethod>
 
-#include <qhttpengine/qhttpsocket.h>
+#include <qhttpengine/socket.h>
 #include <qhttpengine/qobjecthandler.h>
 
 #include "qobjecthandler_p.h"

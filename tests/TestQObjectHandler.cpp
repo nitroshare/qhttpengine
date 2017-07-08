@@ -23,7 +23,7 @@
 #include <QObject>
 #include <QTest>
 
-#include <qhttpengine/qhttpsocket.h>
+#include <qhttpengine/socket.h>
 #include <qhttpengine/qobjecthandler.h>
 
 #include "common/qsimplehttpclient.h"

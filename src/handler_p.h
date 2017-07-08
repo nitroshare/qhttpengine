@@ -20,28 +20,34 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QLOCALAUTHPRIVATE_H
-#define QHTTPENGINE_QLOCALAUTHPRIVATE_H
+#ifndef QHTTPENGINE_QHTTPHANDLERPRIVATE_H
+#define QHTTPENGINE_QHTTPHANDLERPRIVATE_H
 
+#include <QList>
 #include <QObject>
-#include <QVariantMap>
+#include <QPair>
+#include <QRegExp>
 
-#include <qhttpengine/qlocalfile.h>
+#include <qhttpengine/handler.h>
 
-class LocalAuthPrivate : public QObject
+typedef QPair<QRegExp, QString> Redirect;
+typedef QPair<QRegExp, HttpHandler*> SubHandler;
+
+class HttpHandlerPrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    explicit LocalAuthPrivate(QObject *parent);
+    explicit HttpHandlerPrivate(HttpHandler *handler);
 
-    void updateFile();
+    QList<Redirect> redirects;
+    QList<SubHandler> subHandlers;
+    QList<HttpMiddleware*> middleware;
 
-    LocalFile file;
-    QVariantMap data;
-    QByteArray tokenHeader;
-    QString token;
+private:
+
+    HttpHandler*const q;
 };
 
-#endif // QHTTPENGINE_QLOCALAUTHPRIVATE_H
+#endif // QHTTPENGINE_QHTTPHANDLERPRIVATE_H

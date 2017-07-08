@@ -27,7 +27,7 @@
 #include <QObject>
 #include <QTcpSocket>
 
-#include <qhttpengine/qhttpsocket.h>
+#include <qhttpengine/socket.h>
 
 /**
  * @brief HTTP socket for connecting to a proxy

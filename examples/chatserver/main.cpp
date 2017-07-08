@@ -27,9 +27,9 @@
 #include <QRegExp>
 #include <QStringList>
 
-#include <qhttpengine/qfilesystemhandler.h>
-#include <qhttpengine/qhttphandler.h>
-#include <qhttpengine/qhttpserver.h>
+#include <qhttpengine/filesystemhandler.h>
+#include <qhttpengine/handler.h>
+#include <qhttpengine/server.h>
 #include <qhttpengine/qobjecthandler.h>
 
 #include "apihandler.h"

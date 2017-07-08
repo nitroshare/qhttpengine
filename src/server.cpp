@@ -24,10 +24,10 @@
 #  include <QSslSocket>
 #endif
 
-#include <qhttpengine/qhttphandler.h>
-#include <qhttpengine/qhttpsocket.h>
+#include <qhttpengine/handler.h>
+#include <qhttpengine/socket.h>
 
-#include "qhttpserver_p.h"
+#include "server_p.h"
 
 HttpServerPrivate::HttpServerPrivate(HttpServer *httpServer)
     : QObject(httpServer),

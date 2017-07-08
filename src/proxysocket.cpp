@@ -20,9 +20,9 @@
  * IN THE SOFTWARE.
  */
 
-#include <qhttpengine/qhttpparser.h>
+#include <qhttpengine/parser.h>
 
-#include "qproxysocket.h"
+#include "proxysocket.h"
 
 QProxySocket::QProxySocket(HttpSocket *socket, const QString &path, const QHostAddress &address, quint16 port)
     : QObject(socket),

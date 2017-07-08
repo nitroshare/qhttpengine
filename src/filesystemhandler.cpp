@@ -25,11 +25,11 @@
 #include <QFileInfoList>
 #include <QUrl>
 
-#include <qhttpengine/qfilesystemhandler.h>
-#include <qhttpengine/qhttprange.h>
+#include <qhttpengine/filesystemhandler.h>
+#include <qhttpengine/range.h>
 #include <qhttpengine/qiodevicecopier.h>
 
-#include "qfilesystemhandler_p.h"
+#include "filesystemhandler_p.h"
 
 // Template for listing directory contents
 const QString ListTemplate =

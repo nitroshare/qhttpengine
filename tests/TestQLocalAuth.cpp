@@ -26,8 +26,8 @@
 #include <QTest>
 #include <QVariantMap>
 
-#include <qhttpengine/qhttpsocket.h>
-#include <qhttpengine/qlocalauth.h>
+#include <qhttpengine/socket.h>
+#include <qhttpengine/localauthmiddleware.h>
 
 #include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"

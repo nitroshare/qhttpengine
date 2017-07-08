@@ -26,9 +26,9 @@
 #include <QJsonParseError>
 #include <QTcpSocket>
 
-#include <qhttpengine/qhttpparser.h>
+#include <qhttpengine/parser.h>
 
-#include "qhttpsocket_p.h"
+#include "socket_p.h"
 
 // Predefined error response requires a simple HTML template to be returned to
 // the client describing the error condition

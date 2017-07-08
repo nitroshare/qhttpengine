@@ -30,9 +30,9 @@
 #  include <windows.h>
 #endif
 
-#include <qhttpengine/qlocalfile.h>
+#include <qhttpengine/localfile.h>
 
-#include "qlocalfile_p.h"
+#include "localfile_p.h"
 
 LocalFilePrivate::LocalFilePrivate(LocalFile *localFile)
     : QObject(localFile),

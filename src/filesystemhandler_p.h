@@ -20,63 +20,32 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QHTTPSOCKETPRIVATE_H
-#define QHTTPENGINE_QHTTPSOCKETPRIVATE_H
+#ifndef QHTTPENGINE_QFILESYSTEMHANDLERPRIVATE_H
+#define QHTTPENGINE_QFILESYSTEMHANDLERPRIVATE_H
 
-#include <qhttpengine/qhttpsocket.h>
+#include <QDir>
+#include <QMimeDatabase>
+#include <QObject>
 
-class QTcpSocket;
+#include <qhttpengine/filesystemhandler.h>
+#include <qhttpengine/socket.h>
 
-class HttpSocketPrivate : public QObject
+class FilesystemHandlerPrivate : public QObject
 {
     Q_OBJECT
 
 public:
 
-    HttpSocketPrivate(HttpSocket *httpSocket, QTcpSocket *tcpSocket);
+    FilesystemHandlerPrivate(FilesystemHandler *handler);
 
-    QByteArray statusReason(int statusCode) const;
+    bool absolutePath(const QString &path, QString &absolutePath);
+    QByteArray mimeType(const QString &path);
 
-    QTcpSocket *socket;
-    QByteArray readBuffer;
+    void processFile(HttpSocket*socket, const QString &absolutePath);
+    void processDirectory(HttpSocket*socket, const QString &path, const QString &absolutePath);
 
-    enum {
-        ReadHeaders,
-        ReadData,
-        ReadFinished
-    } readState;
-
-    HttpSocket::Method requestMethod;
-    QByteArray requestRawPath;
-    QString requestPath;
-    HttpSocket::QueryStringMap requestQueryString;
-    HttpSocket::HeaderMap requestHeaders;
-    qint64 requestDataRead;
-    qint64 requestDataTotal;
-
-    enum {
-        WriteNone,
-        WriteHeaders,
-        WriteData,
-        WriteFinished
-    } writeState;
-
-    int responseStatusCode;
-    QByteArray responseStatusReason;
-    HttpSocket::HeaderMap responseHeaders;
-    qint64 responseHeaderRemaining;
-
-private Q_SLOTS:
-
-    void onReadyRead();
-    void onBytesWritten(qint64 bytes);
-
-private:
-
-    bool readHeaders();
-    void readData();
-
-    HttpSocket*const q;
+    QDir documentRoot;
+    QMimeDatabase database;
 };
 
-#endif // QHTTPENGINE_QHTTPSOCKETPRIVATE_H
+#endif // QHTTPENGINE_QFILESYSTEMHANDLERPRIVATE_H

@@ -20,11 +20,11 @@
  * IN THE SOFTWARE.
  */
 
-#include <qhttpengine/qhttphandler.h>
-#include <qhttpengine/qhttpmiddleware.h>
-#include <qhttpengine/qhttpsocket.h>
+#include <qhttpengine/handler.h>
+#include <qhttpengine/middleware.h>
+#include <qhttpengine/socket.h>
 
-#include "qhttphandler_p.h"
+#include "handler_p.h"
 
 HttpHandlerPrivate::HttpHandlerPrivate(HttpHandler *handler)
     : QObject(handler),

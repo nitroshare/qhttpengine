@@ -22,9 +22,9 @@
 
 #include <QTest>
 
-#include <qhttpengine/qhttpbasicauth.h>
-#include <qhttpengine/qhttphandler.h>
-#include <qhttpengine/qhttpsocket.h>
+#include <qhttpengine/basicauthmiddleware.h>
+#include <qhttpengine/handler.h>
+#include <qhttpengine/socket.h>
 
 #include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"

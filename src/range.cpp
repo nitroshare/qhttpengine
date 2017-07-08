@@ -22,9 +22,9 @@
 
 #include <QRegExp>
 
-#include <qhttpengine/qhttprange.h>
+#include <qhttpengine/range.h>
 
-#include "qhttprange_p.h"
+#include "range_p.h"
 
 HttpRangePrivate::HttpRangePrivate(HttpRange *range)
     : q(range)

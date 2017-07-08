@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Nathan Osman
+ * Copyright (c) 2016 Nathan Osman
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -20,32 +20,41 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QFILESYSTEMHANDLERPRIVATE_H
-#define QHTTPENGINE_QFILESYSTEMHANDLERPRIVATE_H
+#ifndef QHTTPENGINE_QPROXYHANDLER_H
+#define QHTTPENGINE_QPROXYHANDLER_H
 
-#include <QDir>
-#include <QMimeDatabase>
-#include <QObject>
+#include <QHostAddress>
 
-#include <qhttpengine/qfilesystemhandler.h>
-#include <qhttpengine/qhttpsocket.h>
+#include <qhttpengine/handler.h>
 
-class FilesystemHandlerPrivate : public QObject
+#include "qhttpengine_global.h"
+
+class QHTTPENGINE_EXPORT ProxyHandlerPrivate;
+
+/**
+ * @brief Handler that routes HTTP requests to an upstream server
+ */
+class QHTTPENGINE_EXPORT ProxyHandler : public HttpHandler
 {
     Q_OBJECT
 
 public:
 
-    FilesystemHandlerPrivate(FilesystemHandler *handler);
+    /**
+     * @brief Create a new proxy handler
+     */
+    ProxyHandler(const QHostAddress &address, quint16 port, QObject *parent = 0);
 
-    bool absolutePath(const QString &path, QString &absolutePath);
-    QByteArray mimeType(const QString &path);
+protected:
 
-    void processFile(HttpSocket*socket, const QString &absolutePath);
-    void processDirectory(HttpSocket*socket, const QString &path, const QString &absolutePath);
+    /**
+     * @brief Reimplementation of QHttpHandler::process()
+     */
+    virtual void process(HttpSocket *socket, const QString &path);
 
-    QDir documentRoot;
-    QMimeDatabase database;
+private:
+
+    ProxyHandlerPrivate *const d;
 };
 
-#endif // QHTTPENGINE_QFILESYSTEMHANDLERPRIVATE_H
+#endif // QHTTPENGINE_QPROXYHANDLER_H
