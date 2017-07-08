@@ -54,7 +54,7 @@ public:
     QString mPath;
 };
 
-class TestQHttpServer : public QObject
+class TestServer : public QObject
 {
     Q_OBJECT
 
@@ -67,7 +67,7 @@ private Q_SLOTS:
 #endif
 };
 
-void TestQHttpServer::testServer()
+void TestServer::testServer()
 {
     TestHandler handler;
     QHttpEngine::Server server(&handler);
@@ -90,7 +90,7 @@ void TestQHttpServer::testServer()
 }
 
 #if !defined(QT_NO_SSL)
-void TestQHttpServer::testSsl()
+void TestServer::testSsl()
 {
     QFile keyFile(":/key.pem");
     QVERIFY(keyFile.open(QIODevice::ReadOnly));
@@ -119,5 +119,5 @@ void TestQHttpServer::testSsl()
 }
 #endif
 
-QTEST_MAIN(TestQHttpServer)
-#include "TestQHttpServer.moc"
+QTEST_MAIN(TestServer)
+#include "TestServer.moc"

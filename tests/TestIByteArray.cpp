@@ -42,7 +42,7 @@ const char *Value2 = "TEST";
     TEST_OPERATOR(tn, t, LessEqual, <=, true) \
     TEST_OPERATOR(tn, t, GreaterEqual, >=, true)
 
-class TestQIByteArray : public QObject
+class TestIByteArray : public QObject
 {
     Q_OBJECT
 
@@ -56,7 +56,7 @@ private Q_SLOTS:
     void testContains();
 };
 
-void TestQIByteArray::testContains()
+void TestIByteArray::testContains()
 {
     QHttpEngine::IByteArray v(Value1);
 
@@ -65,5 +65,5 @@ void TestQIByteArray::testContains()
     QVERIFY(v.contains(QByteArray(Value2)));
 }
 
-QTEST_MAIN(TestQIByteArray)
-#include "TestQIByteArray.moc"
+QTEST_MAIN(TestIByteArray)
+#include "TestIByteArray.moc"

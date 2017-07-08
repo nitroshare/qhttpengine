@@ -20,32 +20,38 @@
  * IN THE SOFTWARE.
  */
 
-#include <QFile>
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QTest>
-#include <QVariantMap>
 
+#include <qhttpengine/handler.h>
+#include <qhttpengine/middleware.h>
 #include <qhttpengine/socket.h>
-#include <qhttpengine/localauthmiddleware.h>
 
 #include "common/qsimplehttpclient.h"
 #include "common/qsocketpair.h"
 
-const QByteArray HeaderName = "X-Test";
-const QByteArray CustomName = "Name";
-const QByteArray CustomData = "Data";
+class DummyMiddleware : public QHttpEngine::Middleware
+{
+    Q_OBJECT
 
-class TestQLocalAuth : public QObject
+public:
+
+    virtual bool process(QHttpEngine::Socket *socket)
+    {
+        socket->writeError(QHttpEngine::Socket::Forbidden);
+        return false;
+    }
+};
+
+class TestMiddleware : public QObject
 {
     Q_OBJECT
 
 private Q_SLOTS:
 
-    void testAuth();
+    void testProcess();
 };
 
-void TestQLocalAuth::testAuth()
+void TestMiddleware::testProcess()
 {
     QSocketPair pair;
     QTRY_VERIFY(pair.isConnected());
@@ -53,27 +59,16 @@ void TestQLocalAuth::testAuth()
     QSimpleHttpClient client(pair.client());
     QHttpEngine::Socket socket(pair.server(), &pair);
 
-    QHttpEngine::LocalAuthMiddleware localAuth;
-    localAuth.setData(QVariantMap{
-        {CustomName, CustomData}
-    });
-    localAuth.setHeaderName(HeaderName);
-    QVERIFY(localAuth.exists());
-
-    QFile file(localAuth.filename());
-    QVERIFY(file.open(QIODevice::ReadOnly));
-
-    QVariantMap data = QJsonDocument::fromJson(file.readAll()).object().toVariantMap();
-    QVERIFY(data.contains("token"));
-    QCOMPARE(data.value(CustomName).toByteArray(), CustomData);
-
-    client.sendHeaders("GET", "/", QHttpEngine::Socket::HeaderMap{
-        {HeaderName, data.value("token").toByteArray()}
-    });
+    client.sendHeaders("GET", "/");
     QTRY_VERIFY(socket.isHeadersParsed());
 
-    QVERIFY(localAuth.process(&socket));
+    DummyMiddleware middleware;
+    QHttpEngine::Handler handler;
+    handler.addMiddleware(&middleware);
+    handler.route(&socket, "/");
+
+    QTRY_COMPARE(client.statusCode(), static_cast<int>(QHttpEngine::Socket::Forbidden));
 }
 
-QTEST_MAIN(TestQLocalAuth)
-#include "TestQLocalAuth.moc"
+QTEST_MAIN(TestMiddleware)
+#include "TestMiddleware.moc"

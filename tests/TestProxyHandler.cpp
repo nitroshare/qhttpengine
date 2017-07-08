@@ -35,7 +35,7 @@
 const QString Path = "test";
 const QByteArray Data = "test";
 
-class TestQProxyHandler : public QObject
+class TestProxyHandler : public QObject
 {
     Q_OBJECT
 
@@ -44,7 +44,7 @@ private Q_SLOTS:
     void testDataPassthrough();
 };
 
-void TestQProxyHandler::testDataPassthrough()
+void TestProxyHandler::testDataPassthrough()
 {
     // Create the upstream handler (simple echo)
     QHttpEngine::QObjectHandler upstreamHandler;
@@ -81,5 +81,5 @@ void TestQProxyHandler::testDataPassthrough()
     QTRY_COMPARE(client.data(), Data);
 }
 
-QTEST_MAIN(TestQProxyHandler)
-#include "TestQProxyHandler.moc"
+QTEST_MAIN(TestProxyHandler)
+#include "TestProxyHandler.moc"

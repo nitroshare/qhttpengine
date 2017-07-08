@@ -44,7 +44,7 @@ public:
     QString mPathRemainder;
 };
 
-class TestQHttpHandler : public QObject
+class TestHandler : public QObject
 {
     Q_OBJECT
 
@@ -57,7 +57,7 @@ private Q_SLOTS:
     void testSubHandler();
 };
 
-void TestQHttpHandler::testRedirect_data()
+void TestHandler::testRedirect_data()
 {
     QTest::addColumn<QRegExp>("pattern");
     QTest::addColumn<QString>("destination");
@@ -86,7 +86,7 @@ void TestQHttpHandler::testRedirect_data()
             << QByteArray("/path/123");
 }
 
-void TestQHttpHandler::testRedirect()
+void TestHandler::testRedirect()
 {
     QFETCH(QRegExp, pattern);
     QFETCH(QString, destination);
@@ -114,7 +114,7 @@ void TestQHttpHandler::testRedirect()
     }
 }
 
-void TestQHttpHandler::testSubHandler_data()
+void TestHandler::testSubHandler_data()
 {
     QTest::addColumn<QRegExp>("pattern");
     QTest::addColumn<QByteArray>("path");
@@ -140,7 +140,7 @@ void TestQHttpHandler::testSubHandler_data()
             << static_cast<int>(QHttpEngine::Socket::OK);
 }
 
-void TestQHttpHandler::testSubHandler()
+void TestHandler::testSubHandler()
 {
     QFETCH(QRegExp, pattern);
     QFETCH(QByteArray, path);
@@ -166,5 +166,5 @@ void TestQHttpHandler::testSubHandler()
     QCOMPARE(subHandler.mPathRemainder, pathRemainder);
 }
 
-QTEST_MAIN(TestQHttpHandler)
-#include "TestQHttpHandler.moc"
+QTEST_MAIN(TestHandler)
+#include "TestHandler.moc"

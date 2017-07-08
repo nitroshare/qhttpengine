@@ -32,13 +32,13 @@
 const QString Username = "username";
 const QString Password = "password";
 
-class TestQHttpBasicAuth : public QObject
+class TestBasicAuthMiddleware : public QObject
 {
     Q_OBJECT
 
 public:
 
-    TestQHttpBasicAuth() : auth("Test") {}
+    TestBasicAuthMiddleware() : auth("Test") {}
 
 private Q_SLOTS:
 
@@ -52,12 +52,12 @@ private:
     QHttpEngine::BasicAuthMiddleware auth;
 };
 
-void TestQHttpBasicAuth::initTestCase()
+void TestBasicAuthMiddleware::initTestCase()
 {
     auth.add(Username, Password);
 }
 
-void TestQHttpBasicAuth::testProcess_data()
+void TestBasicAuthMiddleware::testProcess_data()
 {
     QTest::addColumn<bool>("header");
     QTest::addColumn<QString>("username");
@@ -83,7 +83,7 @@ void TestQHttpBasicAuth::testProcess_data()
             << static_cast<int>(QHttpEngine::Socket::NotFound);
 }
 
-void TestQHttpBasicAuth::testProcess()
+void TestBasicAuthMiddleware::testProcess()
 {
     QFETCH(bool, header);
     QFETCH(QString, username);
@@ -115,5 +115,5 @@ void TestQHttpBasicAuth::testProcess()
     QTRY_COMPARE(client.statusCode(), status);
 }
 
-QTEST_MAIN(TestQHttpBasicAuth)
-#include "TestQHttpBasicAuth.moc"
+QTEST_MAIN(TestBasicAuthMiddleware)
+#include "TestBasicAuthMiddleware.moc"

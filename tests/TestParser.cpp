@@ -42,13 +42,13 @@ const QHttpEngine::IByteArray Key2 = "c";
 const QByteArray Value2 = "d";
 const QByteArray Line2 = Key2 + ": " + Value2;
 
-class TestQHttpParser : public QObject
+class TestParser : public QObject
 {
     Q_OBJECT
 
 public:
 
-    TestQHttpParser();
+    TestParser();
 
 private Q_SLOTS:
 
@@ -75,13 +75,13 @@ private:
     QHttpEngine::Socket::HeaderMap headers;
 };
 
-TestQHttpParser::TestQHttpParser()
+TestParser::TestParser()
 {
     headers.insert(Key1, Value1);
     headers.insert(Key2, Value2);
 }
 
-void TestQHttpParser::testSplit_data()
+void TestParser::testSplit_data()
 {
     QTest::addColumn<QByteArray>("data");
     QTest::addColumn<QByteArray>("delim");
@@ -119,7 +119,7 @@ void TestQHttpParser::testSplit_data()
             << (QByteArrayList() << "a" << "a,a");
 }
 
-void TestQHttpParser::testSplit()
+void TestParser::testSplit()
 {
     QFETCH(QByteArray, data);
     QFETCH(QByteArray, delim);
@@ -132,7 +132,7 @@ void TestQHttpParser::testSplit()
     QCOMPARE(outParts, parts);
 }
 
-void TestQHttpParser::testParsePath_data()
+void TestParser::testParsePath_data()
 {
     QTest::addColumn<QByteArray>("rawPath");
     QTest::addColumn<QString>("path");
@@ -149,7 +149,7 @@ void TestQHttpParser::testParsePath_data()
             << QHttpEngine::Socket::QueryStringMap{{"a", "b"}};
 }
 
-void TestQHttpParser::testParsePath()
+void TestParser::testParsePath()
 {
     QFETCH(QByteArray, rawPath);
     QFETCH(QString, path);
@@ -164,7 +164,7 @@ void TestQHttpParser::testParsePath()
     QCOMPARE(map, outMap);
 }
 
-void TestQHttpParser::testParseHeaderList_data()
+void TestParser::testParseHeaderList_data()
 {
     QTest::addColumn<bool>("success");
     QTest::addColumn<QByteArrayList>("lines");
@@ -180,7 +180,7 @@ void TestQHttpParser::testParseHeaderList_data()
             << headers;
 }
 
-void TestQHttpParser::testParseHeaderList()
+void TestParser::testParseHeaderList()
 {
     QFETCH(bool, success);
     QFETCH(QByteArrayList, lines);
@@ -194,7 +194,7 @@ void TestQHttpParser::testParseHeaderList()
     }
 }
 
-void TestQHttpParser::testParseHeaders_data()
+void TestParser::testParseHeaders_data()
 {
     QTest::addColumn<bool>("success");
     QTest::addColumn<QByteArray>("data");
@@ -210,7 +210,7 @@ void TestQHttpParser::testParseHeaders_data()
             << (QByteArrayList() << "GET" << "/" << "HTTP/1.0");
 }
 
-void TestQHttpParser::testParseHeaders()
+void TestParser::testParseHeaders()
 {
     QFETCH(bool, success);
     QFETCH(QByteArray, data);
@@ -226,7 +226,7 @@ void TestQHttpParser::testParseHeaders()
     }
 }
 
-void TestQHttpParser::testParseRequestHeaders_data()
+void TestParser::testParseRequestHeaders_data()
 {
     QTest::addColumn<bool>("success");
     QTest::addColumn<QByteArray>("data");
@@ -244,7 +244,7 @@ void TestQHttpParser::testParseRequestHeaders_data()
             << QByteArray("/");
 }
 
-void TestQHttpParser::testParseRequestHeaders()
+void TestParser::testParseRequestHeaders()
 {
     QFETCH(bool, success);
     QFETCH(QByteArray, data);
@@ -264,7 +264,7 @@ void TestQHttpParser::testParseRequestHeaders()
     }
 }
 
-void TestQHttpParser::testParseResponseHeaders_data()
+void TestParser::testParseResponseHeaders_data()
 {
     QTest::addColumn<bool>("success");
     QTest::addColumn<QByteArray>("data");
@@ -282,7 +282,7 @@ void TestQHttpParser::testParseResponseHeaders_data()
             << QByteArray("NOT FOUND");
 }
 
-void TestQHttpParser::testParseResponseHeaders()
+void TestParser::testParseResponseHeaders()
 {
     QFETCH(bool, success);
     QFETCH(QByteArray, data);
@@ -302,5 +302,5 @@ void TestQHttpParser::testParseResponseHeaders()
     }
 }
 
-QTEST_MAIN(TestQHttpParser)
-#include "TestQHttpParser.moc"
+QTEST_MAIN(TestParser)
+#include "TestParser.moc"

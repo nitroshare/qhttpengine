@@ -35,7 +35,7 @@
 
 const QByteArray Data = "test";
 
-class TestQFilesystemHandler : public QObject
+class TestFilesystemHandler : public QObject
 {
     Q_OBJECT
 
@@ -57,14 +57,14 @@ private:
     QTemporaryDir dir;
 };
 
-void TestQFilesystemHandler::initTestCase()
+void TestFilesystemHandler::initTestCase()
 {
     QVERIFY(createFile("outside"));
     QVERIFY(createDirectory("root"));
     QVERIFY(createFile("root/inside"));
 }
 
-void TestQFilesystemHandler::testRequests_data()
+void TestFilesystemHandler::testRequests_data()
 {
     QTest::addColumn<QString>("path");
     QTest::addColumn<int>("statusCode");
@@ -91,7 +91,7 @@ void TestQFilesystemHandler::testRequests_data()
             << QByteArray();
 }
 
-void TestQFilesystemHandler::testRequests()
+void TestFilesystemHandler::testRequests()
 {
     QFETCH(QString, path);
     QFETCH(int, statusCode);
@@ -114,7 +114,7 @@ void TestQFilesystemHandler::testRequests()
     }
 }
 
-void TestQFilesystemHandler::testRangeRequests_data()
+void TestFilesystemHandler::testRangeRequests_data()
 {
     QTest::addColumn<QString>("path");
     QTest::addColumn<QString>("range");
@@ -159,7 +159,7 @@ void TestQFilesystemHandler::testRangeRequests_data()
             << Data;
 }
 
-void TestQFilesystemHandler::testRangeRequests()
+void TestFilesystemHandler::testRangeRequests()
 {
     QFETCH(QString, path);
     QFETCH(QString, range);
@@ -193,7 +193,7 @@ void TestQFilesystemHandler::testRangeRequests()
     }
 }
 
-bool TestQFilesystemHandler::createFile(const QString &path)
+bool TestFilesystemHandler::createFile(const QString &path)
 {
     QFile file(QDir(dir.path()).absoluteFilePath(path));
     if (!file.open(QIODevice::WriteOnly)) {
@@ -203,10 +203,10 @@ bool TestQFilesystemHandler::createFile(const QString &path)
     return file.write(Data) == Data.length();
 }
 
-bool TestQFilesystemHandler::createDirectory(const QString &path)
+bool TestFilesystemHandler::createDirectory(const QString &path)
 {
     return QDir(dir.path()).mkpath(path);
 }
 
-QTEST_MAIN(TestQFilesystemHandler)
-#include "TestQFilesystemHandler.moc"
+QTEST_MAIN(TestFilesystemHandler)
+#include "TestFilesystemHandler.moc"

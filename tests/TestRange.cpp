@@ -26,13 +26,13 @@
 
 #include <qhttpengine/range.h>
 
-class TestQHttpRange : public QObject
+class TestRange : public QObject
 {
     Q_OBJECT
 
 public:
 
-    TestQHttpRange();
+    TestRange();
 
 private Q_SLOTS:
 
@@ -52,18 +52,18 @@ private Q_SLOTS:
     void testContentRange();
 };
 
-TestQHttpRange::TestQHttpRange()
+TestRange::TestRange()
 {
 }
 
-void TestQHttpRange::testDefaultConstructor()
+void TestRange::testDefaultConstructor()
 {
     QHttpEngine::Range range;
 
     QCOMPARE(range.isValid(), false);
 }
 
-void TestQHttpRange::testAssignmentOperator()
+void TestRange::testAssignmentOperator()
 {
     QHttpEngine::Range range;
     QHttpEngine::Range otherRange(100, 200, -1);
@@ -75,7 +75,7 @@ void TestQHttpRange::testAssignmentOperator()
     QCOMPARE(range.to(), 200);
 }
 
-void TestQHttpRange::testFromToLength_data()
+void TestRange::testFromToLength_data()
 {
     QTest::addColumn<int>("inFrom");
     QTest::addColumn<int>("inTo");
@@ -101,7 +101,7 @@ void TestQHttpRange::testFromToLength_data()
             << 10 << 99 << 90;
 }
 
-void TestQHttpRange::testFromToLength()
+void TestRange::testFromToLength()
 {
     QFETCH(int, inFrom);
     QFETCH(int, inTo);
@@ -117,7 +117,7 @@ void TestQHttpRange::testFromToLength()
     QCOMPARE(range.length(), length);
 }
 
-void TestQHttpRange::testIsValid_data()
+void TestRange::testIsValid_data()
 {
     QTest::addColumn<int>("from");
     QTest::addColumn<int>("to");
@@ -155,7 +155,7 @@ void TestQHttpRange::testIsValid_data()
             << 500 << -1 << 499 << false;
 }
 
-void TestQHttpRange::testIsValid()
+void TestRange::testIsValid()
 {
     QFETCH(int, from);
     QFETCH(int, to);
@@ -167,7 +167,7 @@ void TestQHttpRange::testIsValid()
     QCOMPARE(range.isValid(), valid);
 }
 
-void TestQHttpRange::testParseFromString_data()
+void TestRange::testParseFromString_data()
 {
     QTest::addColumn<QString>("data");
     QTest::addColumn<int>("dataSize");
@@ -229,7 +229,7 @@ void TestQHttpRange::testParseFromString_data()
             << false;
 }
 
-void TestQHttpRange::testParseFromString()
+void TestRange::testParseFromString()
 {
     QFETCH(QString, data);
     QFETCH(int, dataSize);
@@ -250,7 +250,7 @@ void TestQHttpRange::testParseFromString()
     }
 }
 
-void TestQHttpRange::testContentRange_data()
+void TestRange::testContentRange_data()
 {
     QTest::addColumn<int>("from");
     QTest::addColumn<int>("to");
@@ -274,7 +274,7 @@ void TestQHttpRange::testContentRange_data()
             << "";
 }
 
-void TestQHttpRange::testContentRange()
+void TestRange::testContentRange()
 {
     QFETCH(int, from);
     QFETCH(int, to);
@@ -286,5 +286,5 @@ void TestQHttpRange::testContentRange()
     QCOMPARE(range.contentRange(), contentRange);
 }
 
-QTEST_MAIN(TestQHttpRange)
-#include "TestQHttpRange.moc"
+QTEST_MAIN(TestRange)
+#include "TestRange.moc"

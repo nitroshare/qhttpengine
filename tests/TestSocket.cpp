@@ -49,13 +49,13 @@ const int StatusCode = 404;
 const QByteArray StatusReason = "NOT FOUND";
 const QByteArray Data = "test";
 
-class TestQHttpSocket : public QObject
+class TestSocket : public QObject
 {
     Q_OBJECT
 
 public:
 
-    TestQHttpSocket();
+    TestSocket();
 
 private Q_SLOTS:
 
@@ -70,13 +70,13 @@ private:
     QHttpEngine::Socket::HeaderMap headers;
 };
 
-TestQHttpSocket::TestQHttpSocket()
+TestSocket::TestSocket()
 {
     headers.insert("Content-Type", "text/plain");
     headers.insert("Content-Length", QByteArray::number(Data.length()));
 }
 
-void TestQHttpSocket::testProperties()
+void TestSocket::testProperties()
 {
     CREATE_SOCKET_PAIR();
 
@@ -95,7 +95,7 @@ void TestQHttpSocket::testProperties()
     QCOMPARE(client.headers(), headers);
 }
 
-void TestQHttpSocket::testData()
+void TestSocket::testData()
 {
     CREATE_SOCKET_PAIR();
 
@@ -112,7 +112,7 @@ void TestQHttpSocket::testData()
     QTRY_COMPARE(client.data(), Data);
 }
 
-void TestQHttpSocket::testRedirect()
+void TestSocket::testRedirect()
 {
     CREATE_SOCKET_PAIR();
 
@@ -125,7 +125,7 @@ void TestQHttpSocket::testRedirect()
     QTRY_COMPARE(disconnectedSpy.count(), 1);
 }
 
-void TestQHttpSocket::testSignals()
+void TestSocket::testSignals()
 {
     CREATE_SOCKET_PAIR();
 
@@ -163,7 +163,7 @@ void TestQHttpSocket::testSignals()
     QTRY_COMPARE(aboutToCloseSpy.count(), 1);
 }
 
-void TestQHttpSocket::testJson()
+void TestSocket::testJson()
 {
     CREATE_SOCKET_PAIR();
 
@@ -184,5 +184,5 @@ void TestQHttpSocket::testJson()
     QCOMPARE(document.object(), object);
 }
 
-QTEST_MAIN(TestQHttpSocket)
-#include "TestQHttpSocket.moc"
+QTEST_MAIN(TestSocket)
+#include "TestSocket.moc"

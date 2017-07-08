@@ -1,20 +1,20 @@
 add_subdirectory(common)
 
 set(TESTS
-    TestQFilesystemHandler
-    TestQHttpBasicAuth
-    TestQHttpHandler
-    TestQHttpMiddleware
-    TestQHttpParser
-    TestQHttpRange
-    TestQHttpServer
-    TestQHttpSocket
-    TestQIByteArray
+    TestBasicAuthMiddleware
+    TestFilesystemHandler
+    TestHandler
+    TestIByteArray
+    TestLocalAuthMiddleware
+    TestLocalFile
+    TestMiddleware
+    TestParser
+    TestProxyHandler
     TestQIODeviceCopier
-    TestQLocalAuth
-    TestQLocalFile
     TestQObjectHandler
-    TestQProxyHandler
+    TestRange
+    TestServer
+    TestSocket
 )
 
 qt5_add_resources(QRC resource.qrc)

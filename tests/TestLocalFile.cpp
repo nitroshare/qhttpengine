@@ -29,7 +29,7 @@
 
 const QString ApplicationName = "QHttpEngine";
 
-class TestQLocalFile : public QObject
+class TestLocalFile : public QObject
 {
     Q_OBJECT
 
@@ -39,17 +39,17 @@ private Q_SLOTS:
     void testOpen();
 };
 
-void TestQLocalFile::initTestCase()
+void TestLocalFile::initTestCase()
 {
     QCoreApplication::setApplicationName(ApplicationName);
 }
 
-void TestQLocalFile::testOpen()
+void TestLocalFile::testOpen()
 {
     QHttpEngine::LocalFile file;
     QVERIFY(file.open());
     QVERIFY(file.remove());
 }
 
-QTEST_MAIN(TestQLocalFile)
-#include "TestQLocalFile.moc"
+QTEST_MAIN(TestLocalFile)
+#include "TestLocalFile.moc"
