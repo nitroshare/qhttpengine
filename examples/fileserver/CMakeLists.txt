@@ -3,7 +3,7 @@ set(SRC
 )
 
 add_executable(fileserver ${SRC})
-target_link_libraries(fileserver QHttpEngine)
+target_link_libraries(fileserver qhttpengine)
 
 install(TARGETS fileserver
     RUNTIME DESTINATION "${EXAMPLE_DIR}"

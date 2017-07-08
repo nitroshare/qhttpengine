@@ -1,5 +1,3 @@
-find_package(Qt5Test 5.1 REQUIRED)
-
 add_subdirectory(common)
 
 set(TESTS
@@ -27,7 +25,8 @@ foreach(TEST ${TESTS})
         CXX_STANDARD 11
         CXX_STANDARD_REQUIRED ON
     )
-    target_link_libraries(${TEST} Qt5::Test QHttpEngine common)
+    target_include_directories(${TEST} PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
+    target_link_libraries(${TEST} Qt5::Test qhttpengine common)
     add_test(NAME ${TEST}
         COMMAND ${TEST}
     )

@@ -1,7 +1,22 @@
 configure_file(qhttpengine_global.h.in "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine_global.h")
 
-file(GLOB HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/qhttpengine/*")
-set(HEADERS "${HEADERS}" "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine_global.h")
+set(HEADERS
+    include/qhttpengine/basicauthmiddleware.h
+    include/qhttpengine/filesystemhandler.h
+    include/qhttpengine/handler.h
+    include/qhttpengine/ibytearray.h
+    include/qhttpengine/localauthmiddleware.h
+    include/qhttpengine/localfile.h
+    include/qhttpengine/middleware.h
+    include/qhttpengine/parser.h
+    include/qhttpengine/proxyhandler.h
+    include/qhttpengine/qiodevicecopier.h
+    include/qhttpengine/qobjecthandler.h
+    include/qhttpengine/range.h
+    include/qhttpengine/server.h
+    include/qhttpengine/socket.h
+    "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine_global.h"
+)
 
 set(SRC
     src/filesystemhandler.cpp
@@ -24,53 +39,50 @@ if(WIN32)
     set(SRC ${SRC} "${CMAKE_CURRENT_BINARY_DIR}/resource.rc")
 endif()
 
-if(BUILD_STATIC)
-    add_library(QHttpEngine STATIC ${HEADERS} ${SRC})
-else()
-    add_library(QHttpEngine SHARED ${HEADERS} ${SRC})
-endif()
+add_library(qhttpengine SHARED ${HEADERS} ${SRC})
 
-set_target_properties(QHttpEngine PROPERTIES
-    CXX_STANDARD 11
+set_target_properties(qhttpengine PROPERTIES
+    CXX_STANDARD          11
     CXX_STANDARD_REQUIRED ON
-    DEFINE_SYMBOL QT_NO_SIGNALS_SLOTS_KEYWORDS
-    DEFINE_SYMBOL QHTTPENGINE_LIBRARY
-    PUBLIC_HEADER "${HEADERS}"
-    VERSION ${PROJECT_VERSION}
-    SOVERSION ${PROJECT_VERSION_MAJOR}
+    DEFINE_SYMBOL         QT_NO_SIGNALS_SLOTS_KEYWORDS
+    DEFINE_SYMBOL         QHTTPENGINE_LIBRARY
+    PUBLIC_HEADER         "${HEADERS}"
+    VERSION               ${PROJECT_VERSION}
+    SOVERSION             ${PROJECT_VERSION_MAJOR}
 )
 
-target_include_directories(QHttpEngine PUBLIC
+target_include_directories(qhttpengine PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
     "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>"
 )
 
-target_link_libraries(QHttpEngine Qt5::Network)
+target_link_libraries(qhttpengine Qt5::Network)
 
-install(TARGETS QHttpEngine EXPORT QHttpEngine-export
+install(TARGETS qhttpengine EXPORT qhttpengine-export
     RUNTIME DESTINATION "${BIN_INSTALL_DIR}"
     LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
     ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
-    PUBLIC_HEADER DESTINATION "${INCLUDE_INSTALL_DIR}/${PROJECT_NAME}"
+    PUBLIC_HEADER DESTINATION "${INCLUDE_INSTALL_DIR}/qhttpengine"
 )
 
-install(EXPORT QHttpEngine-export DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
-    FILE ${PROJECT_NAME}Config.cmake
+install(EXPORT qhttpengine-export
+    FILE        qhttpengineConfig.cmake
+    DESTINATION "${LIB_INSTALL_DIR}/cmake/qmdnsengine"
 )
 
 include(CMakePackageConfigHelpers)
 
-write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-    VERSION ${PROJECT_VERSION}
+write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/qhttpengineConfigVersion.cmake"
+    VERSION       ${PROJECT_VERSION}
     COMPATIBILITY SameMajorVersion
 )
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-    DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/qhttpengineConfigVersion.cmake"
+    DESTINATION "${LIB_INSTALL_DIR}/cmake/qmdnsengine"
 )
 
-configure_file(${PROJECT_NAME}.pc.in "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc" @ONLY)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
+configure_file(qhttpengine.pc.in "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.pc" @ONLY)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine.pc"
     DESTINATION "${LIB_INSTALL_DIR}/pkgconfig"
 )
