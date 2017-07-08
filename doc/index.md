@@ -28,7 +28,7 @@ QHttpEngine uses CMake for building the library. The library recognizes four opt
 - `BUILD_EXAMPLES` - builds the sample applications that demonstrate how to use QHttpEngine
 - `BUILD_TESTS` - build the test suite
 
-It is also possible to override installation directories by customizing the `BIN_INSTALL_DIR`, `LIB_INSTALL_DIR`, `INCLUDE_INSTALL_DIR`, `CMAKECONFIG_INSTALL_DIR`, `DOC_INSTALL_DIR`, and `EXAMPLES_INSTALL_DIR` variables.
+It is also possible to override installation directories by customizing the `BIN_INSTALL_DIR`, `LIB_INSTALL_DIR`, `INCLUDE_INSTALL_DIR`, `DOC_INSTALL_DIR`, and `EXAMPLES_INSTALL_DIR` variables.
 
 ## Basic Usage
 
