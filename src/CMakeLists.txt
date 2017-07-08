@@ -1,22 +1,22 @@
 configure_file(qhttpengine_global.h.in "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine_global.h")
 
-file(GLOB HEADERS "${CMAKE_SOURCE_DIR}/include/qhttpengine/*")
+file(GLOB HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/qhttpengine/*")
 set(HEADERS "${HEADERS}" "${CMAKE_CURRENT_BINARY_DIR}/qhttpengine_global.h")
 
 set(SRC
-    filesystemhandler.cpp
-    basicauthmiddleware.cpp
-    handler.cpp
-    parser.cpp
-    range.cpp
-    server.cpp
-    socket.cpp
-    qiodevicecopier.cpp
-    localauthmiddleware.cpp
-    localfile.cpp
-    qobjecthandler.cpp
-    proxyhandler.cpp
-    proxysocket.cpp
+    src/filesystemhandler.cpp
+    src/basicauthmiddleware.cpp
+    src/handler.cpp
+    src/parser.cpp
+    src/range.cpp
+    src/server.cpp
+    src/socket.cpp
+    src/qiodevicecopier.cpp
+    src/localauthmiddleware.cpp
+    src/localfile.cpp
+    src/qobjecthandler.cpp
+    src/proxyhandler.cpp
+    src/proxysocket.cpp
 )
 
 if(WIN32)
@@ -41,7 +41,7 @@ set_target_properties(QHttpEngine PROPERTIES
 )
 
 target_include_directories(QHttpEngine PUBLIC
-    "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
     "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>"
 )
