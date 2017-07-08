@@ -25,6 +25,8 @@
 #include "proxyhandler_p.h"
 #include "proxysocket.h"
 
+using namespace QHttpEngine;
+
 ProxyHandlerPrivate::ProxyHandlerPrivate(QObject *parent, const QHostAddress &address, quint16 port)
     : QObject(parent),
       address(address),

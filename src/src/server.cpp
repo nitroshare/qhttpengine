@@ -29,6 +29,8 @@
 
 #include "server_p.h"
 
+using namespace QHttpEngine;
+
 ServerPrivate::ServerPrivate(Server *httpServer)
     : QObject(httpServer),
       q(httpServer),

@@ -26,6 +26,10 @@
 #include <QObject>
 
 class QIODevice;
+
+namespace QHttpEngine
+{
+
 class QIODeviceCopier;
 
 class QIODeviceCopierPrivate : public QObject
@@ -55,5 +59,7 @@ private:
 
     QIODeviceCopier *const q;
 };
+
+}
 
 #endif // QHTTPENGINE_QIODEVICECOPIER_P_H

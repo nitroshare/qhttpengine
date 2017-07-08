@@ -33,7 +33,11 @@
 class QSslConfiguration;
 #endif
 
+namespace QHttpEngine
+{
+
 class Handler;
+
 class QHTTPENGINE_EXPORT ServerPrivate;
 
 /**
@@ -103,5 +107,7 @@ private:
     ServerPrivate *const d;
     friend class ServerPrivate;
 };
+
+}
 
 #endif // QHTTPENGINE_SERVER_H

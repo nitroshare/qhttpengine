@@ -28,6 +28,9 @@
 
 #include <qhttpengine/localfile.h>
 
+namespace QHttpEngine
+{
+
 class LocalAuthMiddlewarePrivate : public QObject
 {
     Q_OBJECT
@@ -43,5 +46,7 @@ public:
     QByteArray tokenHeader;
     QString token;
 };
+
+}
 
 #endif // QHTTPENGINE_LOCALAUTHMIDDLEWARE_P_H

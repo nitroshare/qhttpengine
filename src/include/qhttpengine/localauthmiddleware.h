@@ -29,6 +29,9 @@
 
 #include "qhttpengine_global.h"
 
+namespace QHttpEngine
+{
+
 class QHTTPENGINE_EXPORT LocalAuthMiddlewarePrivate;
 
 /**
@@ -97,5 +100,7 @@ private:
 
     LocalAuthMiddlewarePrivate *const d;
 };
+
+}
 
 #endif // QHTTPENGINE_LOCALAUTHMIDDLEWARE_H

@@ -27,6 +27,8 @@
 
 #include "basicauthmiddleware_p.h"
 
+using namespace QHttpEngine;
+
 BasicAuthMiddlewarePrivate::BasicAuthMiddlewarePrivate(QObject *parent, const QString &realm)
     : QObject(parent),
       realm(realm)

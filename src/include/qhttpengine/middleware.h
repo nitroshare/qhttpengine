@@ -27,6 +27,9 @@
 
 #include "qhttpengine_global.h"
 
+namespace QHttpEngine
+{
+
 class Socket;
 
 /**
@@ -55,5 +58,7 @@ public:
      */
     virtual bool process(Socket *socket) = 0;
 };
+
+}
 
 #endif // QHTTPENGINE_MIDDLEWARE_H

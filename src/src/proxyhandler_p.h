@@ -28,6 +28,9 @@
 
 #include <qhttpengine/socket.h>
 
+namespace QHttpEngine
+{
+
 class ProxyHandlerPrivate : public QObject
 {
     Q_OBJECT
@@ -39,5 +42,7 @@ public:
     QHostAddress address;
     quint16 port;
 };
+
+}
 
 #endif // QHTTPENGINE_PROXYHANDLER_P_H

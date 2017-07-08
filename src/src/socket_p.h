@@ -27,6 +27,9 @@
 
 class QTcpSocket;
 
+namespace QHttpEngine
+{
+
 class SocketPrivate : public QObject
 {
     Q_OBJECT
@@ -78,5 +81,7 @@ private:
 
     Socket*const q;
 };
+
+}
 
 #endif // QHTTPENGINE_SOCKET_P_H

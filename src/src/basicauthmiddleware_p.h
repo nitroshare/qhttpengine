@@ -26,6 +26,9 @@
 #include <QMap>
 #include <QObject>
 
+namespace QHttpEngine
+{
+
 class BasicAuthMiddlewarePrivate : public QObject
 {
     Q_OBJECT
@@ -37,5 +40,7 @@ public:
     const QString realm;
     QMap<QString, QString> map;
 };
+
+}
 
 #endif // QHTTPENGINE_BASICAUTHMIDDLEWARE_P_H

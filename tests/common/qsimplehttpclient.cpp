@@ -33,7 +33,7 @@ QSimpleHttpClient::QSimpleHttpClient(QTcpSocket *socket)
     onReadyRead();
 }
 
-void QSimpleHttpClient::sendHeaders(const QByteArray &method, const QByteArray &path, const Socket::HeaderMap &headers)
+void QSimpleHttpClient::sendHeaders(const QByteArray &method, const QByteArray &path, const QHttpEngine::Socket::HeaderMap &headers)
 {
     QByteArray data = method + " " + path + " HTTP/1.0\r\n";
     for (auto i = headers.constBegin(); i != headers.constEnd(); ++i) {
@@ -59,7 +59,7 @@ void QSimpleHttpClient::onReadyRead()
         // Parse the headers if the double CRLF sequence was found
         int index = mBuffer.indexOf("\r\n\r\n");
         if (index != -1) {
-            Parser::parseResponseHeaders(mBuffer.left(index), mStatusCode, mStatusReason, mHeaders);
+            QHttpEngine::Parser::parseResponseHeaders(mBuffer.left(index), mStatusCode, mStatusReason, mHeaders);
 
             mHeadersParsed = true;
             mData.append(mBuffer.mid(index + 4));

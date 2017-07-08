@@ -29,6 +29,8 @@
 
 #include <qhttpengine/socket.h>
 
+using namespace QHttpEngine;
+
 /**
  * @brief HTTP socket for connecting to a proxy
  */

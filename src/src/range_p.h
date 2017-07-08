@@ -25,6 +25,9 @@
 
 #include <qhttpengine/range.h>
 
+namespace QHttpEngine
+{
+
 class RangePrivate
 {
 public:
@@ -39,5 +42,7 @@ private:
 
     Range *const q;
 };
+
+}
 
 #endif // QHTTPENGINE_RANGE_P_H

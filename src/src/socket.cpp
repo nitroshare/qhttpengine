@@ -30,6 +30,8 @@
 
 #include "socket_p.h"
 
+using namespace QHttpEngine;
+
 // Predefined error response requires a simple HTML template to be returned to
 // the client describing the error condition
 const QString ErrorTemplate =

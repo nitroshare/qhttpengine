@@ -26,6 +26,8 @@
 
 #include "range_p.h"
 
+using namespace QHttpEngine;
+
 RangePrivate::RangePrivate(Range *range)
     : q(range)
 {

@@ -27,6 +27,8 @@
 
 #include "qiodevicecopier_p.h"
 
+using namespace QHttpEngine;
+
 // Default value for the bufferSize property
 const qint64 DefaultBufferSize = 65536;
 

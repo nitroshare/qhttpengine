@@ -28,6 +28,10 @@
 #include "qhttpengine_global.h"
 
 class QIODevice;
+
+namespace QHttpEngine
+{
+
 class QHTTPENGINE_EXPORT QIODeviceCopierPrivate;
 
 /**
@@ -125,5 +129,7 @@ private:
     QIODeviceCopierPrivate *const d;
     friend class QIODeviceCopierPrivate;
 };
+
+}
 
 #endif // QHTTPENGINE_QIODEVICECOPIER_H

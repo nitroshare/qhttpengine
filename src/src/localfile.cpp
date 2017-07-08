@@ -34,6 +34,8 @@
 
 #include "localfile_p.h"
 
+using namespace QHttpEngine;
+
 LocalFilePrivate::LocalFilePrivate(LocalFile *localFile)
     : QObject(localFile),
       q(localFile)

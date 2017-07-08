@@ -27,6 +27,9 @@
 
 #include "qhttpengine_global.h"
 
+namespace QHttpEngine
+{
+
 class QHTTPENGINE_EXPORT FilesystemHandlerPrivate;
 
 /**
@@ -81,5 +84,7 @@ private:
     FilesystemHandlerPrivate *const d;
     friend class FilesystemHandlerPrivate;
 };
+
+}
 
 #endif // QHTTPENGINE_FILESYSTEMHANDLER_H

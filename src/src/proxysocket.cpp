@@ -24,6 +24,8 @@
 
 #include "proxysocket.h"
 
+using namespace QHttpEngine;
+
 QProxySocket::QProxySocket(Socket *socket, const QString &path, const QHostAddress &address, quint16 port)
     : QObject(socket),
       mDownstreamSocket(socket),

@@ -28,6 +28,8 @@
 
 #include "qobjecthandler_p.h"
 
+using namespace QHttpEngine;
+
 QObjectHandlerPrivate::QObjectHandlerPrivate(QObjectHandler *handler)
     : QObject(handler),
       q(handler)

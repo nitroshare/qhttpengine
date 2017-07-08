@@ -27,6 +27,9 @@
 
 #include "qhttpengine_global.h"
 
+namespace QHttpEngine
+{
+
 class QHTTPENGINE_EXPORT LocalFilePrivate;
 
 /**
@@ -74,5 +77,7 @@ private:
     LocalFilePrivate *const d;
     friend class LocalFilePrivate;
 };
+
+}
 
 #endif // QHTTPENGINE_LOCALFILE_H

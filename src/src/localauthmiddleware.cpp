@@ -29,6 +29,8 @@
 
 #include "localauthmiddleware_p.h"
 
+using namespace QHttpEngine;
+
 LocalAuthMiddlewarePrivate::LocalAuthMiddlewarePrivate(QObject *parent)
     : QObject(parent),
       tokenHeader("X-Auth-Token"),

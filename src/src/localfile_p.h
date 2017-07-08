@@ -25,6 +25,9 @@
 
 #include <QObject>
 
+namespace QHttpEngine
+{
+
 class LocalFile;
 
 class LocalFilePrivate : public QObject
@@ -40,7 +43,9 @@ public:
 
 private:
 
-    LocalFile*const q;
+    LocalFile *const q;
 };
+
+}
 
 #endif // QHTTPENGINE_LOCALFILE_P_H

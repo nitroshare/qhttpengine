@@ -28,6 +28,10 @@
 #include "qhttpengine_global.h"
 
 class QRegExp;
+
+namespace QHttpEngine
+{
+
 class Middleware;
 class Socket;
 
@@ -127,5 +131,7 @@ private:
     HandlerPrivate *const d;
     friend class HandlerPrivate;
 };
+
+}
 
 #endif // QHTTPENGINE_HANDLER_H

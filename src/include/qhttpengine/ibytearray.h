@@ -29,6 +29,9 @@
 
 #include "qhttpengine_global.h"
 
+namespace QHttpEngine
+{
+
 /**
  * @brief Case-insensitive subclass of QByteArray
  *
@@ -93,5 +96,7 @@ inline bool operator>=(const char *a1, const IByteArray &a2) { return QByteArray
 inline bool operator>=(const IByteArray &a1, const QByteArray &a2) { return a1.toLower() >= a2.toLower(); }
 inline bool operator>=(const QByteArray &a1, const IByteArray &a2) { return a1.toLower() >= a2.toLower(); }
 inline bool operator>=(const IByteArray &a1, const IByteArray &a2) { return a1.toLower() >= a2.toLower(); }
+
+}
 
 #endif // QHTTPENGINE_IBYTEARRAY_H

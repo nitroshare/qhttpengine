@@ -47,27 +47,27 @@ private Q_SLOTS:
 void TestQProxyHandler::testDataPassthrough()
 {
     // Create the upstream handler (simple echo)
-    QObjectHandler upstreamHandler;
-    upstreamHandler.registerMethod(Path, [](Socket *socket) {
+    QHttpEngine::QObjectHandler upstreamHandler;
+    upstreamHandler.registerMethod(Path, [](QHttpEngine::Socket *socket) {
         socket->write(socket->readAll());
         socket->close();
     }, true);
 
     // Create the upstream server and begin listening
-    Server upstreamServer(&upstreamHandler);
+    QHttpEngine::Server upstreamServer(&upstreamHandler);
     QVERIFY(upstreamServer.listen(QHostAddress::LocalHost));
 
     // Create the proxy handler
-    ProxyHandler handler(upstreamServer.serverAddress(), upstreamServer.serverPort());
+    QHttpEngine::ProxyHandler handler(upstreamServer.serverAddress(), upstreamServer.serverPort());
 
     QSocketPair pair;
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    Socket socket(pair.server());
+    QHttpEngine::Socket socket(pair.server());
 
     // Send the headers and wait for them to be parsed
-    Socket::HeaderMap headers{
+    QHttpEngine::Socket::HeaderMap headers{
         {"Content-Length", QByteArray::number(Data.length())}
     };
     client.sendHeaders("POST", QString("/%1").arg(Path).toUtf8(), headers);

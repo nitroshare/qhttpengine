@@ -30,6 +30,9 @@
 
 #include <qhttpengine/handler.h>
 
+namespace QHttpEngine
+{
+
 typedef QPair<QRegExp, QString> Redirect;
 typedef QPair<QRegExp, Handler*> SubHandler;
 
@@ -49,5 +52,7 @@ private:
 
     Handler *const q;
 };
+
+}
 
 #endif // QHTTPENGINE_HANDLER_P_H

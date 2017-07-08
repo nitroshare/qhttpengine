@@ -33,6 +33,10 @@
 
 class QJsonDocument;
 class QTcpSocket;
+
+namespace QHttpEngine
+{
+
 class QHTTPENGINE_EXPORT SocketPrivate;
 
 /**
@@ -357,5 +361,7 @@ private:
     SocketPrivate *const d;
     friend class SocketPrivate;
 };
+
+}
 
 #endif // QHTTPENGINE_SOCKET_H

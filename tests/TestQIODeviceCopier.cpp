@@ -55,7 +55,7 @@ void TestQIODeviceCopier::testQBuffer()
     QByteArray destData;
     QBuffer dest(&destData);
 
-    QIODeviceCopier copier(&src, &dest);
+    QHttpEngine::QIODeviceCopier copier(&src, &dest);
     copier.setBufferSize(2);
 
     QSignalSpy errorSpy(&copier, SIGNAL(error(QString)));
@@ -76,7 +76,7 @@ void TestQIODeviceCopier::testQTcpSocket()
     QByteArray destData;
     QBuffer dest(&destData);
 
-    QIODeviceCopier copier(pair.server(), &dest);
+    QHttpEngine::QIODeviceCopier copier(pair.server(), &dest);
     copier.setBufferSize(2);
 
     QSignalSpy errorSpy(&copier, SIGNAL(error(QString)));
@@ -100,7 +100,7 @@ void TestQIODeviceCopier::testStop()
     QByteArray destData;
     QBuffer dest(&destData);
 
-    QIODeviceCopier copier(pair.server(), &dest);
+    QHttpEngine::QIODeviceCopier copier(pair.server(), &dest);
 
     copier.start();
 
@@ -141,7 +141,7 @@ void TestQIODeviceCopier::testRange()
     QByteArray destData;
     QBuffer dest(&destData);
 
-    QIODeviceCopier copier(&src, &dest);
+    QHttpEngine::QIODeviceCopier copier(&src, &dest);
     copier.setBufferSize(bufferSize);
     copier.setRange(from, to);
 

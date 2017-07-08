@@ -26,6 +26,9 @@
 #include <QMap>
 #include <QObject>
 
+namespace QHttpEngine
+{
+
 class Socket;
 class QObjectHandler;
 
@@ -68,5 +71,7 @@ private:
 
     QObjectHandler *const q;
 };
+
+}
 
 #endif // QHTTPENGINE_QOBJECTHANDLER_P_H

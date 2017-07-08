@@ -27,6 +27,9 @@
 
 #include "qhttpengine_global.h"
 
+namespace QHttpEngine
+{
+
 class QHTTPENGINE_EXPORT BasicAuthMiddlewarePrivate;
 
 /**
@@ -78,5 +81,7 @@ private:
 
     BasicAuthMiddlewarePrivate *const d;
 };
+
+}
 
 #endif // QHTTPENGINE_BASICAUTHMIDDLEWARE_H

@@ -32,6 +32,8 @@
 
 #include "filesystemhandler_p.h"
 
+using namespace QHttpEngine;
+
 // Template for listing directory contents
 const QString ListTemplate =
         "<!DOCTYPE html>"

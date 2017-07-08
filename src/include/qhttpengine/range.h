@@ -27,6 +27,9 @@
 
 #include "qhttpengine_global.h"
 
+namespace QHttpEngine
+{
+
 class QHTTPENGINE_EXPORT RangePrivate;
 
 /**
@@ -265,5 +268,7 @@ private:
 
     RangePrivate *const d;
 };
+
+}
 
 #endif // QHTTPENGINE_RANGE_H

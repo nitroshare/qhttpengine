@@ -32,6 +32,9 @@
 
 #include <qhttpengine/server.h>
 
+namespace QHttpEngine
+{
+
 class Handler;
 
 class ServerPrivate : public QObject
@@ -54,5 +57,7 @@ private:
 
     Server *const q;
 };
+
+}
 
 #endif // QHTTPENGINE_SERVER_P_H

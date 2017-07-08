@@ -27,6 +27,9 @@
 #include <QMimeDatabase>
 #include <QObject>
 
+namespace QHttpEngine
+{
+
 class FilesystemHandler;
 class Socket;
 
@@ -47,5 +50,7 @@ public:
     QDir documentRoot;
     QMimeDatabase database;
 };
+
+}
 
 #endif // QHTTPENGINE_FILESYSTEMHANDLER_P_H

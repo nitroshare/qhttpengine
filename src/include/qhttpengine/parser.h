@@ -29,6 +29,9 @@
 
 #include "qhttpengine_global.h"
 
+namespace QHttpEngine
+{
+
 /**
  * @brief Utility methods for parsing HTTP requests and responses
  *
@@ -85,5 +88,7 @@ public:
      */
     static bool parseResponseHeaders(const QByteArray &data, int &statusCode, QByteArray &statusReason, Socket::HeaderMap &headers);
 };
+
+}
 
 #endif // QHTTPENGINE_PARSER_H

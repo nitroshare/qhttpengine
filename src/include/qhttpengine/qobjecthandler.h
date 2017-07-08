@@ -27,7 +27,11 @@
 
 #include "qhttpengine_global.h"
 
+namespace QHttpEngine
+{
+
 class Socket;
+
 class QHTTPENGINE_EXPORT QObjectHandlerPrivate;
 
 /**
@@ -184,5 +188,7 @@ private:
     QObjectHandlerPrivate *const d;
     friend class QObjectHandlerPrivate;
 };
+
+}
 
 #endif // QHTTPENGINE_QOBJECTHANDLER_H

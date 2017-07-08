@@ -46,7 +46,7 @@ void TestQLocalFile::initTestCase()
 
 void TestQLocalFile::testOpen()
 {
-    LocalFile file;
+    QHttpEngine::LocalFile file;
     QVERIFY(file.open());
     QVERIFY(file.remove());
 }

@@ -29,6 +29,9 @@
 
 #include "qhttpengine_global.h"
 
+namespace QHttpEngine
+{
+
 class QHTTPENGINE_EXPORT ProxyHandlerPrivate;
 
 /**
@@ -56,5 +59,7 @@ private:
 
     ProxyHandlerPrivate *const d;
 };
+
+}
 
 #endif // QHTTPENGINE_PROXYHANDLER_H

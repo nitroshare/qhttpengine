@@ -37,7 +37,7 @@
 
 #include "common/qsimplehttpclient.h"
 
-class TestHandler : public Handler
+class TestHandler : public QHttpEngine::Handler
 {
     Q_OBJECT
 
@@ -45,12 +45,12 @@ public:
 
     TestHandler() : mSocket(0) {}
 
-    virtual void process(Socket *socket, const QString &path) {
+    virtual void process(QHttpEngine::Socket *socket, const QString &path) {
         mSocket = socket;
         mPath = path;
     }
 
-    Socket *mSocket;
+    QHttpEngine::Socket *mSocket;
     QString mPath;
 };
 
@@ -70,7 +70,7 @@ private Q_SLOTS:
 void TestQHttpServer::testServer()
 {
     TestHandler handler;
-    Server server(&handler);
+    QHttpEngine::Server server(&handler);
 
     QVERIFY(server.listen(QHostAddress::LocalHost));
 
@@ -102,7 +102,7 @@ void TestQHttpServer::testSsl()
     config.setPrivateKey(key);
     config.setLocalCertificateChain(certs);
 
-    Server server;
+    QHttpEngine::Server server;
     server.setSslConfiguration(config);
 
     QVERIFY(server.listen(QHostAddress::LocalHost));
