@@ -23,6 +23,7 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QScopedPointer>
 #include <QTest>
 #include <QVariantMap>
 
@@ -43,6 +44,7 @@ class TestLocalAuthMiddleware : public QObject
 private Q_SLOTS:
 
     void testAuth();
+    void testRemoval();
 };
 
 void TestLocalAuthMiddleware::testAuth()
@@ -73,6 +75,17 @@ void TestLocalAuthMiddleware::testAuth()
     QTRY_VERIFY(socket.isHeadersParsed());
 
     QVERIFY(localAuth.process(&socket));
+}
+
+void TestLocalAuthMiddleware::testRemoval()
+{
+    QScopedPointer<QHttpEngine::LocalAuthMiddleware> localAuth(
+                new QHttpEngine::LocalAuthMiddleware);
+    QString filename = localAuth->filename();
+
+    QVERIFY(QFile::exists(filename));
+    delete localAuth.take();
+    QVERIFY(!QFile::exists(filename));
 }
 
 QTEST_MAIN(TestLocalAuthMiddleware)

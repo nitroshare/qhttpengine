@@ -38,6 +38,7 @@ class LocalAuthMiddlewarePrivate : public QObject
 public:
 
     explicit LocalAuthMiddlewarePrivate(QObject *parent);
+    virtual ~LocalAuthMiddlewarePrivate();
 
     void updateFile();
 

@@ -39,6 +39,11 @@ LocalAuthMiddlewarePrivate::LocalAuthMiddlewarePrivate(QObject *parent)
     updateFile();
 }
 
+LocalAuthMiddlewarePrivate::~LocalAuthMiddlewarePrivate()
+{
+    file.remove();
+}
+
 void LocalAuthMiddlewarePrivate::updateFile()
 {
     if (file.open()) {
