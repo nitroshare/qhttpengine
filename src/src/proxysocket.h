@@ -29,10 +29,12 @@
 
 #include <qhttpengine/socket.h>
 
-using namespace QHttpEngine;
-
 /**
  * @brief HTTP socket for connecting to a proxy
+ *
+ * The proxy socket manages the two socket connections - one for downstream
+ * (the client's connection to the server) and one for upstream (the server's
+ * connection to the upstream proxy).
  */
 class QProxySocket : public QObject
 {
@@ -40,7 +42,7 @@ class QProxySocket : public QObject
 
 public:
 
-    explicit QProxySocket(Socket *socket, const QString &path, const QHostAddress &address, quint16 port);
+    explicit QProxySocket(QHttpEngine::Socket *socket, const QString &path, const QHostAddress &address, quint16 port);
 
 private Q_SLOTS:
 
@@ -52,9 +54,9 @@ private Q_SLOTS:
 
 private:
 
-    QString methodToString(Socket::Method method) const;
+    QString methodToString(QHttpEngine::Socket::Method method) const;
 
-    Socket *mDownstreamSocket;
+    QHttpEngine::Socket *mDownstreamSocket;
     QTcpSocket mUpstreamSocket;
 
     QString mPath;

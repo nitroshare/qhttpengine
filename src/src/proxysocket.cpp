@@ -137,5 +137,6 @@ QString QProxySocket::methodToString(Socket::Method method) const
     case Socket::DELETE: return "DELETE";
     case Socket::TRACE: return "TRACE";
     case Socket::CONNECT: return "CONNECT";
+    default: return QString();
     }
 }
