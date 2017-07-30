@@ -61,7 +61,10 @@ private:
 
     QString mPath;
     bool mHeadersParsed;
-    QByteArray mBuffer;
+    bool mHeadersWritten;
+
+    QByteArray mUpstreamRead;
+    QByteArray mUpstreamWrite;
 };
 
 #endif // QHTTPENGINE_QPROXYSOCKET_H

@@ -30,7 +30,8 @@ QProxySocket::QProxySocket(Socket *socket, const QString &path, const QHostAddre
     : QObject(socket),
       mDownstreamSocket(socket),
       mPath(path),
-      mHeadersParsed(false)
+      mHeadersParsed(false),
+      mHeadersWritten(false)
 {
     connect(mDownstreamSocket, &Socket::readyRead, this, &QProxySocket::onDownstreamReadyRead);
 
@@ -48,7 +49,11 @@ QProxySocket::QProxySocket(Socket *socket, const QString &path, const QHostAddre
 
 void QProxySocket::onDownstreamReadyRead()
 {
-    mUpstreamSocket.write(mDownstreamSocket->readAll());
+    if (mHeadersWritten) {
+        mUpstreamSocket.write(mDownstreamSocket->readAll());
+    } else {
+        mUpstreamWrite.append(mDownstreamSocket->readAll());
+    }
 }
 
 void QProxySocket::onUpstreamConnected()
@@ -79,6 +84,13 @@ void QProxySocket::onUpstreamConnected()
         mUpstreamSocket.write(i.key() + ": " + i.value() + "\r\n");
     }
     mUpstreamSocket.write("\r\n");
+    mHeadersWritten = true;
+
+    // If there is any data buffered for writing, write it
+    if (mUpstreamWrite.size()) {
+        mUpstreamSocket.write(mUpstreamWrite);
+        mUpstreamWrite.clear();
+    }
 }
 
 void QProxySocket::onUpstreamReadyRead()
@@ -89,15 +101,15 @@ void QProxySocket::onUpstreamReadyRead()
     if (!mHeadersParsed) {
 
         // Add to the buffer and check to see if the end was reached
-        mBuffer.append(mUpstreamSocket.readAll());
-        int index = mBuffer.indexOf("\r\n\r\n");
+        mUpstreamRead.append(mUpstreamSocket.readAll());
+        int index = mUpstreamRead.indexOf("\r\n\r\n");
         if (index != -1) {
 
             // Parse the headers
             int statusCode;
             QByteArray statusReason;
             Socket::HeaderMap headers;
-            if (!Parser::parseResponseHeaders(mBuffer.left(index), statusCode, statusReason, headers)) {
+            if (!Parser::parseResponseHeaders(mUpstreamRead.left(index), statusCode, statusReason, headers)) {
                 mDownstreamSocket->writeError(Socket::BadGateway);
                 return;
             }
@@ -106,11 +118,11 @@ void QProxySocket::onUpstreamReadyRead()
             mDownstreamSocket->setStatusCode(statusCode, statusReason);
             mDownstreamSocket->setHeaders(headers);
             mDownstreamSocket->writeHeaders();
-            mDownstreamSocket->write(mBuffer.mid(index + 4));
+            mDownstreamSocket->write(mUpstreamRead.mid(index + 4));
 
             // Remember that headers were parsed and empty the buffer
             mHeadersParsed = true;
-            mBuffer.clear();
+            mUpstreamRead.clear();
         }
     } else {
         mDownstreamSocket->write(mUpstreamSocket.readAll());
