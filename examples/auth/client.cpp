@@ -20,8 +20,6 @@
  * IN THE SOFTWARE.
  */
 
-#include <iostream>
-
 #include <QCoreApplication>
 #include <QJsonDocument>
 #include <QJsonObject>
