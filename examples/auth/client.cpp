@@ -21,6 +21,8 @@
  */
 
 #include <QCoreApplication>
+#include <QDir>
+#include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QNetworkAccessManager>
@@ -28,15 +30,13 @@
 #include <QNetworkReply>
 #include <QUrl>
 
-#include <qhttpengine/localfile.h>
-
 int main(int argc, char * argv[])
 {
     QCoreApplication a(argc, argv);
 
     // Attempt to open the local file and read from it
-    QHttpEngine::LocalFile file;
-    if (!file.open()) {
+    QFile file(QDir::home().absoluteFilePath(".authserver"));
+    if (!file.open(QIODevice::ReadOnly)) {
         qCritical("Unable to open local file - is server running?");
         return 1;
     }
@@ -47,6 +47,9 @@ int main(int argc, char * argv[])
         qCritical("Malformed JSON in local file.");
         return 1;
     }
+
+    // Close the file
+    file.close();
 
     // Create a request to the server, using the provided port and passing the
     // auth token as a custom HTTP header

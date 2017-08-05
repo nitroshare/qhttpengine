@@ -28,12 +28,19 @@
 #include <qhttpengine/localauthmiddleware.h>
 #include <qhttpengine/qobjecthandler.h>
 #include <qhttpengine/server.h>
+#include <qhttpengine/socket.h>
 
 int main(int argc, char * argv[])
 {
     QCoreApplication a(argc, argv);
 
     QHttpEngine::QObjectHandler handler;
+    handler.registerMethod("", [](QHttpEngine::Socket *socket) {
+        socket->setStatusCode(QHttpEngine::Socket::OK);
+        socket->writeHeaders();
+        socket->close();
+    });
+
     QHttpEngine::Server server(&handler);
     if (!server.listen(QHostAddress::LocalHost)) {
         qCritical("unable to bind to a local port");
