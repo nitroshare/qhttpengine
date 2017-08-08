@@ -92,6 +92,9 @@ void FilesystemHandlerPrivate::processFile(Socket *socket, const QString &absolu
         socket->close();
     });
 
+    // Stop the copier if the socket is disconnected
+    connect(socket, &Socket::disconnected, copier, &QIODeviceCopier::stop);
+
     qint64 fileSize = file->size();
 
     // Checking for partial content request

@@ -69,6 +69,7 @@ SocketPrivate::SocketPrivate(Socket *httpSocket, QTcpSocket *tcpSocket)
     connect(socket, &QTcpSocket::readyRead, this, &SocketPrivate::onReadyRead);
     connect(socket, &QTcpSocket::bytesWritten, this, &SocketPrivate::onBytesWritten);
     connect(socket, &QTcpSocket::readChannelFinished, q, &Socket::readChannelFinished);
+    connect(socket, &QTcpSocket::disconnected, q, &Socket::disconnected);
 
     // Process anything already received by the socket
     onReadyRead();

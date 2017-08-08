@@ -345,6 +345,11 @@ Q_SIGNALS:
      */
     void headersParsed();
 
+    /**
+     * @brief Indicate that the client has disconnected
+     */
+    void disconnected();
+
 protected:
 
     /**

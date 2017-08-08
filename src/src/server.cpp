@@ -50,9 +50,6 @@ void ServerPrivate::process(QTcpSocket *socket)
             httpSocket->writeError(Socket::InternalServerError);
         }
     });
-
-    // Destroy the socket once the client is disconnected
-    connect(socket, &QTcpSocket::disconnected, httpSocket, &Socket::deleteLater);
 }
 
 Server::Server(QObject *parent)
