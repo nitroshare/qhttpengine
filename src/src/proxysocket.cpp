@@ -26,28 +26,29 @@
 
 using namespace QHttpEngine;
 
-QProxySocket::QProxySocket(Socket *socket, const QString &path, const QHostAddress &address, quint16 port)
+ProxySocket::ProxySocket(Socket *socket, const QString &path, const QHostAddress &address, quint16 port)
     : QObject(socket),
       mDownstreamSocket(socket),
       mPath(path),
       mHeadersParsed(false),
       mHeadersWritten(false)
 {
-    connect(mDownstreamSocket, &Socket::readyRead, this, &QProxySocket::onDownstreamReadyRead);
+    connect(mDownstreamSocket, &Socket::readyRead, this, &ProxySocket::onDownstreamReadyRead);
+    connect(mDownstreamSocket, &Socket::disconnected, this, &ProxySocket::onDownstreamDisconnected);
 
-    connect(&mUpstreamSocket, &QTcpSocket::connected, this, &QProxySocket::onUpstreamConnected);
-    connect(&mUpstreamSocket, &QTcpSocket::readyRead, this, &QProxySocket::onUpstreamReadyRead);
+    connect(&mUpstreamSocket, &QTcpSocket::connected, this, &ProxySocket::onUpstreamConnected);
+    connect(&mUpstreamSocket, &QTcpSocket::readyRead, this, &ProxySocket::onUpstreamReadyRead);
     connect(
         &mUpstreamSocket,
         static_cast<void(QAbstractSocket::*)(QAbstractSocket::SocketError)>(&QAbstractSocket::error),
         this,
-        &QProxySocket::onUpstreamError
+        &ProxySocket::onUpstreamError
     );
 
     mUpstreamSocket.connectToHost(address, port);
 }
 
-void QProxySocket::onDownstreamReadyRead()
+void ProxySocket::onDownstreamReadyRead()
 {
     if (mHeadersWritten) {
         mUpstreamSocket.write(mDownstreamSocket->readAll());
@@ -56,7 +57,12 @@ void QProxySocket::onDownstreamReadyRead()
     }
 }
 
-void QProxySocket::onUpstreamConnected()
+void ProxySocket::onDownstreamDisconnected()
+{
+    mUpstreamSocket.disconnectFromHost();
+}
+
+void ProxySocket::onUpstreamConnected()
 {
     // Write the status line using the stripped path from the handler
     mUpstreamSocket.write(
@@ -93,7 +99,7 @@ void QProxySocket::onUpstreamConnected()
     }
 }
 
-void QProxySocket::onUpstreamReadyRead()
+void ProxySocket::onUpstreamReadyRead()
 {
     // If the headers have not yet been parsed, then check to see if the end
     // has been reached yet; if they have, just dump data
@@ -129,7 +135,7 @@ void QProxySocket::onUpstreamReadyRead()
     }
 }
 
-void QProxySocket::onUpstreamError(QAbstractSocket::SocketError socketError)
+void ProxySocket::onUpstreamError(QAbstractSocket::SocketError socketError)
 {
     if (mHeadersParsed) {
         mDownstreamSocket->close();
@@ -138,7 +144,7 @@ void QProxySocket::onUpstreamError(QAbstractSocket::SocketError socketError)
     }
 }
 
-QString QProxySocket::methodToString(Socket::Method method) const
+QString ProxySocket::methodToString(Socket::Method method) const
 {
     switch (method) {
     case Socket::OPTIONS: return "OPTIONS";

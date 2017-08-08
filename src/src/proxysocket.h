@@ -20,8 +20,8 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef QHTTPENGINE_QPROXYSOCKET_H
-#define QHTTPENGINE_QPROXYSOCKET_H
+#ifndef QHTTPENGINE_PROXYSOCKET_H
+#define QHTTPENGINE_PROXYSOCKET_H
 
 #include <QHostAddress>
 #include <QObject>
@@ -36,17 +36,18 @@
  * (the client's connection to the server) and one for upstream (the server's
  * connection to the upstream proxy).
  */
-class QProxySocket : public QObject
+class ProxySocket: public QObject
 {
     Q_OBJECT
 
 public:
 
-    explicit QProxySocket(QHttpEngine::Socket *socket, const QString &path, const QHostAddress &address, quint16 port);
+    explicit ProxySocket(QHttpEngine::Socket *socket, const QString &path, const QHostAddress &address, quint16 port);
 
 private Q_SLOTS:
 
     void onDownstreamReadyRead();
+    void onDownstreamDisconnected();
 
     void onUpstreamConnected();
     void onUpstreamReadyRead();
@@ -67,4 +68,4 @@ private:
     QByteArray mUpstreamWrite;
 };
 
-#endif // QHTTPENGINE_QPROXYSOCKET_H
+#endif // QHTTPENGINE_PROXYSOCKET_H

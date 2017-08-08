@@ -46,5 +46,5 @@ void ProxyHandler::process(Socket *socket, const QString &path)
     socket->setParent(this);
 
     // Create a new proxy socket
-    new QProxySocket(socket, path, d->address, d->port);
+    new ProxySocket(socket, path, d->address, d->port);
 }
