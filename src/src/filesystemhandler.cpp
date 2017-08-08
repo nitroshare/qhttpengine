@@ -131,7 +131,7 @@ void FilesystemHandlerPrivate::processDirectory(Socket *socket, const QString &p
 {
     // Add entries for each of the files
     QString listing;
-    foreach (QFileInfo info, QDir(absolutePath).entryInfoList()) {
+    foreach (QFileInfo info, QDir(absolutePath).entryInfoList(QDir::NoFilter, QDir::Name | QDir::DirsFirst | QDir::IgnoreCase)) {
         listing.append(QString("<li><a href=\"%1%2\">%1%2</a></li>")
                 .arg(info.fileName().toHtmlEscaped())
                 .arg(info.isDir() ? "/" : ""));

@@ -93,6 +93,10 @@ void Server::incomingConnection(qintptr socketDescriptor)
             d->process(socket);
         });
 
+        // If an error occurs, delete the socket
+        connect(socket, static_cast<void(QAbstractSocket::*)(QAbstractSocket::SocketError)>(&QAbstractSocket::error),
+            socket, &QSslSocket::deleteLater);
+
         socket->setSocketDescriptor(socketDescriptor);
         socket->setSslConfiguration(d->configuration);
         socket->startServerEncryption();
