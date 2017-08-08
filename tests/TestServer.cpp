@@ -20,7 +20,6 @@
  * IN THE SOFTWARE.
  */
 
-#include <QSignalSpy>
 #include <QTcpSocket>
 #include <QTest>
 
@@ -43,14 +42,11 @@ class TestHandler : public QHttpEngine::Handler
 
 public:
 
-    TestHandler() : mSocket(0) {}
-
     virtual void process(QHttpEngine::Socket *socket, const QString &path) {
-        mSocket = socket;
         mPath = path;
+        socket->deleteLater();
     }
 
-    QHttpEngine::Socket *mSocket;
     QString mPath;
 };
 
@@ -81,12 +77,7 @@ void TestServer::testServer()
     QSimpleHttpClient client(&socket);
     client.sendHeaders("GET", "/test");
 
-    QTRY_VERIFY(handler.mSocket != 0);
-    QCOMPARE(handler.mPath, QString("test"));
-
-    QSignalSpy destroyedSpy(handler.mSocket, SIGNAL(destroyed()));
-    handler.mSocket->close();
-    QTRY_COMPARE(destroyedSpy.count(), 1);
+    QTRY_COMPARE(handler.mPath, QString("test"));
 }
 
 #if !defined(QT_NO_SSL)
