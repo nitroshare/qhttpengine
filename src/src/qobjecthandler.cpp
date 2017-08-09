@@ -92,11 +92,9 @@ void QObjectHandler::process(Socket *socket, const QString &path)
     // already the case, otherwise, wait until the rest of it arrives
     if (!m.readAll || socket->bytesAvailable() >= socket->contentLength()) {
         d->invokeSlot(socket, m);
-        socket->close();
     } else {
         connect(socket, &Socket::readChannelFinished, [this, socket, m]() {
             d->invokeSlot(socket, m);
-            socket->close();
         });
     }
 }

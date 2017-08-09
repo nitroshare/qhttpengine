@@ -39,8 +39,9 @@ class QHTTPENGINE_EXPORT QObjectHandlerPrivate;
  *
  * This handler enables incoming requests to be processed by slots in a
  * QObject-derived class or functor. Methods are registered by providing a
- * name and slot to invoke. The slot may take a pointer to the
- * [Socket](@ref QHttpEngine::Socket) for the request as an argument.
+ * name and slot to invoke. The slot must take a pointer to the
+ * [Socket](@ref QHttpEngine::Socket) for the request as an argument and
+ * must also close the socket when finished with it.
  *
  * To use this class, simply create an instance and call the appropriate
  * registerMethod() overload. For example:
@@ -68,6 +69,7 @@ class QHTTPENGINE_EXPORT QObjectHandlerPrivate;
  * QHttpEngine::QObjectHandler handler;
  * handler.registerMethod("something", [](QHttpEngine::Socket *socket) {
  *     // do something
+ *     socket->close();
  * });
  * @endcode
  */

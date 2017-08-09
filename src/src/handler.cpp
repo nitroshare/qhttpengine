@@ -92,5 +92,4 @@ void Handler::process(Socket *socket, const QString &)
 {
     // The default response is simply a 404 error
     socket->writeError(Socket::NotFound);
-    socket->close();
 }
