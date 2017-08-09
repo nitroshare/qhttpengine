@@ -89,12 +89,12 @@ void TestQObjectHandler::testOldConnection()
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    QHttpEngine::Socket socket(pair.server(), &pair);
+    QHttpEngine::Socket *socket = new QHttpEngine::Socket(pair.server(), &pair);
 
     client.sendHeaders("GET", "test");
-    QTRY_VERIFY(socket.isHeadersParsed());
+    QTRY_VERIFY(socket->isHeadersParsed());
 
-    handler.route(&socket, socket.path());
+    handler.route(socket, socket->path());
     QTRY_COMPARE(client.statusCode(), statusCode);
 }
 
@@ -119,12 +119,12 @@ void TestQObjectHandler::testNewConnection()
         QTRY_VERIFY(pair.isConnected());
 
         QSimpleHttpClient client(pair.client());
-        QHttpEngine::Socket socket(pair.server(), &pair);
+        QHttpEngine::Socket *socket = new QHttpEngine::Socket(pair.server(), &pair);
 
         client.sendHeaders("GET", QByteArray::number(i));
-        QTRY_VERIFY(socket.isHeadersParsed());
+        QTRY_VERIFY(socket->isHeadersParsed());
 
-        handler.route(&socket, socket.path());
+        handler.route(socket, socket->path());
         QTRY_COMPARE(client.statusCode(), static_cast<int>(QHttpEngine::Socket::OK));
     }
 }

@@ -103,9 +103,9 @@ void TestFilesystemHandler::testRequests()
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    QHttpEngine::Socket socket(pair.server(), &pair);
+    QHttpEngine::Socket *socket = new QHttpEngine::Socket(pair.server(), &pair);
 
-    handler.route(&socket, path);
+    handler.route(socket, path);
 
     QTRY_COMPARE(client.statusCode(), statusCode);
 
@@ -173,16 +173,16 @@ void TestFilesystemHandler::testRangeRequests()
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    QHttpEngine::Socket socket(pair.server(), &pair);
+    QHttpEngine::Socket *socket = new QHttpEngine::Socket(pair.server(), &pair);
 
     if (!range.isEmpty()) {
         QHttpEngine::Socket::HeaderMap inHeaders;
         inHeaders.insert("Range", QByteArray("bytes=") + range.toUtf8());
         client.sendHeaders("GET", path.toUtf8(), inHeaders);
-        QTRY_VERIFY(socket.isHeadersParsed());
+        QTRY_VERIFY(socket->isHeadersParsed());
     }
 
-    handler.route(&socket, path);
+    handler.route(socket, path);
 
     QTRY_COMPARE(client.statusCode(), statusCode);
 

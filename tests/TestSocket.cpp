@@ -41,7 +41,7 @@ Q_DECLARE_METATYPE(QHttpEngine::Socket::QueryStringMap)
     QSocketPair pair; \
     QTRY_VERIFY(pair.isConnected()); \
     QSimpleHttpClient client(pair.client()); \
-    QHttpEngine::Socket server(pair.server())
+    QHttpEngine::Socket *server = new QHttpEngine::Socket(pair.server(), &pair);
 
 const QByteArray Method = "POST";
 const QByteArray Path = "/test";
@@ -82,13 +82,13 @@ void TestSocket::testProperties()
 
     client.sendHeaders(Method, Path, headers);
 
-    QTRY_COMPARE(server.method(), QHttpEngine::Socket::POST);
-    QCOMPARE(server.rawPath(), Path);
-    QCOMPARE(server.headers(), headers);
+    QTRY_COMPARE(server->method(), QHttpEngine::Socket::POST);
+    QCOMPARE(server->rawPath(), Path);
+    QCOMPARE(server->headers(), headers);
 
-    server.setStatusCode(StatusCode, StatusReason);
-    server.setHeaders(headers);
-    server.writeHeaders();
+    server->setStatusCode(StatusCode, StatusReason);
+    server->setHeaders(headers);
+    server->writeHeaders();
 
     QTRY_COMPARE(client.statusCode(), StatusCode);
     QCOMPARE(client.statusReason(), StatusReason);
@@ -102,12 +102,12 @@ void TestSocket::testData()
     client.sendHeaders(Method, Path, headers);
     client.sendData(Data);
 
-    QTRY_COMPARE(server.contentLength(), Data.length());
-    QTRY_COMPARE(server.bytesAvailable(), Data.length());
-    QCOMPARE(server.readAll(), Data);
+    QTRY_COMPARE(server->contentLength(), Data.length());
+    QTRY_COMPARE(server->bytesAvailable(), Data.length());
+    QCOMPARE(server->readAll(), Data);
 
-    server.writeHeaders();
-    server.write(Data);
+    server->writeHeaders();
+    server->write(Data);
 
     QTRY_COMPARE(client.data(), Data);
 }
@@ -118,7 +118,7 @@ void TestSocket::testRedirect()
 
     QSignalSpy disconnectedSpy(pair.client(), SIGNAL(disconnected()));
 
-    server.writeRedirect(Path, true);
+    server->writeRedirect(Path, true);
 
     QTRY_COMPARE(client.statusCode(), static_cast<int>(QHttpEngine::Socket::MovedPermanently));
     QCOMPARE(client.headers().value("Location"), Path);
@@ -129,11 +129,11 @@ void TestSocket::testSignals()
 {
     CREATE_SOCKET_PAIR();
 
-    QSignalSpy headersParsedSpy(&server, SIGNAL(headersParsed()));
-    QSignalSpy readyReadSpy(&server, SIGNAL(readyRead()));
-    QSignalSpy readChannelFinishedSpy(&server, SIGNAL(readChannelFinished()));
-    QSignalSpy bytesWrittenSpy(&server, SIGNAL(bytesWritten(qint64)));
-    QSignalSpy aboutToCloseSpy(&server, SIGNAL(aboutToClose()));
+    QSignalSpy headersParsedSpy(server, SIGNAL(headersParsed()));
+    QSignalSpy readyReadSpy(server, SIGNAL(readyRead()));
+    QSignalSpy readChannelFinishedSpy(server, SIGNAL(readChannelFinished()));
+    QSignalSpy bytesWrittenSpy(server, SIGNAL(bytesWritten(qint64)));
+    QSignalSpy aboutToCloseSpy(server, SIGNAL(aboutToClose()));
 
     client.sendHeaders(Method, Path, headers);
 
@@ -142,12 +142,12 @@ void TestSocket::testSignals()
 
     client.sendData(Data);
 
-    QTRY_COMPARE(server.bytesAvailable(), Data.length());
+    QTRY_COMPARE(server->bytesAvailable(), Data.length());
     QVERIFY(readyReadSpy.count() > 0);
     QCOMPARE(readChannelFinishedSpy.count(), 1);
 
-    server.writeHeaders();
-    server.write(Data);
+    server->writeHeaders();
+    server->write(Data);
 
     QTRY_COMPARE(client.data().length(), Data.length());
     QVERIFY(bytesWrittenSpy.count() > 0);
@@ -159,7 +159,7 @@ void TestSocket::testSignals()
     QCOMPARE(bytesWritten, Data.length());
 
     QTRY_COMPARE(aboutToCloseSpy.count(), 0);
-    server.close();
+    server->close();
     QTRY_COMPARE(aboutToCloseSpy.count(), 1);
 }
 
@@ -176,11 +176,11 @@ void TestSocket::testJson()
     });
     client.sendData(data);
 
-    QTRY_VERIFY(server.isHeadersParsed());
-    QTRY_VERIFY(server.bytesAvailable() >= server.contentLength());
+    QTRY_VERIFY(server->isHeadersParsed());
+    QTRY_VERIFY(server->bytesAvailable() >= server->contentLength());
 
     QJsonDocument document;
-    QVERIFY(server.readJson(document));
+    QVERIFY(server->readJson(document));
     QCOMPARE(document.object(), object);
 }
 

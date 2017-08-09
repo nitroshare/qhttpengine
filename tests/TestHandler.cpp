@@ -97,14 +97,14 @@ void TestHandler::testRedirect()
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    QHttpEngine::Socket socket(pair.server(), &pair);
+    QHttpEngine::Socket *socket = new QHttpEngine::Socket(pair.server(), &pair);
 
     client.sendHeaders("GET", path);
-    QTRY_VERIFY(socket.isHeadersParsed());
+    QTRY_VERIFY(socket->isHeadersParsed());
 
     QHttpEngine::Handler handler;
     handler.addRedirect(pattern, destination);
-    handler.route(&socket, socket.path());
+    handler.route(socket, socket->path());
 
     QTRY_COMPARE(client.statusCode(), statusCode);
 
@@ -151,16 +151,16 @@ void TestHandler::testSubHandler()
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    QHttpEngine::Socket socket(pair.server(), &pair);
+    QHttpEngine::Socket *socket = new QHttpEngine::Socket(pair.server(), &pair);
 
     client.sendHeaders("GET", path);
-    QTRY_VERIFY(socket.isHeadersParsed());
+    QTRY_VERIFY(socket->isHeadersParsed());
 
     DummyHandler subHandler;
     QHttpEngine::Handler handler;
     handler.addSubHandler(pattern, &subHandler);
 
-    handler.route(&socket, socket.path());
+    handler.route(socket, socket->path());
 
     QTRY_COMPARE(client.statusCode(), statusCode);
     QCOMPARE(subHandler.mPathRemainder, pathRemainder);

@@ -203,7 +203,8 @@ public:
      * @brief Close the device and underlying socket
      *
      * Invoking this method signifies that no more data will be written to the
-     * device. It will also close the underlying QTcpSocket.
+     * device. It will also close the underlying QTcpSocket and destroy this
+     * object.
      */
     virtual void close();
 
@@ -319,12 +320,12 @@ public:
     void writeHeaders();
 
     /**
-     * @brief Write an HTTP 3xx redirect to the socket
+     * @brief Write an HTTP 3xx redirect to the socket and close it
      */
     void writeRedirect(const QByteArray &path, bool permanent = false);
 
     /**
-     * @brief Write an HTTP error to the socket
+     * @brief Write an HTTP error to the socket and close it
      */
     void writeError(int statusCode, const QByteArray &statusReason = QByteArray());
 

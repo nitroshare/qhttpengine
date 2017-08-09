@@ -217,6 +217,7 @@ void Socket::close()
     d->readState = SocketPrivate::ReadFinished;
     d->writeState = SocketPrivate::WriteFinished;
 
+    connect(d->socket, &QTcpSocket::disconnected, this, &Socket::deleteLater);
     d->socket->close();
 }
 

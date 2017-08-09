@@ -94,7 +94,7 @@ void TestBasicAuthMiddleware::testProcess()
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    QHttpEngine::Socket socket(pair.server(), &pair);
+    QHttpEngine::Socket *socket = new QHttpEngine::Socket(pair.server(), &pair);
 
     QHttpEngine::Socket::HeaderMap headers;
 
@@ -106,11 +106,11 @@ void TestBasicAuthMiddleware::testProcess()
     }
 
     client.sendHeaders("GET", "/", headers);
-    QTRY_VERIFY(socket.isHeadersParsed());
+    QTRY_VERIFY(socket->isHeadersParsed());
 
     QHttpEngine::Handler handler;
     handler.addMiddleware(&auth);
-    handler.route(&socket, "/");
+    handler.route(socket, "/");
 
     QTRY_COMPARE(client.statusCode(), status);
 }

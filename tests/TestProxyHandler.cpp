@@ -64,17 +64,17 @@ void TestProxyHandler::testDataPassthrough()
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    QHttpEngine::Socket socket(pair.server());
+    QHttpEngine::Socket *socket = new QHttpEngine::Socket(pair.server(), &pair);
 
     // Send the headers and wait for them to be parsed
     QHttpEngine::Socket::HeaderMap headers{
         {"Content-Length", QByteArray::number(Data.length())}
     };
     client.sendHeaders("POST", QString("/%1").arg(Path).toUtf8(), headers);
-    QTRY_VERIFY(socket.isHeadersParsed());
+    QTRY_VERIFY(socket->isHeadersParsed());
 
     // Route the request (triggering the upstream connection)
-    handler.route(&socket, Path);
+    handler.route(socket, Path);
 
     // Send the data and wait for it to return
     client.sendData(Data);

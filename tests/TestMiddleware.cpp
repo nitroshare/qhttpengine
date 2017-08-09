@@ -57,15 +57,15 @@ void TestMiddleware::testProcess()
     QTRY_VERIFY(pair.isConnected());
 
     QSimpleHttpClient client(pair.client());
-    QHttpEngine::Socket socket(pair.server(), &pair);
+    QHttpEngine::Socket *socket = new QHttpEngine::Socket(pair.server(), &pair);
 
     client.sendHeaders("GET", "/");
-    QTRY_VERIFY(socket.isHeadersParsed());
+    QTRY_VERIFY(socket->isHeadersParsed());
 
     DummyMiddleware middleware;
     QHttpEngine::Handler handler;
     handler.addMiddleware(&middleware);
-    handler.route(&socket, "/");
+    handler.route(socket, "/");
 
     QTRY_COMPARE(client.statusCode(), static_cast<int>(QHttpEngine::Socket::Forbidden));
 }
