@@ -82,7 +82,8 @@ void TestSocket::testProperties()
 
     client.sendHeaders(Method, Path, headers);
 
-    QTRY_COMPARE(server->method(), QHttpEngine::Socket::POST);
+    QTRY_VERIFY(server->headersParsed());
+    QCOMPARE(server->method(), QHttpEngine::Socket::POST);
     QCOMPARE(server->rawPath(), Path);
     QCOMPARE(server->headers(), headers);
 
