@@ -8,4 +8,5 @@ add_custom_target(doc ALL
 
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/html"
     DESTINATION "${DOC_INSTALL_DIR}"
+    COMPONENT documentation
 )

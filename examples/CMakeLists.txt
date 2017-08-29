@@ -9,5 +9,6 @@ foreach(EXAMPLE ${EXAMPLES})
     add_subdirectory(${EXAMPLE})
     install(DIRECTORY ${EXAMPLE}
         DESTINATION "${EXAMPLES_INSTALL_DIR}"
+        COMPONENT examples
     )
 endforeach()

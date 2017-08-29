@@ -6,6 +6,7 @@ set_target_properties(authclient PROPERTIES
 )
 install(TARGETS authclient
     RUNTIME DESTINATION "${EXAMPLE_DIR}"
+    COMPONENT examples
 )
 
 # Server
@@ -16,4 +17,5 @@ set_target_properties(authserver PROPERTIES
 )
 install(TARGETS authserver
     RUNTIME DESTINATION "${EXAMPLE_DIR}"
+    COMPONENT examples
 )

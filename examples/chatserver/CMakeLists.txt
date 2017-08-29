@@ -10,4 +10,5 @@ target_link_libraries(chatserver qhttpengine)
 
 install(TARGETS chatserver
     RUNTIME DESTINATION "${EXAMPLE_DIR}"
+    COMPONENT examples
 )
