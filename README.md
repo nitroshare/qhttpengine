@@ -7,6 +7,6 @@ Simple set of classes for developing HTTP server applications in Qt.
 
 ### Documentation
 
-To learn more about the building and using the library, please visit this page:
+To learn more about building and using the library, please visit this page:
 
 https://ci.quickmediasolutions.com/job/qhttpengine-documentation/doxygen/
