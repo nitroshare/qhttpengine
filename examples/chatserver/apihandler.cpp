@@ -47,7 +47,4 @@ void ApiHandler::messagesNew(QHttpEngine::Socket *socket)
             return;
         }
     }
-
-    // If execution reaches this point, malformed data was supplied
-    socket->writeError(QHttpEngine::Socket::BadRequest);
 }
