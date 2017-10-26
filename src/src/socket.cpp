@@ -68,7 +68,7 @@ SocketPrivate::SocketPrivate(Socket *httpSocket, QTcpSocket *tcpSocket)
 
     connect(socket, &QTcpSocket::readyRead, this, &SocketPrivate::onReadyRead);
     connect(socket, &QTcpSocket::bytesWritten, this, &SocketPrivate::onBytesWritten);
-    connect(socket, &QTcpSocket::readChannelFinished, q, &Socket::readChannelFinished);
+    connect(socket, &QTcpSocket::readChannelFinished, this, &SocketPrivate::onReadChannelFinished);
     connect(socket, &QTcpSocket::disconnected, q, &Socket::disconnected);
 
     // Process anything already received by the socket
@@ -134,6 +134,13 @@ void SocketPrivate::onBytesWritten(qint64 bytes)
     // Only emit bytesWritten() for data after the headers
     if (writeState == WriteData) {
         Q_EMIT q->bytesWritten(bytes);
+    }
+}
+
+void SocketPrivate::onReadChannelFinished()
+{
+    if (requestDataTotal == -1) {
+        emit q->readChannelFinished();
     }
 }
 

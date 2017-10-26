@@ -73,6 +73,7 @@ private Q_SLOTS:
 
     void onReadyRead();
     void onBytesWritten(qint64 bytes);
+    void onReadChannelFinished();
 
 private:
 

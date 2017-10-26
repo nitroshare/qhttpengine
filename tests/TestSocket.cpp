@@ -132,9 +132,9 @@ void TestSocket::testSignals()
 
     QSignalSpy headersParsedSpy(server, SIGNAL(headersParsed()));
     QSignalSpy readyReadSpy(server, SIGNAL(readyRead()));
-    QSignalSpy readChannelFinishedSpy(server, SIGNAL(readChannelFinished()));
     QSignalSpy bytesWrittenSpy(server, SIGNAL(bytesWritten(qint64)));
     QSignalSpy aboutToCloseSpy(server, SIGNAL(aboutToClose()));
+    QSignalSpy readChannelFinishedSpy(server, SIGNAL(readChannelFinished()));
 
     client.sendHeaders(Method, Path, headers);
 
@@ -145,7 +145,6 @@ void TestSocket::testSignals()
 
     QTRY_COMPARE(server->bytesAvailable(), Data.length());
     QVERIFY(readyReadSpy.count() > 0);
-    QCOMPARE(readChannelFinishedSpy.count(), 1);
 
     server->writeHeaders();
     server->write(Data);
@@ -162,6 +161,8 @@ void TestSocket::testSignals()
     QTRY_COMPARE(aboutToCloseSpy.count(), 0);
     server->close();
     QTRY_COMPARE(aboutToCloseSpy.count(), 1);
+
+    QCOMPARE(readChannelFinishedSpy.count(), 1);
 }
 
 void TestSocket::testJson()
