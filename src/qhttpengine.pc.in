@@ -6,5 +6,6 @@ Name: @PROJECT_NAME@
 Description: @PROJECT_DESCRIPTION@
 URL: @PROJECT_URL@
 Version: @PROJECT_VERSION@
+Requires: Qt5Network
 Cflags: -I${includedir}
 Libs: -L${libdir} -lqhttpengine
