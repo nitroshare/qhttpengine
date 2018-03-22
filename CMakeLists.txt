@@ -11,6 +11,9 @@ set(PROJECT_VERSION_MINOR 0)
 set(PROJECT_VERSION_PATCH 1)
 set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
 
+# Build a shared library by default
+option(BUILD_SHARED_LIBS "Build QHttpEngine as a shared library" ON)
+
 set(BIN_INSTALL_DIR bin CACHE STRING "Binary runtime installation directory relative to the install prefix")
 set(LIB_INSTALL_DIR lib CACHE STRING "Library installation directory relative to the install prefix")
 set(INCLUDE_INSTALL_DIR include CACHE STRING "Header installation directory relative to the install prefix")
