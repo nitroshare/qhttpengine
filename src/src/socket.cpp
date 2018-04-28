@@ -116,6 +116,8 @@ void SocketPrivate::onReadyRead()
     case ReadFinished:
         readBuffer.clear();
         break;
+    default:
+        break;
     }
 }
 
