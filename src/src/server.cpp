@@ -33,8 +33,8 @@ using namespace QHttpEngine;
 
 ServerPrivate::ServerPrivate(Server *httpServer)
     : QObject(httpServer),
-      q(httpServer),
-      handler(0)
+      handler(0),
+      q(httpServer)
 {
 }
 

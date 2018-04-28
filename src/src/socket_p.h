@@ -34,6 +34,8 @@ class SocketPrivate : public QObject
 {
     Q_OBJECT
 
+    Socket*const q;
+
 public:
 
     SocketPrivate(Socket *httpSocket, QTcpSocket *tcpSocket);
@@ -80,7 +82,6 @@ private:
     bool readHeaders();
     void readData();
 
-    Socket*const q;
 };
 
 }

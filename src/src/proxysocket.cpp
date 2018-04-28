@@ -137,6 +137,7 @@ void ProxySocket::onUpstreamReadyRead()
 
 void ProxySocket::onUpstreamError(QAbstractSocket::SocketError socketError)
 {
+    Q_UNUSED(socketError);
     if (mHeadersParsed) {
         mDownstreamSocket->close();
     } else {

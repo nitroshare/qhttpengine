@@ -36,6 +36,8 @@ class QIODeviceCopierPrivate : public QObject
 {
     Q_OBJECT
 
+    QIODeviceCopier *const q;
+
 public:
 
     QIODeviceCopierPrivate(QIODeviceCopier *copier, QIODevice *srcDevice, QIODevice *destDevice);
@@ -56,8 +58,6 @@ public Q_SLOTS:
     void nextBlock();
 
 private:
-
-    QIODeviceCopier *const q;
 };
 
 }
