@@ -196,7 +196,8 @@ void SocketPrivate::readData()
 
 Socket::Socket(QTcpSocket *socket, QObject *parent)
     : QIODevice(parent),
-      d(new SocketPrivate(this, socket))
+      d(new SocketPrivate(this, socket)),
+      sseEnabled(false)
 {
     // The device is initially open for both reading and writing
     setOpenMode(QIODevice::ReadWrite);
@@ -301,6 +302,11 @@ void Socket::setHeaders(const HeaderMap &headers)
     d->responseHeaders = headers;
 }
 
+void Socket::setSSEEnabled(bool enabled)
+{
+    sseEnabled = enabled;
+}
+
 void Socket::writeHeaders()
 {
     // Use a QByteArray for building the header so that we can later determine
@@ -335,7 +341,7 @@ void Socket::writeRedirect(const QByteArray &path, bool permanent)
     setStatusCode(permanent ? MovedPermanently : Found);
     setHeader("Location", path);
     writeHeaders();
-    close();
+    if (!sseEnabled) close();
 }
 
 void Socket::writeError(int statusCode, const QByteArray &statusReason)
@@ -348,23 +354,30 @@ void Socket::writeError(int statusCode, const QByteArray &statusReason)
             .arg(d->responseStatusReason.constData())
             .arg(QHTTPENGINE_VERSION)
             .toUtf8();
+    
+    if (!sseEnabled)
+    {
+        setHeader("Content-Length", QByteArray::number(data.length()));
+        setHeader("Content-Type", "text/html");
 
-    setHeader("Content-Length", QByteArray::number(data.length()));
-    setHeader("Content-Type", "text/html");
+        writeHeaders();
+    }
 
-    writeHeaders();
     write(data);
-    close();
+    if (!sseEnabled) close();
 }
 
 void Socket::writeJson(const QJsonDocument &document, int statusCode)
 {
     QByteArray data = document.toJson();
-    setStatusCode(statusCode);
-    setHeader("Content-Length", QByteArray::number(data.length()));
-    setHeader("Content-Type", "application/json");
+    if (!sseEnabled)
+    {
+        setStatusCode(statusCode);
+        setHeader("Content-Length", QByteArray::number(data.length()));
+        setHeader("Content-Type", "application/json");
+    }
     write(data);
-    close();
+    if (!sseEnabled) close();
 }
 
 qint64 Socket::readData(char *data, qint64 maxlen)

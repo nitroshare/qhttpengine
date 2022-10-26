@@ -312,6 +312,14 @@ public:
     void setHeaders(const HeaderMap &headers);
 
     /**
+    * @brief Set the SSEEnabled flag
+     *
+     * Causes calls to write methods on the socket to leave connection open
+     * It will also not provide content length to prevent clients from closing connections
+    */
+   void setSSEEnabled(bool enabled = false);
+
+    /**
      * @brief Write response headers to the socket
      *
      * This method should not be invoked after the response headers have been
@@ -367,6 +375,7 @@ private:
 
     SocketPrivate *const d;
     friend class SocketPrivate;
+    bool sseEnabled;
 };
 
 }
